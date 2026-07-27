@@ -11,7 +11,6 @@ import { GameStatus } from "../../components/game/GameStatus";
 import { PlayerList } from "../../components/game/PlayerList";
 import { GameBoard } from "../../components/game/GameBoard";
 import { PlayerHand } from "../../components/game/PlayerHand";
-import { LockButton } from "../../components/game/LockButton";
 import { HostPanel } from "../../components/game/HostPanel";
 import { ResultOverlay } from "../../components/game/ResultOverlay";
 import { Button } from "../../components/ui/Button";
