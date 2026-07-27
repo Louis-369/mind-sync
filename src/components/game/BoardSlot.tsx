@@ -148,7 +148,7 @@ export function BoardSlot({
         </div>
       )}
 
-      {/* 標籤權重化渲染 (全場翻開結算後：錯誤時顯示 ✕ 錯誤；碰撞時顯示碰撞名字) */}
+      {/* 標籤權重化渲染 (全場翻開結算後：錯誤時顯示 ✕ 錯誤；碰撞時顯示碰撞名字；鎖定階段顯示點擊翻牌) */}
       {isFinishedReveal && isCorrectOrder === false ? (
         <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
           ✕ 錯誤
@@ -157,6 +157,10 @@ export function BoardSlot({
         <div className="absolute -top-3.5 z-50 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
           {collisionNamesText}
         </div>
+      ) : status === "locked" && myUnflippedCard && !topCard?.flipped ? (
+        <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold pointer-events-none whitespace-nowrap animate-pulse">
+          點擊翻牌
+        </span>
       ) : null}
 
       {/* 鎖定同意朱紅落款小印章「確」(僅在個人同意鎖定、遊戲進行中、且牌未翻開時顯示) */}

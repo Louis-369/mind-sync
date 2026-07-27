@@ -13,26 +13,36 @@ interface ResultOverlayProps {
 
 export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps) {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   useEffect(() => {
-    if (result === "win") {
-      try {
-        confetti({
-          particleCount: 80,
-          spread: 60,
-          origin: { y: 0.6 },
-          colors: ["#c9a96e", "#e8dcc8", "#3d5a80"],
-        });
-      } catch (error) {
-        console.error("觸發彩帶動畫失敗:", error);
-      }
+    if (result) {
+      // 延遲 1.8 秒登場，讓玩家先在盤面上滿眼觀賞 1.8 秒的紅綠微光揭示特效！
+      const timer = setTimeout(() => {
+        setShowModal(true);
+        setIsCollapsed(false);
+
+        if (result === "win") {
+          try {
+            confetti({
+              particleCount: 80,
+              spread: 60,
+              origin: { y: 0.6 },
+              colors: ["#c9a96e", "#e8dcc8", "#3d5a80"],
+            });
+          } catch (error) {
+            console.error("觸發彩帶動畫失敗:", error);
+          }
+        }
+      }, 1800);
+
+      return () => clearTimeout(timer);
+    } else {
+      setShowModal(false);
     }
-    // 結算產生時預設展開
-    if (result) setIsCollapsed(false);
-    return () => {};
   }, [result]);
 
-  if (!result) return null;
+  if (!result || !showModal) return null;
 
   const isWin = result === "win";
 
