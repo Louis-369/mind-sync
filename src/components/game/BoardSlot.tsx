@@ -82,7 +82,7 @@ export function BoardSlot({
     return (
       <div
         onClick={() => canSelect && onSelectSlot && onSelectSlot(slotId)}
-        className={`w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed flex flex-col items-center justify-center transition-all ${
+        className={`w-14 h-22 sm:w-16 sm:h-24 md:w-20 md:h-28 rounded-xl border border-dashed flex flex-col items-center justify-center transition-all ${
           canSelect ? "cursor-pointer hover:scale-105" : "cursor-default opacity-60"
         } ${
           isSelected

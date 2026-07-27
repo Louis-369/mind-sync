@@ -30,7 +30,7 @@ export function Card({
 }: CardProps) {
   const sizeClasses = {
     sm: "w-12 h-16 text-lg",
-    md: "w-16 h-24 text-2xl md:w-20 md:h-28 md:text-3xl",
+    md: "w-14 h-22 text-xl sm:w-16 sm:h-24 sm:text-2xl md:w-20 md:h-28 md:text-3xl",
     lg: "w-24 h-36 text-4xl md:w-28 md:h-40 md:text-5xl",
   };
 

@@ -39,10 +39,12 @@ export function PlayerHand({
   };
 
   const getButtonTextMobile = () => {
+    if (hasBoardCollision) return "撞牌無法鎖定";
     return `同意鎖定 (${lockedCount}/${totalPlayers})`;
   };
 
   const getButtonTextDesktop = () => {
+    if (hasBoardCollision) return "撞牌無法鎖定";
     return `同意鎖定 (${lockedCount}/${totalPlayers})`;
   };
 
