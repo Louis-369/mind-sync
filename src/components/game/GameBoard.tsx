@@ -65,14 +65,41 @@ export function GameBoard({
   }
 
   if (flippedSlots.length > 0) {
-    flippedSlots.forEach(({ slotKey, slotIdx, val }) => {
-      const prevFlippedValues = flippedSlots.filter((s) => s.slotIdx < slotIdx).map((s) => s.val);
-      const nextFlippedValues = flippedSlots.filter((s) => s.slotIdx > slotIdx).map((s) => s.val);
+    const n = flippedSlots.length;
+    const dp = new Array(n).fill(1);
+    const parent = new Array(n).fill(-1);
 
-      const prevMax = prevFlippedValues.length > 0 ? Math.max(...prevFlippedValues) : -Infinity;
-      const nextMin = nextFlippedValues.length > 0 ? Math.min(...nextFlippedValues) : Infinity;
+    for (let i = 0; i < n; i++) {
+      for (let j = 0; j < i; j++) {
+        if (flippedSlots[j].val < flippedSlots[i].val) {
+          if (dp[j] + 1 > dp[i]) {
+            dp[i] = dp[j] + 1;
+            parent[i] = j;
+          }
+        }
+      }
+    }
 
-      slotCorrectnessMap[slotKey] = val > prevMax && val < nextMin;
+    let maxLen = 0;
+    let maxIdx = 0;
+    for (let i = 0; i < n; i++) {
+      if (dp[i] >= maxLen) {
+        maxLen = dp[i];
+        maxIdx = i;
+      }
+    }
+
+    const lisSet = new Set<string>();
+    if (maxLen > 1 || n === 1) {
+      let curr: number = maxIdx;
+      while (curr !== -1) {
+        lisSet.add(flippedSlots[curr].slotKey);
+        curr = parent[curr];
+      }
+    }
+
+    flippedSlots.forEach(({ slotKey }) => {
+      slotCorrectnessMap[slotKey] = lisSet.has(slotKey);
     });
   }
 

@@ -45,6 +45,22 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.065 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E");
 }
 
+/* 天秤傾斜 30 度與左右擺盪動畫 */
+@keyframes tenbinSway {
+  0%, 100% {
+    transform: rotate(-32deg);
+  }
+  50% {
+    transform: rotate(-22deg);
+  }
+}
+
+.animate-tenbin-sway {
+  display: inline-block;
+  animation: tenbinSway 3.5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
 /* 浮世繪波浪卡背圖案 */
 .ukiyo-card-back {
   background-color: #1b2838;
