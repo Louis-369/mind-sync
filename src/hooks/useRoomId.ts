@@ -13,7 +13,7 @@ export function useRoomId(): string {
           setRoomId(idParam);
         } else {
           // 若無參數則設為預設體驗房間
-          setRoomId("room-🐶-🚀-🍎");
+          setRoomId("🐶-🚀-🍎");
         }
       }
     } catch (error) {

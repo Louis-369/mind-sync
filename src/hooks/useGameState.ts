@@ -203,6 +203,22 @@ export function useGameState() {
     });
   }, []);
 
+  // 自動聲明/維護房主身分 (無房主或原房主離線時自動遞補)
+  const claimHost = useMutation(({ storage }) => {
+    const currentHost = storage.get("hostId");
+    const myConnId = self?.connectionId ? String(self.connectionId) : null;
+    if (!myConnId) return;
+
+    const allIds = [self?.connectionId, ...others.map((o) => o.connectionId)].filter(Boolean).map(String);
+    const isHostPresent = currentHost && allIds.includes(currentHost);
+
+    if (!isHostPresent && allIds.length > 0) {
+      // 最早連線的玩家自動繼承房主
+      const sortedIds = [...allIds].sort((a, b) => Number(a) - Number(b));
+      storage.set("hostId", sortedIds[0]);
+    }
+  }, [self, others]);
+
   // 更新遊戲設定
   const updateSettings = useMutation(({ storage }, newSettings: Partial<GameSettings>) => {
     const mutableSettings = storage.get("settings");
@@ -252,5 +268,6 @@ export function useGameState() {
     useShuriken,
     updateSettings,
     resetGame,
+    claimHost,
   };
 }

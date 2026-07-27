@@ -30,7 +30,7 @@ export function GameStatus({
       <div className="flex items-center space-x-2">
         <span className="text-xs text-gray-400 font-mono">房間代碼:</span>
         <span className="text-base md:text-lg font-bold text-poker-neonGold bg-poker-bg/60 px-3 py-1 rounded-lg border border-poker-accent/30">
-          {roomId.replace("room-", "")}
+          {roomId}
         </span>
       </div>
 

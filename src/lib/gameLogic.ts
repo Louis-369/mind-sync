@@ -48,7 +48,7 @@ export function checkAscendingOrder(cards: BoardCard[]): boolean {
   return true;
 }
 
-// 格式化 Emoji 房間 ID (例如: "room-🐶-🚀-🍎")
+// 格式化 Emoji 房間 ID (例如: "🐶-🚀-🍎")
 export function buildRoomId(emoji1: string, emoji2: string, emoji3: string): string {
-  return `room-${emoji1}-${emoji2}-${emoji3}`;
+  return `${emoji1}-${emoji2}-${emoji3}`;
 }

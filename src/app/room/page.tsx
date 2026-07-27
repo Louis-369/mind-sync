@@ -43,9 +43,10 @@ function RoomInner() {
     useShuriken,
     updateSettings,
     resetGame,
+    claimHost,
   } = useGameState();
 
-  // 更新 Presence
+  // 更新 Presence 與維護房主身分
   useEffect(() => {
     try {
       if (playerId && playerName) {
@@ -55,13 +56,14 @@ function RoomInner() {
           isReady: false,
         });
       }
+      claimHost();
     } catch (error) {
       console.error("更新玩家 Presence 失敗:", error);
     }
     return () => {};
-  }, [playerId, playerName, updateMyPresence]);
+  }, [playerId, playerName, updateMyPresence, claimHost, others]);
 
-  const isHost = String(self?.connectionId) === hostId || (!hostId && others.length === 0);
+  const isHost = Boolean(self?.connectionId && String(self.connectionId) === hostId);
   const currentConnId = String(self?.connectionId);
   const isLocked = lockedList.includes(currentConnId);
   const totalPlayers = others.length + 1;

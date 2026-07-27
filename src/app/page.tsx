@@ -11,7 +11,7 @@ import { usePlayerId } from "../hooks/usePlayerId";
 export default function LobbyPage() {
   const router = useRouter();
   const { playerName, setPlayerName } = usePlayerId();
-  const [selectedRoomId, setSelectedRoomId] = useState<string>("room-🐶-🚀-🍎");
+  const [selectedRoomId, setSelectedRoomId] = useState<string>("🐶-🚀-🍎");
 
   const handleEnterRoom = () => {
     try {
