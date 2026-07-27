@@ -36,11 +36,11 @@ export default function LobbyPage() {
         </div>
 
         <h1 className="text-4xl md:text-5xl font-serif font-black text-ukiyo-foam tracking-widest mb-3">
-          心靈同步
+          心天秤
         </h1>
 
         <p className="text-xs md:text-sm text-ukiyo-mist mb-8 max-w-sm leading-relaxed font-serif">
-          不發一言，零語音、零文字。透過極致的心靈感應與默契，合作將數字從小到大打出。
+          透過言語構築，在心的天秤上取得平衡，最純粹的默契卡牌遊戲。
         </p>
 
         {/* 表單區域 (使用 div 避免使用 HTML form) */}
@@ -72,7 +72,7 @@ export default function LobbyPage() {
           </h4>
           <ul className="text-xs text-ukiyo-mist space-y-2 font-serif">
             <li className="flex items-start gap-1.5">
-              <span className="text-ukiyo-gold font-bold shrink-0">☯️ 心靈對頻：</span>
+              <span className="text-ukiyo-gold font-bold shrink-0">☯️ 以心入座：</span>
               <span>輸入相同 Emoji 暗號入座</span>
             </li>
             <li className="flex items-start gap-1.5">

@@ -11,7 +11,7 @@ export function NameInput({ name, onChange }: NameInputProps) {
   return (
     <div className="flex flex-col space-y-2 w-full max-w-xs">
       <label className="text-xs font-serif font-bold text-ukiyo-gold tracking-widest uppercase text-center">
-        你的心靈稱號
+        你的稱號
       </label>
       <input
         type="text"

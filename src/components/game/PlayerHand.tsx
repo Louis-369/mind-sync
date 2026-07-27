@@ -66,7 +66,7 @@ export function PlayerHand({
             {playerName}
             {isLocked && (
               <span className="text-[9px] bg-ukiyo-gold/20 text-ukiyo-gold border border-ukiyo-gold/40 font-serif px-2 py-0.5 rounded-full">
-                ✓ 心靈確認
+                ✓ 已確認
               </span>
             )}
           </span>
@@ -103,7 +103,7 @@ export function PlayerHand({
       <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 py-1 min-h-[90px]">
         {hand.length === 0 ? (
           <div className="text-xs text-ukiyo-mist font-serif py-2">
-            手牌已清空，靜候心靈判定結果...
+            手牌已清空，靜候天秤裁定...
           </div>
         ) : (
           hand.map((cardValue) => (

@@ -55,7 +55,7 @@ function LoadingFallback() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-ukiyo-bg text-ukiyo-gold">
       <div className="w-12 h-12 border-4 border-ukiyo-gold border-t-transparent rounded-full animate-spin mb-4" />
-      <p className="text-sm font-serif animate-pulse">心靈連線建立中，請稍候...</p>
+      <p className="text-sm font-serif animate-pulse">天秤連線中，請稍候...</p>
     </div>
   );
 }

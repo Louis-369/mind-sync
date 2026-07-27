@@ -64,13 +64,13 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
           </div>
 
           <h2 className={`text-2xl font-serif font-black mb-2 tracking-widest ${isWin ? "text-ukiyo-gold" : "text-ukiyo-vermillion"}`}>
-            {isWin ? "心靈極限極致同步" : "心靈感應中斷"}
+            {isWin ? "天秤完美平衡" : "天秤傾斜失衡"}
           </h2>
 
           <p className="text-xs text-ukiyo-mist mb-5 max-w-xs leading-relaxed font-serif">
             {isWin
-              ? "默契如潮水般流暢，全員牌陣順序完美達成！"
-              : "卡牌數值順序發生碰撞，重組心境再試一次。"}
+              ? "默契如潮水般流暢，天秤完美歸位！"
+              : "天秤傾斜，牌序失衡。重新調頻再試一次。"}
           </p>
 
           {/* 操作按鈕組：重新開局與顯眼的查看盤面 */}

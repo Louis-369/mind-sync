@@ -118,6 +118,7 @@ export function GameBoard({
               isCurrentPlayer={topCard ? topCard.playerId === currentConnectionId : false}
               currentConnectionId={currentConnectionId}
               isSelected={selectedSlotId === slotKey}
+              isCorrectOrder={slotCorrectnessMap[slotKey]}
               onSelectSlot={onSelectSlot}
               onRecall={onRecallCard}
               onFlip={onFlipCard}

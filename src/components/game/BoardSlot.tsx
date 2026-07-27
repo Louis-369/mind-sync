@@ -182,7 +182,7 @@ export function BoardSlot({
       {/* 鎖定同意朱紅落款小印章「確」(僅在個人同意鎖定、遊戲進行中、且牌未翻開時顯示) */}
       {isOwnerLocked && status === "playing" && !topCard?.flipped && (
         <div
-          title="已完成心靈確認"
+          title="已確認落牌"
           className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded ukiyo-seal flex items-center justify-center text-[10px] shadow-md border border-ukiyo-cream/30 font-serif pointer-events-none"
         >
           確

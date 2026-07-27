@@ -86,7 +86,7 @@ function RoomInner() {
       console.error("更新玩家 Presence 失敗:", error);
     }
     return () => {};
-  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, others, isOverflow]);
+  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, others.length, isOverflow]);
 
   const isHost = Boolean(self?.connectionId && String(self.connectionId) === hostId);
   const currentConnId = String(self?.connectionId);
@@ -97,7 +97,7 @@ function RoomInner() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
         <div className="glass-panel p-6 rounded-3xl max-w-sm w-full border border-ukiyo-foam/20 flex flex-col items-center space-y-4">
-          <h2 className="text-xl font-serif font-bold text-ukiyo-gold">請輸入心靈稱號</h2>
+          <h2 className="text-xl font-serif font-bold text-ukiyo-gold">請輸入稱號</h2>
           <p className="text-xs text-ukiyo-mist font-serif">
             你正在進入暗號房間 <span className="text-ukiyo-foam font-mono font-bold">{roomId}</span>
           </p>
@@ -149,7 +149,7 @@ function RoomInner() {
         </Button>
 
         <h1 className="text-lg md:text-xl font-serif font-black text-ukiyo-foam tracking-widest">
-          心靈牌席
+          心天秤
         </h1>
 
         <div className="w-16 text-right">

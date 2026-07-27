@@ -1,6 +1,7 @@
 "use client";
 
 import { useStorage, useMutation, useOthers, useSelf, useMyPresence } from "@liveblocks/react";
+import { LiveList, LiveObject } from "@liveblocks/client";
 import { useCallback } from "react";
 import { generateShuffledDeck } from "../lib/gameLogic";
 import { GameSettings, BoardCard } from "../types/game";
@@ -76,7 +77,7 @@ export function useGameState() {
       cardIndex += cardsPerPlayer;
 
       // 建立 LiveList
-      const list = new (require("@liveblocks/client").LiveList)(playerHandCards);
+      const list = new LiveList(playerHandCards);
       mutableHands.set(String(connId), list);
     });
 
@@ -104,7 +105,7 @@ export function useGameState() {
 
     // 使用時間戳與唯一的 slotId 複合鍵
     const uniqueKey = `${finalSlotId}_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`;
-    const newCard = new (require("@liveblocks/client").LiveObject)({
+    const newCard = new LiveObject({
       playerId: connId,
       playerName: playerName || "玩家",
       cardValue,
@@ -220,8 +221,12 @@ export function useGameState() {
       const allFlipped = allCards.length > 0 && allCards.every((c) => c.get("flipped"));
 
       if (allFlipped) {
-        // 檢查順序
-        const sorted = [...allCards].sort((a, b) => a.get("placedAt") - b.get("placedAt"));
+        // 按席位位置 (slotId 數字索引) 排序，而非放置時間
+        const sorted = [...allCards].sort((a, b) => {
+          const slotA = parseInt((a.get("slotId") || "").replace("slot-", ""), 10) || 0;
+          const slotB = parseInt((b.get("slotId") || "").replace("slot-", ""), 10) || 0;
+          return slotA - slotB;
+        });
         let isCorrect = true;
         for (let i = 0; i < sorted.length - 1; i++) {
           if (sorted[i].get("cardValue") > sorted[i + 1].get("cardValue")) {
@@ -274,7 +279,7 @@ export function useGameState() {
 
         // 自動以翻開狀態放到盤面
         const slotId = `shuriken-${Date.now()}-${connId}`;
-        const newCard = new (require("@liveblocks/client").LiveObject)({
+        const newCard = new LiveObject({
           playerId: connId,
           playerName: "手裏劍棄牌",
           cardValue: smallestCard,
