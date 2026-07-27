@@ -37,6 +37,7 @@ export function BoardSlot({
   onRecall,
   onFlip,
 }: BoardSlotProps) {
+  const slotIndex = parseInt(slotId.replace("slot-", ""), 10) + 1;
   // 相容單卡與多卡模式
   const allCards = cards.length > 0 ? cards : card ? [card] : [];
   const topCard = allCards[allCards.length - 1];
@@ -82,7 +83,7 @@ export function BoardSlot({
     return (
       <div
         onClick={() => canSelect && onSelectSlot && onSelectSlot(slotId)}
-        className={`w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed flex flex-col items-center justify-center transition-all ${
+        className={`relative w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed flex flex-col items-center justify-center transition-all ${
           canSelect ? "cursor-pointer hover:scale-105" : "cursor-default opacity-60"
         } ${
           isSelected
@@ -90,6 +91,9 @@ export function BoardSlot({
             : "border-ukiyo-foam/25 bg-ukiyo-surface/30 text-ukiyo-mist/50 hover:border-ukiyo-gold/60 hover:text-ukiyo-gold"
         }`}
       >
+        <div className="absolute top-1.5 left-2 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">
+          #{slotIndex}
+        </div>
         <span className="text-[11px] font-serif font-bold">
           {isSelected ? "已選定" : "空席位"}
         </span>
@@ -131,7 +135,6 @@ export function BoardSlot({
   };
 
   const isHighlightSelected = status === "playing" && isSelected;
-  const slotIndex = parseInt(slotId.replace("slot-", ""), 10) + 1;
   const isCardFlipped = topCard?.flipped === true;
 
   return (
@@ -139,15 +142,6 @@ export function BoardSlot({
       onClick={(e) => handleCardClick(undefined, e)}
       className="relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-ukiyo-foam/20 touch-manipulation"
     >
-      {/* 席位編號標籤 (#1, #2, #3... 僅在卡牌未翻開時顯示金箔色標籤) */}
-      {!isCardFlipped && (
-        <div className="absolute top-1 left-1.5 z-20 pointer-events-none">
-          <span className="text-[10px] font-mono font-bold text-ukiyo-gold bg-ukiyo-surface/90 px-1.5 py-0.2 rounded border border-ukiyo-gold/40 shadow-sm">
-            #{slotIndex}
-          </span>
-        </div>
-      )}
-
       {/* 標籤權重化渲染 (全場翻開結算後：錯誤時顯示 ✕ 錯誤；碰撞時顯示碰撞名字；鎖定階段顯示點擊翻牌) */}
       {isFinishedReveal && isCorrectOrder === false ? (
         <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
@@ -194,6 +188,8 @@ export function BoardSlot({
           const isMe =
             (currentConnectionId && c.playerId === currentConnectionId) ||
             (c.playerId === topCard?.playerId && isCurrentPlayer);
+          const isTopCard = idx === allCards.length - 1;
+
           return (
             <div
               key={`${c.placedAt}-${idx}`}
@@ -201,7 +197,7 @@ export function BoardSlot({
                 transform: idx > 0 ? `translateY(${idx * 18}px)` : "none",
                 zIndex: idx + 1,
               }}
-              className={idx > 0 ? "absolute top-0 left-0" : "relative"}
+              className={idx > 0 ? "absolute top-0 left-0 pointer-events-auto" : "relative pointer-events-auto"}
             >
               <Card
                 value={c.cardValue}
@@ -211,9 +207,16 @@ export function BoardSlot({
                 onClick={() => handleCardClick(c)}
               />
 
-              {/* 自己蓋著的牌：在右下角呈現半透明可記憶數字 (同意鎖定與全員鎖定後自動隱藏) */}
+              {/* 席位編號標籤 (#1, #2, #3... 緊貼卡牌內部左上角，隨卡牌浮動且無凸出外框) */}
+              {isTopCard && !c.flipped && (
+                <div className="absolute top-1.5 left-2 z-20 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] tracking-tight">
+                  #{slotIndex}
+                </div>
+              )}
+
+              {/* 自己蓋著的牌：在右下角呈現無框晶亮金箔數字 (隨卡牌浮動且不超出圓角) */}
               {isMe && !c.flipped && !isOwnerLocked && status === "playing" && (
-                <div className="absolute bottom-1 right-1.5 z-20 pointer-events-none bg-ukiyo-bg/85 border border-ukiyo-gold/40 px-1 py-0.2 rounded text-[10px] font-mono font-bold text-ukiyo-gold shadow-sm">
+                <div className="absolute bottom-1.5 right-2 z-20 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] tracking-tight">
                   {c.cardValue}
                 </div>
               )}
