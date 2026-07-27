@@ -51,22 +51,27 @@ export function GameBoard({
     }
   });
 
-  // 在結算階段 (status === "finished" 或全部翻開) 計算各席位卡牌順序正確性
+  // 即時計算所有已翻開卡牌 (或 status === "finished" / status === "locked") 各席位卡牌順序正確性
   const slotCorrectnessMap: Record<string, boolean> = {};
-  if (status === "finished" || (board.length > 0 && board.every((c) => c.flipped))) {
-    const slotValues: { slotKey: string; val: number }[] = [];
-    for (let i = 0; i < totalSlotsCount; i++) {
-      const key = `slot-${i}`;
-      const cards = slotsMap[key] || [];
-      const topCard = cards[cards.length - 1];
-      if (topCard) {
-        slotValues.push({ slotKey: key, val: topCard.cardValue });
-      }
-    }
+  const flippedSlots: { slotKey: string; slotIdx: number; val: number }[] = [];
 
-    slotValues.forEach(({ slotKey, val }, idx) => {
-      const prevMax = idx > 0 ? Math.max(...slotValues.slice(0, idx).map((v) => v.val)) : -Infinity;
-      const nextMin = idx < slotValues.length - 1 ? Math.min(...slotValues.slice(idx + 1).map((v) => v.val)) : Infinity;
+  for (let i = 0; i < totalSlotsCount; i++) {
+    const key = `slot-${i}`;
+    const cards = slotsMap[key] || [];
+    const topCard = cards[cards.length - 1];
+    if (topCard && topCard.flipped) {
+      flippedSlots.push({ slotKey: key, slotIdx: i, val: topCard.cardValue });
+    }
+  }
+
+  if (flippedSlots.length > 0) {
+    flippedSlots.forEach(({ slotKey, slotIdx, val }) => {
+      const prevFlippedValues = flippedSlots.filter((s) => s.slotIdx < slotIdx).map((s) => s.val);
+      const nextFlippedValues = flippedSlots.filter((s) => s.slotIdx > slotIdx).map((s) => s.val);
+
+      const prevMax = prevFlippedValues.length > 0 ? Math.max(...prevFlippedValues) : -Infinity;
+      const nextMin = nextFlippedValues.length > 0 ? Math.min(...nextFlippedValues) : Infinity;
+
       slotCorrectnessMap[slotKey] = val > prevMax && val < nextMin;
     });
   }

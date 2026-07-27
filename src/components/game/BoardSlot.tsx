@@ -130,16 +130,16 @@ export function BoardSlot({
 
   const isHighlightSelected = status === "playing" && isSelected;
   const slotIndex = parseInt(slotId.replace("slot-", ""), 10) + 1;
-  const isFinishedReveal = status === "finished" || (allCards.length > 0 && allCards.every(c => c.flipped));
+  const isSlotRevealed = topCard?.flipped === true || status === "finished";
 
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
       className={`relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border touch-manipulation ${
-        isFinishedReveal && isCorrectOrder === true
-          ? "ring-2 ring-emerald-500/80 bg-emerald-500/10 border-emerald-500/80 shadow-[0_0_16px_rgba(16,185,129,0.45)]"
-          : isFinishedReveal && isCorrectOrder === false
-          ? "ring-2 ring-ukiyo-vermillion/90 bg-ukiyo-vermillion/15 border-ukiyo-vermillion shadow-[0_0_18px_rgba(196,43,28,0.6)]"
+        isSlotRevealed && isCorrectOrder === true
+          ? "ring-2 ring-emerald-500 bg-emerald-500/10 border-emerald-500 shadow-[0_0_18px_rgba(16,185,129,0.5)]"
+          : isSlotRevealed && isCorrectOrder === false
+          ? "ring-2 ring-ukiyo-vermillion bg-ukiyo-vermillion/15 border-ukiyo-vermillion shadow-[0_0_20px_rgba(196,43,28,0.7)]"
           : isHighlightSelected
           ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
           : hasCollision
@@ -155,11 +155,11 @@ export function BoardSlot({
       </div>
 
       {/* 標籤權重化渲染 (權重：結算正確性 > 撞牌 > 動作提示；每個席位上方最多顯示單一標籤) */}
-      {isFinishedReveal && isCorrectOrder === true ? (
+      {isSlotRevealed && isCorrectOrder === true ? (
         <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-emerald-950 border border-emerald-500 text-emerald-400 font-bold pointer-events-none whitespace-nowrap">
           ✓ 順序正確
         </span>
-      ) : isFinishedReveal && isCorrectOrder === false ? (
+      ) : isSlotRevealed && isCorrectOrder === false ? (
         <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
           ✕ 順序錯誤
         </span>

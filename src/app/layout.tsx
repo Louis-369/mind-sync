@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "心靈同步 Mind Sync",
-  description: "基於 Liveblocks 與 Next.js 打造的浮世繪風格極致默契卡牌遊戲，無溝通按順序出牌！",
+  title: "心天秤 Kokoro Tenbin",
+  description: "透過言語構築，在心的天秤上取得平衡，最純粹的默契卡牌遊戲。",
 };
 
 export default function RootLayout({
