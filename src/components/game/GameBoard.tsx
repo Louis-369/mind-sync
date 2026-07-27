@@ -51,9 +51,9 @@ export function GameBoard({
   });
 
   return (
-    <div className="w-full flex-1 min-h-[320px] md:min-h-[380px] bg-gradient-to-b from-ukiyo-surface/90 via-ukiyo-bg/95 to-ukiyo-surface/90 rounded-3xl p-4 md:p-6 border border-ukiyo-ash/40 shadow-xl relative flex flex-col items-center justify-between overflow-hidden my-2 washi-texture">
+    <div className="w-full flex-1 min-h-[320px] md:min-h-[380px] bg-gradient-to-b from-ukiyo-surface/90 via-ukiyo-bg/95 to-ukiyo-surface/90 rounded-3xl p-4 md:p-6 border border-ukiyo-foam/20 shadow-2xl relative flex flex-col items-center justify-between overflow-hidden my-2 washi-texture">
       {/* 背景水墨波浪浮水印 */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+      <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
         <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border-8 border-ukiyo-foam flex items-center justify-center">
           <span className="text-8xl font-serif text-ukiyo-foam">心</span>
         </div>

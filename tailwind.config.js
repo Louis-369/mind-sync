@@ -9,18 +9,18 @@ module.exports = {
     extend: {
       colors: {
         ukiyo: {
-          bg: "#f8f2dc",          // 淺米色 (全網頁主底色)
-          surface: "#e9cfae",     // 金米沙色 (面板與容器背景)
-          wave: "#16245c",        // 普魯士浪藍
-          foam: "#0d1740",        // 濃紺墨藍 (主要高對比字體/標題)
-          cream: "#f8f2dc",       // 淺米古紙
-          vermillion: "#c73e1d",  // 朱紅 (印章/撞牌警示)
-          indigo: "#16245c",      // 普魯士藍 (按鈕)
-          indigoHover: "#0d1740", // 濃紺墨藍懸停
-          gold: "#16245c",        // 濃紺浪藍高亮
-          ink: "#0d1740",         // 濃紺墨藍 (文字/卡牌數字)
-          mist: "#5c584e",        // 灰褐色 (次要清晰文字 - 顯眼對比)
-          ash: "#a39f93",         // 灰褐色 (輔助邊框)
+          bg: "#0d1b2a",          // 深海夜空
+          surface: "#1b2838",     // 面板/卡片背景
+          wave: "#2d5a7b",        // 波浪中段藍
+          foam: "#e8dcc8",        // 卡片正面/高亮 (和紙金米色)
+          cream: "#f5f0e3",       // 古紙底色
+          vermillion: "#c73e1d",  // 朱紅 (警告/印章)
+          indigo: "#3d5a80",      // 藍染藍 (按鈕)
+          indigoHover: "#2c4260", // 藍染藍懸停
+          gold: "#c9a96e",        // 金箔色
+          ink: "#2a2a2a",         // 墨黑 (字體)
+          mist: "#8a9bb0",        // 山嵐霧 (次要字)
+          ash: "#3d5a80",         // 輔助邊框
         },
       },
       fontFamily: {

@@ -5,46 +5,47 @@
 @layer base {
   body {
     @apply bg-ukiyo-bg text-ukiyo-foam min-h-screen antialiased select-none font-sans overflow-x-hidden relative;
-    background-color: #f8f2dc;
+    background-color: #0d1b2a;
     background-image: 
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E"),
-      radial-gradient(circle at 50% 10%, rgba(233, 207, 174, 0.6) 0%, transparent 60%),
-      radial-gradient(circle at 20% 80%, rgba(163, 159, 147, 0.35) 0%, transparent 50%),
-      radial-gradient(circle at 80% 90%, rgba(22, 36, 92, 0.08) 0%, transparent 60%);
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.085 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E"),
+      radial-gradient(circle at 50% 10%, rgba(45, 90, 123, 0.45) 0%, transparent 60%),
+      radial-gradient(circle at 20% 80%, rgba(27, 40, 56, 0.85) 0%, transparent 50%),
+      radial-gradient(circle at 80% 90%, rgba(13, 27, 42, 0.95) 0%, transparent 60%);
     background-attachment: fixed;
   }
 }
 
-/* 浮世繪風格和紙面板 (淺米質感和紙 + 金米沙色 #e9cfae) */
+/* 浮世繪風格和紙面板 (深海夜空 + 和紙質紋) */
 .glass-panel {
-  background: rgba(233, 207, 174, 0.88);
+  background: rgba(27, 40, 56, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1.5px solid rgba(163, 159, 147, 0.45);
-  box-shadow: 0 12px 35px rgba(13, 23, 64, 0.12);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E");
+  border: 1px solid rgba(232, 220, 200, 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E");
 }
 
 /* 浮世繪手工和紙觸感質感層 */
 .washi-texture {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.065 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.075 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E");
 }
 
 .glass-card {
-  background: rgba(233, 207, 174, 0.7);
+  background: rgba(27, 40, 56, 0.7);
   backdrop-filter: blur(8px);
-  border: 1.5px solid rgba(163, 159, 147, 0.35);
+  border: 1px solid rgba(232, 220, 200, 0.15);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.065 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E");
 }
 
-/* 浮世繪波浪卡背圖案 (普魯士浪藍 #16245c) */
+/* 浮世繪波浪卡背圖案 */
 .ukiyo-card-back {
-  background-color: #16245c;
+  background-color: #1b2838;
   background-image: 
-    radial-gradient(circle at 50% 50%, #0d1740 12%, transparent 13%), 
-    radial-gradient(circle at 0% 100%, #0d1740 12%, transparent 13%), 
-    radial-gradient(circle at 100% 100%, #0d1740 12%, transparent 13%);
-  background-size: 16px 16px;
-  border: 1px solid rgba(248, 242, 220, 0.3);
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 50% 50%, #2d5a7b 10%, transparent 11%), 
+    radial-gradient(circle at 0% 100%, #2d5a7b 10%, transparent 11%), 
+    radial-gradient(circle at 100% 100%, #2d5a7b 10%, transparent 11%);
+  background-size: auto, 16px 16px, 16px 16px, 16px 16px;
 }
 
 /* 朱紅日式印章標籤 */
