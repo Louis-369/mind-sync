@@ -51,7 +51,7 @@ export function GameBoard({
     }
   });
 
-  // 即時計算所有已翻開卡牌 (或 status === "finished" / status === "locked") 各席位卡牌順序正確性
+  // 即時計算所有已翻開卡牌各席位卡牌順序正確性 (1對1與正確排序比對)
   const slotCorrectnessMap: Record<string, boolean> = {};
   const flippedSlots: { slotKey: string; slotIdx: number; val: number }[] = [];
 
@@ -65,41 +65,13 @@ export function GameBoard({
   }
 
   if (flippedSlots.length > 0) {
-    const n = flippedSlots.length;
-    const dp = new Array(n).fill(1);
-    const parent = new Array(n).fill(-1);
+    // 依據卡牌數值由小到大正確排序
+    const sortedCards = [...flippedSlots].sort((a, b) => a.val - b.val);
 
-    for (let i = 0; i < n; i++) {
-      for (let j = 0; j < i; j++) {
-        if (flippedSlots[j].val < flippedSlots[i].val) {
-          if (dp[j] + 1 > dp[i]) {
-            dp[i] = dp[j] + 1;
-            parent[i] = j;
-          }
-        }
-      }
-    }
-
-    let maxLen = 0;
-    let maxIdx = 0;
-    for (let i = 0; i < n; i++) {
-      if (dp[i] >= maxLen) {
-        maxLen = dp[i];
-        maxIdx = i;
-      }
-    }
-
-    const lisSet = new Set<string>();
-    if (maxLen > 1 || n === 1) {
-      let curr: number = maxIdx;
-      while (curr !== -1) {
-        lisSet.add(flippedSlots[curr].slotKey);
-        curr = parent[curr];
-      }
-    }
-
-    flippedSlots.forEach(({ slotKey }) => {
-      slotCorrectnessMap[slotKey] = lisSet.has(slotKey);
+    // 依據當前席位順序與正確排序進行 1 對 1 位置比對
+    flippedSlots.forEach((slot, idx) => {
+      const expectedVal = sortedCards[idx].val;
+      slotCorrectnessMap[slot.slotKey] = slot.val === expectedVal;
     });
   }
 

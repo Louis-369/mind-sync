@@ -135,17 +135,7 @@ export function BoardSlot({
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
-      className={`relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border touch-manipulation ${
-        isSlotRevealed && isCorrectOrder === true
-          ? "ring-2 ring-emerald-500 bg-emerald-500/10 border-emerald-500 shadow-[0_0_18px_rgba(16,185,129,0.5)]"
-          : isSlotRevealed && isCorrectOrder === false
-          ? "ring-2 ring-ukiyo-vermillion bg-ukiyo-vermillion/15 border-ukiyo-vermillion shadow-[0_0_20px_rgba(196,43,28,0.7)]"
-          : isHighlightSelected
-          ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
-          : hasCollision
-          ? "ring-2 ring-ukiyo-vermillion border-ukiyo-vermillion bg-ukiyo-vermillion/10 shadow-[0_0_18px_rgba(196,43,28,0.5)]"
-          : "border-transparent hover:border-ukiyo-foam/20"
-      }`}
+      className="relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-ukiyo-foam/20 touch-manipulation"
     >
       {/* 席位編號標籤 (#1, #2, #3... 方便玩家溝通) */}
       <div className="absolute top-1 left-1.5 z-20 pointer-events-none">
@@ -154,14 +144,10 @@ export function BoardSlot({
         </span>
       </div>
 
-      {/* 標籤權重化渲染 (權重：結算正確性 > 撞牌 > 動作提示；每個席位上方最多顯示單一標籤) */}
-      {isSlotRevealed && isCorrectOrder === true ? (
-        <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-emerald-950 border border-emerald-500 text-emerald-400 font-bold pointer-events-none whitespace-nowrap">
-          ✓ 順序正確
-        </span>
-      ) : isSlotRevealed && isCorrectOrder === false ? (
-        <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
-          ✕ 順序錯誤
+      {/* 標籤權重化渲染 (錯誤時顯示 ✕ 錯誤，正確時隱藏標籤極簡美觀) */}
+      {isSlotRevealed && isCorrectOrder === false ? (
+        <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
+          ✕ 錯誤
         </span>
       ) : hasCollision ? (
         <div className="absolute -top-3.5 z-50 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
@@ -189,11 +175,21 @@ export function BoardSlot({
         </div>
       )}
 
-      {/* 卡牌渲染 (紙牌接龍式上下垂直錯位重疊效果) */}
+      {/* 卡牌實體區域 (紅/綠/金高亮微光僅包覆卡片本身，不含底部玩家標籤) */}
       <div
-        className="relative flex items-center justify-center"
+        className={`relative flex items-center justify-center p-1 rounded-2xl transition-all border ${
+          isSlotRevealed && isCorrectOrder === true
+            ? "ring-2 ring-emerald-500 bg-emerald-500/10 border-emerald-500 shadow-[0_0_18px_rgba(16,185,129,0.5)]"
+            : isSlotRevealed && isCorrectOrder === false
+            ? "ring-2 ring-ukiyo-vermillion bg-ukiyo-vermillion/15 border-ukiyo-vermillion shadow-[0_0_20px_rgba(196,43,28,0.7)]"
+            : isHighlightSelected
+            ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+            : hasCollision
+            ? "ring-2 ring-ukiyo-vermillion border-ukiyo-vermillion bg-ukiyo-vermillion/10 shadow-[0_0_18px_rgba(196,43,28,0.5)]"
+            : "border-transparent"
+        }`}
         style={{
-          paddingBottom: hasCollision ? `${(allCards.length - 1) * 18}px` : "0px",
+          paddingBottom: hasCollision ? `${(allCards.length - 1) * 18}px` : "4px",
         }}
       >
         {allCards.map((c, idx) => {
@@ -228,7 +224,7 @@ export function BoardSlot({
         })}
       </div>
 
-      {/* 出牌者標籤 (碰撞時顯示參與的所有玩家，如「你、小華」) */}
+      {/* 出牌者標籤 (獨立在微光外框下方) */}
       <div className="mt-1 flex items-center space-x-1 z-10">
         <span
           className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[130px] transition-colors ${
