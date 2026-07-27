@@ -64,7 +64,7 @@ export function GameBoard({
         <span className="text-xs tracking-widest text-ukiyo-gold font-serif font-bold bg-ukiyo-bg/60 px-3 py-1 rounded-full border border-ukiyo-foam/10">
           {status === "playing"
             ? selectedSlotId
-              ? `已選定槽位 [${selectedSlotId}]！點擊手牌即可將牌放至該位子`
+              ? `已選定第 ${parseInt(selectedSlotId.replace("slot-", ""), 10) + 1} 個席位！點擊手牌即可將牌放至該位子`
               : `已落牌 ${board.length} / ${totalSlotsCount} 張 (先點擊槽位，再點擊手牌放置)`
             : status === "locked"
             ? "全員已同意鎖定！點擊自己的牌翻開"

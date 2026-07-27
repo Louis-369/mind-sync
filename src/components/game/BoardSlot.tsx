@@ -38,7 +38,7 @@ export function BoardSlot({
   const topCard = allCards[allCards.length - 1];
   const hasCollision = allCards.length > 1;
 
-  // 取得撞牌玩家名字清單 (例如：你與小華撞牌)
+  // 取得撞牌玩家名字清單 (例如：你與小華撞牌 2張)
   const collisionNamesText = hasCollision
     ? Array.from(
         new Set(
@@ -50,7 +50,7 @@ export function BoardSlot({
               : c.playerName || "匿名"
           )
         )
-      ).join("與") + "撞牌"
+      ).join("與") + `撞牌 ${allCards.length}張`
     : "";
 
   if (allCards.length === 0) {
@@ -102,10 +102,12 @@ export function BoardSlot({
       className={`relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border ${
         isSelected
           ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+          : hasCollision
+          ? "ring-2 ring-ukiyo-vermillion border-ukiyo-vermillion bg-ukiyo-vermillion/10 shadow-[0_0_18px_rgba(196,43,28,0.5)]"
           : "border-transparent hover:border-ukiyo-foam/20"
       }`}
     >
-      {/* 撞牌碰撞警示標籤 (顯示撞牌玩家姓名、無 Emoji、不換行) */}
+      {/* 撞牌碰撞警示標籤 (顯示撞牌玩家姓名、無 Emoji、無括號、不換行) */}
       {hasCollision && (
         <div className="absolute -top-3.5 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce">
           {collisionNamesText}
@@ -122,8 +124,13 @@ export function BoardSlot({
         </div>
       )}
 
-      {/* 卡牌渲染 (堆疊層次效果) */}
-      <div className="relative flex items-center justify-center">
+      {/* 卡牌渲染 (紙牌接龍式上下垂直錯位重疊效果) */}
+      <div
+        className="relative flex items-center justify-center"
+        style={{
+          paddingBottom: hasCollision ? `${(allCards.length - 1) * 18}px` : "0px",
+        }}
+      >
         {allCards.map((c, idx) => {
           const isMe =
             (currentConnectionId && c.playerId === currentConnectionId) ||
@@ -132,7 +139,8 @@ export function BoardSlot({
             <div
               key={`${c.placedAt}-${idx}`}
               style={{
-                transform: idx > 0 ? `translate(${idx * 4}px, ${idx * 4}px)` : "none",
+                transform: idx > 0 ? `translateY(${idx * 18}px)` : "none",
+                zIndex: idx + 1,
               }}
               className={idx > 0 ? "absolute top-0 left-0" : "relative"}
             >
