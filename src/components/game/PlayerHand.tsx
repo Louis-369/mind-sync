@@ -13,6 +13,7 @@ interface PlayerHandProps {
   isLocked?: boolean;
   lockedCount?: number;
   totalPlayers?: number;
+  hasBoardCollision?: boolean;
   onToggleLock?: () => void;
   disabled?: boolean;
 }
@@ -24,9 +25,12 @@ export function PlayerHand({
   isLocked = false,
   lockedCount = 0,
   totalPlayers = 1,
+  hasBoardCollision = false,
   onToggleLock,
   disabled = false,
 }: PlayerHandProps) {
+  const isLockDisabled = disabled || hasBoardCollision;
+
   return (
     <div
       className={clsx(
@@ -59,7 +63,7 @@ export function PlayerHand({
               variant={isLocked ? "secondary" : "primary"}
               size="sm"
               onClick={onToggleLock}
-              disabled={disabled}
+              disabled={isLockDisabled}
               className="text-xs font-serif"
             >
               {isLocked ? (
@@ -68,7 +72,7 @@ export function PlayerHand({
                 </span>
               ) : (
                 <span className="flex items-center gap-1">
-                  <Unlock className="w-3.5 h-3.5" /> 同意鎖定 ({lockedCount}/{totalPlayers})
+                  <Unlock className="w-3.5 h-3.5" /> {hasBoardCollision ? "撞牌無法鎖定" : `同意鎖定 (${lockedCount}/${totalPlayers})`}
                 </span>
               )}
             </Button>
@@ -99,15 +103,16 @@ export function PlayerHand({
 
       {/* 右側：心靈鎖定按鈕 (桌面端顯示) */}
       {onToggleLock && (
-        <div className="hidden md:flex flex-col items-end min-w-[150px]">
+        <div className="hidden md:flex flex-col items-end min-w-[170px]">
           <Button
             variant={isLocked ? "secondary" : "primary"}
             size="md"
             onClick={onToggleLock}
-            disabled={disabled}
+            disabled={isLockDisabled}
             className={clsx(
               "w-full text-xs font-serif transition-all",
-              isLocked && "border-ukiyo-gold text-ukiyo-gold font-bold"
+              isLocked && "border-ukiyo-gold text-ukiyo-gold font-bold",
+              hasBoardCollision && "opacity-60 cursor-not-allowed"
             )}
           >
             {isLocked ? (
@@ -116,12 +121,12 @@ export function PlayerHand({
               </span>
             ) : (
               <span className="flex items-center justify-center gap-1.5">
-                <Unlock className="w-4 h-4 text-ukiyo-gold" /> 同意鎖定
+                <Unlock className="w-4 h-4 text-ukiyo-gold" /> {hasBoardCollision ? "撞牌無法鎖定" : "同意鎖定"}
               </span>
             )}
           </Button>
-          <span className="text-[10px] text-ukiyo-mist mt-1 font-mono">
-            同意進度: {lockedCount}/{totalPlayers} 人
+          <span className={`text-[10px] mt-1 font-serif ${hasBoardCollision ? "text-ukiyo-vermillion font-bold animate-pulse" : "text-ukiyo-mist font-mono"}`}>
+            {hasBoardCollision ? "⚠️ 盤面有撞牌，請先收回卡牌" : `同意進度: ${lockedCount}/${totalPlayers} 人`}
           </span>
         </div>
       )}

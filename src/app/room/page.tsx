@@ -35,6 +35,7 @@ function RoomInner() {
     shurikens,
     currentLevel,
     myHand,
+    hasBoardCollision,
     self,
     others,
     updateMyPresence,
@@ -204,6 +205,7 @@ function RoomInner() {
           isLocked={isLocked}
           lockedCount={lockedList.length}
           totalPlayers={totalPlayers}
+          hasBoardCollision={hasBoardCollision}
           onToggleLock={() => toggleLock(playerName)}
         />
       )}

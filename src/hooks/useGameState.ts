@@ -36,6 +36,15 @@ export function useGameState() {
     : [];
   const lockedList = lockedPlayers ? Array.from(lockedPlayers) : [];
 
+  // 計算盤面上是否有任何槽位發生撞牌 (超過 1 張牌)
+  const slotCounts: Record<string, number> = {};
+  board.forEach((c) => {
+    if (c.slotId) {
+      slotCounts[c.slotId] = (slotCounts[c.slotId] || 0) + 1;
+    }
+  });
+  const hasBoardCollision = Object.values(slotCounts).some((cnt) => cnt > 1);
+
   // 發牌 mutation
   const dealCards = useMutation(({ storage }) => {
     const mutableSettings = storage.get("settings");
@@ -147,6 +156,22 @@ export function useGameState() {
   // 切換玩家鎖定準備狀態
   const toggleLock = useMutation(({ storage }, playerName: string) => {
     const connId = String(self?.connectionId);
+    const mutableBoard = storage.get("board");
+
+    // 檢查盤面上是否有撞牌 (多張牌放置在同一槽位)
+    const currentBoard = Array.from(mutableBoard.values());
+    const counts: Record<string, number> = {};
+    currentBoard.forEach((c) => {
+      const sId = c.get("slotId");
+      if (sId) counts[sId] = (counts[sId] || 0) + 1;
+    });
+    const isColliding = Object.values(counts).some((cnt) => cnt > 1);
+
+    if (isColliding) {
+      // 存在撞牌時，禁止鎖定！
+      return;
+    }
+
     const mutableLocked = storage.get("lockedPlayers");
     const lockIndex = mutableLocked.indexOf(connId);
 
@@ -307,6 +332,7 @@ export function useGameState() {
     shurikens,
     currentLevel,
     myHand,
+    hasBoardCollision,
     myPresence,
     updateMyPresence,
     self,
