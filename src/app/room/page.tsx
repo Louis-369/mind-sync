@@ -20,6 +20,7 @@ function RoomInner() {
   const router = useRouter();
   const roomId = useRoomId();
   const { playerId, playerName } = usePlayerId();
+  const [isHostModalOpen, setIsHostModalOpen] = React.useState<boolean>(false);
 
   const {
     settings,
@@ -73,12 +74,12 @@ function RoomInner() {
   if (totalPlayers > maxPlayers) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-        <div className="glass-panel p-8 rounded-3xl max-w-md border-red-500/40">
-          <h2 className="text-2xl font-bold text-red-400 mb-2">房間人數已滿</h2>
-          <p className="text-sm text-gray-300 mb-6">
-            此心靈房間已達人數上限 ({maxPlayers} 人)，請選擇其他 Emoji 暗號房間。
+        <div className="glass-panel p-8 rounded-3xl max-w-md border-ukiyo-vermillion/40">
+          <h2 className="text-2xl font-serif font-bold text-ukiyo-vermillion mb-2">房間人數已滿</h2>
+          <p className="text-xs md:text-sm text-ukiyo-mist mb-6 font-serif">
+            此心靈席位已達上限 ({maxPlayers} 人)，請選擇其他 Emoji 暗號房間。
           </p>
-          <Button variant="gold" onClick={() => router.push("/")}>
+          <Button variant="primary" onClick={() => router.push("/")}>
             返回大廳
           </Button>
         </div>
@@ -87,25 +88,25 @@ function RoomInner() {
   }
 
   return (
-    <main className="min-h-screen p-3 md:p-6 max-w-5xl mx-auto flex flex-col justify-between">
-      {/* 頂部導覽 */}
-      <div className="flex items-center justify-between mb-4">
-        <Button variant="ghost" size="sm" onClick={() => router.push("/")} className="gap-1 text-xs">
-          <ArrowLeft className="w-4 h-4" /> 離開房間
+    <main className="min-h-screen p-2.5 md:p-5 max-w-4xl mx-auto flex flex-col justify-between">
+      {/* 頂部極簡單行 Header */}
+      <div className="flex items-center justify-between mb-2">
+        <Button variant="ghost" size="sm" onClick={() => router.push("/")} className="gap-1 text-xs font-serif">
+          <ArrowLeft className="w-3.5 h-3.5" /> 離開席位
         </Button>
 
-        <h1 className="text-xl md:text-2xl font-black text-poker-accent tracking-wide">
-          心靈牌桌
+        <h1 className="text-lg md:text-xl font-serif font-black text-ukiyo-foam tracking-widest">
+          心靈牌席
         </h1>
 
-        <div className="w-20 text-right">
-          <span className="text-[11px] bg-emerald-950/60 text-emerald-300 px-2 py-1 rounded border border-emerald-500/30">
-            即時連線中
+        <div className="w-16 text-right">
+          <span className="text-[10px] bg-ukiyo-surface/80 text-ukiyo-gold px-2 py-0.5 rounded border border-ukiyo-foam/10 font-mono">
+            LIVE
           </span>
         </div>
       </div>
 
-      {/* 狀態列 */}
+      {/* 頂部狀態與房間資訊列 (包含房主 ⚙ 按鈕) */}
       <GameStatus
         roomId={roomId}
         lives={lives ?? 3}
@@ -113,11 +114,13 @@ function RoomInner() {
         currentLevel={currentLevel ?? 1}
         connectedCount={totalPlayers}
         maxPlayers={maxPlayers}
+        isHost={isHost}
+        onOpenHostPanel={() => setIsHostModalOpen(true)}
         onUseShuriken={useShuriken}
         canUseShuriken={(shurikens ?? 0) > 0 && status === "playing"}
       />
 
-      {/* 玩家列表 */}
+      {/* 線上玩家清單 (極簡標籤) */}
       <PlayerList
         currentConnectionId={currentConnId}
         hostId={hostId}
@@ -126,7 +129,7 @@ function RoomInner() {
         selfPresence={self?.presence}
       />
 
-      {/* 中央賭桌盤面 */}
+      {/* 中央極簡禪意盤面 */}
       <GameBoard
         board={board}
         currentConnectionId={currentConnId}
@@ -135,9 +138,12 @@ function RoomInner() {
         onFlipCard={(slotId) => flipCard(slotId)}
       />
 
-      {/* 鎖定按鈕 */}
+      {/* 底部玩家手牌與鎖定按鈕 */}
       {status === "playing" && (
-        <LockButton
+        <PlayerHand
+          hand={myHand}
+          playerName={playerName}
+          onPlayCard={(val) => placeCard(val, playerName)}
           isLocked={isLocked}
           lockedCount={lockedList.length}
           totalPlayers={totalPlayers}
@@ -145,18 +151,27 @@ function RoomInner() {
         />
       )}
 
-      {/* 玩家手牌區 */}
-      {status === "playing" && (
-        <PlayerHand
-          hand={myHand}
-          playerName={playerName}
-          onPlayCard={(val) => placeCard(val, playerName)}
-        />
+      {/* 大廳等待提示與房主開局按鈕 (當 status === "waiting") */}
+      {status === "waiting" && (
+        <div className="w-full glass-panel rounded-2xl p-4 my-2 text-center flex flex-col items-center">
+          <p className="text-xs text-ukiyo-mist font-serif mb-3">
+            {isHost
+              ? "全員入座後，請點擊下按鈕開始遊戲。"
+              : "靜候房主開始牌局..."}
+          </p>
+          {isHost && (
+            <Button variant="primary" size="lg" onClick={dealCards} className="font-serif tracking-widest">
+              發牌啟局
+            </Button>
+          )}
+        </div>
       )}
 
-      {/* 房主控制面板 */}
+      {/* 房主 Modal 控制彈窗 */}
       <HostPanel
         isHost={isHost}
+        isOpen={isHostModalOpen}
+        onClose={() => setIsHostModalOpen(false)}
         status={status || "waiting"}
         settings={settings}
         onDealCards={dealCards}

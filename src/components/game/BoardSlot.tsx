@@ -23,8 +23,8 @@ export function BoardSlot({
 }: BoardSlotProps) {
   if (!card) {
     return (
-      <div className="w-16 h-24 md:w-20 md:h-28 rounded-xl border-2 border-dashed border-poker-tableBorder/50 bg-poker-table/30 flex items-center justify-center text-poker-tableBorder/40">
-        <span className="text-xs">出牌區</span>
+      <div className="w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed border-ukiyo-foam/20 bg-ukiyo-surface/30 flex items-center justify-center text-ukiyo-mist/40">
+        <span className="text-[11px] font-serif">席位</span>
       </div>
     );
   }

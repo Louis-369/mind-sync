@@ -8,44 +8,46 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        poker: {
-          bg: "#0a0e17",
-          table: "#1a4a3a",
-          tableBorder: "#2d7a60",
-          accent: "#d4a853",
-          accentHover: "#b88e3d",
-          cardBg: "#f8f6f0",
-          cardBorder: "#d1ccc0",
-          danger: "#e74c3c",
-          success: "#27ae60",
-          neonGold: "#ffd700",
-          neonBlue: "#00f0ff",
+        ukiyo: {
+          bg: "#0d1b2a",          // 深海夜空
+          surface: "#1b2838",     // 面板/卡片背景
+          wave: "#2d5a7b",        // 波浪中段藍
+          foam: "#e8dcc8",        // 卡片正面/高亮 (和紙色)
+          cream: "#f5f0e3",       // 古紙底色
+          vermillion: "#c73e1d",  // 朱紅 (警告/印章)
+          indigo: "#3d5a80",      // 藍染藍 (按鈕)
+          indigoHover: "#2c4260", // 藍染藍懸停
+          gold: "#c9a96e",        // 金箔色
+          ink: "#2a2a2a",         // 墨黑 (字體)
+          mist: "#8a9bb0",        // 山嵐霧 (次要字)
         },
       },
+      fontFamily: {
+        serif: ["'Noto Serif JP'", "serif"],
+        sans: ["'Inter'", "sans-serif"],
+      },
       boxShadow: {
-        'glow-gold': '0 0 15px rgba(212, 168, 83, 0.5)',
-        'glow-blue': '0 0 15px rgba(0, 240, 255, 0.5)',
-        'table': 'inset 0 0 50px rgba(0,0,0,0.6)',
+        'ukiyo-soft': '0 8px 30px rgba(0, 0, 0, 0.4)',
+        'ukiyo-glow': '0 0 20px rgba(201, 169, 110, 0.3)',
       },
       keyframes: {
         flip: {
           '0%': { transform: 'rotateY(0deg)' },
           '100%': { transform: 'rotateY(180deg)' },
         },
-        pulseGlow: {
-          '0%, 100%': { opacity: '1', filter: 'drop-shadow(0 0 10px rgba(212, 168, 83, 0.8))' },
-          '50%': { opacity: '0.6', filter: 'drop-shadow(0 0 2px rgba(212, 168, 83, 0.3))' },
+        waveFloat: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-6px)' },
         },
-        shake: {
-          '0%, 100%': { transform: 'translateX(0)' },
-          '20%, 60%': { transform: 'translateX(-5px)' },
-          '40%, 80%': { transform: 'translateX(5px)' },
-        }
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'scale(0.98)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
       },
       animation: {
         'card-flip': 'flip 0.6s ease-in-out forwards',
-        'pulse-glow': 'pulseGlow 2s infinite',
-        'shake': 'shake 0.4s ease-in-out',
+        'wave-float': 'waveFloat 4s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.3s ease-out forwards',
       },
     },
   },

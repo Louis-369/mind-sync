@@ -22,7 +22,7 @@ export function LockButton({
   return (
     <div className="flex flex-col items-center space-y-2 my-2">
       <Button
-        variant={isLocked ? "green" : "gold"}
+        variant={isLocked ? "secondary" : "primary"}
         size="lg"
         onClick={onToggleLock}
         disabled={disabled}

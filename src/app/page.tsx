@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Brain, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { NameInput } from "../components/lobby/NameInput";
 import { EmojiPicker } from "../components/lobby/EmojiPicker";
 import { Button } from "../components/ui/Button";
@@ -24,26 +24,23 @@ export default function LobbyPage() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative overflow-hidden">
-      {/* 背景霓虹光罩 */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-600/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-amber-500/15 rounded-full blur-[100px] pointer-events-none" />
+      {/* 背景浮世繪深海波浪暈光 */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-ukiyo-wave/25 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-80 h-80 bg-ukiyo-gold/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* 主面板容器 */}
-      <div className="glass-panel w-full max-w-lg rounded-3xl p-6 md:p-10 border-2 border-poker-accent/40 shadow-2xl relative z-10 flex flex-col items-center text-center">
-        {/* 遊戲 Header */}
-        <div className="flex items-center space-x-2 mb-2">
-          <Brain className="w-10 h-10 text-poker-accent animate-pulse-glow" />
-          <span className="text-xs uppercase tracking-widest text-poker-accent font-bold bg-poker-accent/10 px-3 py-1 rounded-full border border-poker-accent/30">
-            Liveblocks 即時連線
-          </span>
+      <div className="glass-panel w-full max-w-lg rounded-3xl p-6 md:p-10 border border-ukiyo-foam/20 shadow-2xl relative z-10 flex flex-col items-center text-center">
+        {/* 日式硃砂圓圖騰 */}
+        <div className="w-14 h-14 rounded-full ukiyo-seal flex items-center justify-center text-2xl font-serif mb-4 shadow-lg animate-wave-float">
+          心
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-poker-accent to-yellow-400 tracking-tight mb-3">
+        <h1 className="text-4xl md:text-5xl font-serif font-black text-ukiyo-foam tracking-widest mb-3">
           心靈同步
         </h1>
 
-        <p className="text-sm text-gray-300 mb-8 max-w-sm leading-relaxed">
-          不發一言，零語音、零文字。透過極致的心靈感應與默契，合作將數字從小到大打出！
+        <p className="text-xs md:text-sm text-ukiyo-mist mb-8 max-w-sm leading-relaxed font-serif">
+          不發一言，零語音、零文字。透過極致的心靈感應與默契，合作將數字從小到大打出。
         </p>
 
         {/* 表單區域 (使用 div 避免使用 HTML form) */}
@@ -56,27 +53,27 @@ export default function LobbyPage() {
 
           {/* 進入遊戲按鈕 */}
           <Button
-            variant="gold"
+            variant="primary"
             size="lg"
             onClick={handleEnterRoom}
             className="w-full max-w-xs mt-4 group"
           >
-            <span className="flex items-center justify-center gap-2">
-              <Sparkles className="w-5 h-5" /> 進入心靈牌桌
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            <span className="flex items-center justify-center gap-2 font-serif tracking-widest">
+              <Sparkles className="w-4 h-4 text-ukiyo-gold" /> 入座牌席
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
           </Button>
         </div>
 
         {/* 遊戲說明引導 */}
-        <div className="mt-8 pt-6 border-t border-white/10 w-full text-left">
-          <h4 className="text-xs font-bold text-poker-accent uppercase tracking-wider mb-2">
-            遊玩規則簡介:
+        <div className="mt-8 pt-6 border-t border-ukiyo-foam/10 w-full text-left">
+          <h4 className="text-xs font-serif font-bold text-ukiyo-gold uppercase tracking-widest mb-2">
+            默契法則:
           </h4>
-          <ul className="text-xs text-gray-400 space-y-1 list-disc list-inside">
+          <ul className="text-xs text-ukiyo-mist space-y-1.5 list-disc list-inside font-serif">
             <li>選擇或加入相同的 3 個 Emoji 暗號房間</li>
-            <li>所有人拿牌後，憑感覺打出最小的牌</li>
-            <li>確認沒牌後全員按「認可鎖定」，最後翻牌結算</li>
+            <li>所有人拿牌後，憑心靈感覺打出最小的牌</li>
+            <li>確認無牌後全員鎖定，進行翻牌結算</li>
           </ul>
         </div>
       </div>

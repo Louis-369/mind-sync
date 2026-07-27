@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "心靈同步 Mind Sync — 多人即時網頁卡牌遊戲",
-  description: "基於 Liveblocks 與 Next.js 打造的多人極致默契考驗卡牌遊戲，無溝通按順序出牌！",
+  title: "心靈同步 Mind Sync — 浮世繪風格多人網頁卡牌遊戲",
+  description: "基於 Liveblocks 與 Next.js 打造的浮世繪風格極致默契卡牌遊戲，無溝通按順序出牌！",
 };
 
 export default function RootLayout({
@@ -13,7 +13,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
-      <body className="antialiased font-sans bg-poker-bg text-gray-100 min-h-screen">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Noto+Serif+JP:wght@600;700;900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="antialiased font-sans bg-ukiyo-bg text-ukiyo-foam min-h-screen">
         {children}
       </body>
     </html>

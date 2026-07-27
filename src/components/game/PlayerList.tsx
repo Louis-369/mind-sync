@@ -33,9 +33,9 @@ export function PlayerList({
   ];
 
   return (
-    <div className="w-full glass-card rounded-xl p-3 border border-white/10 mb-4">
-      <h3 className="text-xs uppercase tracking-wider text-gray-400 font-bold mb-2 flex items-center gap-1">
-        <User className="w-3.5 h-3.5 text-poker-accent" /> 線上玩家列表 ({allPlayers.length})
+    <div className="w-full glass-card rounded-xl p-2.5 border border-ukiyo-foam/10 mb-2">
+      <h3 className="text-[11px] font-serif tracking-widest text-ukiyo-mist font-bold mb-1.5 flex items-center gap-1">
+        <User className="w-3.5 h-3.5 text-ukiyo-gold" /> 同席同伴 ({allPlayers.length})
       </h3>
       <div className="flex flex-wrap gap-2">
         {allPlayers.map((p) => {
@@ -46,13 +46,13 @@ export function PlayerList({
             <div
               key={p.connectionId}
               className={clsx(
-                "flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all",
+                "flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs font-serif border transition-all",
                 isLocked
-                  ? "bg-emerald-950/80 border-emerald-500/50 text-emerald-300 shadow-glow-gold"
-                  : "bg-poker-bg/60 border-white/10 text-gray-300"
+                  ? "bg-ukiyo-wave/80 border-ukiyo-gold/40 text-ukiyo-foam shadow-md"
+                  : "bg-ukiyo-surface/60 border-ukiyo-foam/10 text-ukiyo-mist"
               )}
             >
-              {isHost && <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />}
+              {isHost && <Crown className="w-3.5 h-3.5 text-ukiyo-gold fill-ukiyo-gold" />}
               <span>{p.name} {p.isSelf ? "(你)" : ""}</span>
               {isLocked && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
             </div>

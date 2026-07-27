@@ -30,7 +30,7 @@ export function EmojiPicker({ onRoomSelect }: EmojiPickerProps) {
         <select
           value={e1}
           onChange={(e) => setE1(e.target.value)}
-          className="bg-poker-bg/80 border-2 border-poker-accent/40 rounded-xl p-3 text-2xl text-center focus:outline-none focus:border-poker-accent cursor-pointer transition-colors"
+          className="bg-ukiyo-surface/90 border border-ukiyo-foam/20 rounded-xl p-3 text-2xl text-center focus:outline-none focus:border-ukiyo-gold cursor-pointer transition-colors"
         >
           {EMOJI_GROUPS.animals.map((emoji) => (
             <option key={emoji} value={emoji}>
@@ -43,7 +43,7 @@ export function EmojiPicker({ onRoomSelect }: EmojiPickerProps) {
         <select
           value={e2}
           onChange={(e) => setE2(e.target.value)}
-          className="bg-poker-bg/80 border-2 border-poker-accent/40 rounded-xl p-3 text-2xl text-center focus:outline-none focus:border-poker-accent cursor-pointer transition-colors"
+          className="bg-ukiyo-surface/90 border border-ukiyo-foam/20 rounded-xl p-3 text-2xl text-center focus:outline-none focus:border-ukiyo-gold cursor-pointer transition-colors"
         >
           {EMOJI_GROUPS.items.map((emoji) => (
             <option key={emoji} value={emoji}>
@@ -56,7 +56,7 @@ export function EmojiPicker({ onRoomSelect }: EmojiPickerProps) {
         <select
           value={e3}
           onChange={(e) => setE3(e.target.value)}
-          className="bg-poker-bg/80 border-2 border-poker-accent/40 rounded-xl p-3 text-2xl text-center focus:outline-none focus:border-poker-accent cursor-pointer transition-colors"
+          className="bg-ukiyo-surface/90 border border-ukiyo-foam/20 rounded-xl p-3 text-2xl text-center focus:outline-none focus:border-ukiyo-gold cursor-pointer transition-colors"
         >
           {EMOJI_GROUPS.foods.map((emoji) => (
             <option key={emoji} value={emoji}>

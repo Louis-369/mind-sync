@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import confetti from "canvas-confetti";
-import { Trophy, AlertTriangle, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { Button } from "../ui/Button";
 
 interface ResultOverlayProps {
@@ -15,9 +15,10 @@ export function ResultOverlay({ result, onRestart }: ResultOverlayProps) {
     if (result === "win") {
       try {
         confetti({
-          particleCount: 100,
-          spread: 70,
+          particleCount: 80,
+          spread: 60,
           origin: { y: 0.6 },
+          colors: ["#c9a96e", "#e8dcc8", "#3d5a80"],
         });
       } catch (error) {
         console.error("觸發彩帶動畫失敗:", error);
@@ -31,36 +32,35 @@ export function ResultOverlay({ result, onRestart }: ResultOverlayProps) {
   const isWin = result === "win";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="glass-panel w-full max-w-md rounded-3xl p-6 text-center border-2 border-poker-accent shadow-2xl relative overflow-hidden">
-        {/* 背景裝飾 */}
-        <div className={`absolute -top-24 -left-24 w-48 h-48 rounded-full blur-3xl opacity-30 ${isWin ? "bg-amber-400" : "bg-red-600"}`} />
-
-        <div className="relative z-10 flex flex-col items-center">
-          {isWin ? (
-            <div className="w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center mb-4 shadow-glow-gold">
-              <Trophy className="w-10 h-10 text-amber-300 animate-bounce" />
-            </div>
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-red-500/20 border-2 border-red-500 flex items-center justify-center mb-4 animate-shake">
-              <AlertTriangle className="w-10 h-10 text-red-400" />
-            </div>
-          )}
-
-          <h2 className={`text-3xl font-black mb-2 tracking-wide ${isWin ? "text-poker-neonGold" : "text-red-400"}`}>
-            {isWin ? "心靈極限同步成功！" : "心靈同步中斷！"}
-          </h2>
-
-          <p className="text-sm text-gray-300 mb-6 max-w-xs">
-            {isWin
-              ? "太不可思議了！所有人完全沒有語言溝通，依然按照精準的數字順序出牌！"
-              : "卡牌數值發生倒置或碰撞，默契鍛鍊尚未成功，再試一次吧！"}
-          </p>
-
-          <Button variant={isWin ? "gold" : "red"} size="lg" onClick={onRestart} className="flex items-center gap-2">
-            <RotateCcw className="w-5 h-5" /> 再來一局
-          </Button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ukiyo-bg/90 backdrop-blur-md animate-fade-in">
+      <div className="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 text-center border border-ukiyo-foam/20 shadow-2xl relative overflow-hidden flex flex-col items-center">
+        {/* 日式朱紅/金箔大印章 */}
+        <div
+          className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-serif font-bold mb-4 shadow-xl ${
+            isWin ? "bg-ukiyo-gold text-ukiyo-bg" : "ukiyo-seal text-ukiyo-cream animate-wave-float"
+          }`}
+        >
+          {isWin ? "勝" : "敗"}
         </div>
+
+        <h2 className={`text-2xl md:text-3xl font-serif font-black mb-2 tracking-widest ${isWin ? "text-ukiyo-gold" : "text-ukiyo-vermillion"}`}>
+          {isWin ? "心靈極限極致同步" : "心靈感應中斷"}
+        </h2>
+
+        <p className="text-xs md:text-sm text-ukiyo-mist mb-6 max-w-xs leading-relaxed font-serif">
+          {isWin
+            ? "無需隻字片語，默契如潮水般流暢，牌陣順序完美達成！"
+            : "卡牌數值發生倒置衝突，心靈修練尚未結束，重組心境再試一次。"}
+        </p>
+
+        <Button
+          variant={isWin ? "primary" : "danger"}
+          size="lg"
+          onClick={onRestart}
+          className="flex items-center gap-2 font-serif tracking-widest"
+        >
+          <RotateCcw className="w-4 h-4" /> 重新開局
+        </Button>
       </div>
     </div>
   );

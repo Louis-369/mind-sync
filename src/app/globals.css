@@ -4,26 +4,44 @@
 
 @layer base {
   body {
-    @apply bg-poker-bg text-gray-100 min-h-screen antialiased select-none font-sans overflow-x-hidden;
+    @apply bg-ukiyo-bg text-ukiyo-foam min-h-screen antialiased select-none font-sans overflow-x-hidden;
     background-image: 
-      radial-gradient(circle at 50% 0%, rgba(45, 122, 96, 0.25) 0%, transparent 75%),
-      radial-gradient(circle at 50% 100%, rgba(10, 14, 23, 0.9) 0%, transparent 100%);
+      radial-gradient(circle at 50% 10%, rgba(45, 90, 123, 0.35) 0%, transparent 60%),
+      radial-gradient(circle at 20% 80%, rgba(27, 40, 56, 0.8) 0%, transparent 50%),
+      radial-gradient(circle at 80% 90%, rgba(13, 27, 42, 0.95) 0%, transparent 60%);
   }
 }
 
-/* 玻璃態元件效果 */
+/* 浮世繪風格和紙面板 */
 .glass-panel {
-  background: rgba(26, 74, 58, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(212, 168, 83, 0.25);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: rgba(27, 40, 56, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(232, 220, 200, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 .glass-card {
-  background: rgba(10, 14, 23, 0.6);
+  background: rgba(27, 40, 56, 0.6);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(232, 220, 200, 0.1);
+}
+
+/* 浮世繪波浪卡背圖案 */
+.ukiyo-card-back {
+  background-color: #1b2838;
+  background-image: radial-gradient(circle at 50% 50%, #2d5a7b 10%, transparent 11%), radial-gradient(circle at 0% 100%, #2d5a7b 10%, transparent 11%), radial-gradient(circle at 100% 100%, #2d5a7b 10%, transparent 11%);
+  background-size: 16px 16px;
+}
+
+/* 朱紅日式印章標籤 */
+.ukiyo-seal {
+  background: #c73e1d;
+  color: #f5f0e3;
+  border-radius: 4px;
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(199, 62, 29, 0.4);
 }
 
 /* 3D 卡片翻轉效果 */
@@ -44,18 +62,18 @@
   transform: rotateY(180deg);
 }
 
-/* 自訂捲軸 */
+/* 自訂極簡捲軸 */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0e17;
+  background: #0d1b2a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2d7a60;
+  background: #2d5a7b;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4a853;
+  background: #c9a96e;
 }

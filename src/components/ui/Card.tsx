@@ -39,35 +39,36 @@ export function Card({
     >
       <div
         className={clsx(
-          "w-full h-full duration-500 transform-style-3d relative rounded-xl shadow-xl border-2 transition-transform",
+          "w-full h-full duration-500 transform-style-3d relative rounded-xl shadow-ukiyo-soft border transition-transform",
           flipped ? "rotate-y-180" : "",
-          isOwner ? "border-amber-400 shadow-glow-gold" : "border-gray-600"
+          isOwner ? "border-ukiyo-gold shadow-ukiyo-glow" : "border-ukiyo-wave/40"
         )}
       >
-        {/* 卡牌背面 (未翻開) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-poker-bg rounded-xl p-1 flex flex-col items-center justify-between border border-poker-accent/40 overflow-hidden">
-          <div className="w-full h-full rounded-lg border border-poker-accent/20 flex items-center justify-center bg-[radial-gradient(#d4a853_1px,transparent_1px)] [background-size:8px_8px]">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-poker-accent/50 flex items-center justify-center bg-poker-bg/80">
-              <span className="text-poker-accent text-xs font-bold">🧠</span>
+        {/* 卡牌背面 (浮世繪海浪質感) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden ukiyo-card-back rounded-xl p-1 flex flex-col items-center justify-between border border-ukiyo-foam/20 overflow-hidden">
+          <div className="w-full h-full rounded-lg border border-ukiyo-foam/15 flex items-center justify-center">
+            {/* 朱紅日式心印 */}
+            <div className="w-7 h-7 md:w-9 md:h-9 rounded-full ukiyo-seal flex items-center justify-center text-xs font-serif shadow-md">
+              心
             </div>
           </div>
           {playerName && (
-            <span className="absolute bottom-1 text-[10px] text-gray-300 bg-black/60 px-1 rounded truncate max-w-[90%]">
+            <span className="absolute bottom-1 text-[10px] text-ukiyo-cream bg-ukiyo-bg/80 px-1.5 py-0.5 rounded truncate max-w-[90%] font-serif">
               {playerName}
             </span>
           )}
         </div>
 
-        {/* 卡牌正面 (已翻開) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-amber-50 via-white to-amber-100 text-poker-bg rounded-xl border-2 border-poker-accent p-2 flex flex-col justify-between font-black shadow-inner">
-          <div className="text-left leading-none">
-            <span className="text-xs md:text-sm font-bold block opacity-75">{value}</span>
+        {/* 卡牌正面 (和紙古紙墨書風) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-ukiyo-cream via-amber-50 to-ukiyo-foam text-ukiyo-ink rounded-xl border border-ukiyo-gold p-2 flex flex-col justify-between font-black shadow-inner">
+          <div className="text-left leading-none font-serif">
+            <span className="text-xs md:text-sm block opacity-80">{value}</span>
           </div>
           <div className="text-center my-auto">
-            <span className="block drop-shadow-md">{value}</span>
+            <span className="block drop-shadow-sm font-sans tracking-tight">{value}</span>
           </div>
-          <div className="text-right leading-none rotate-180">
-            <span className="text-xs md:text-sm font-bold block opacity-75">{value}</span>
+          <div className="text-right leading-none rotate-180 font-serif">
+            <span className="text-xs md:text-sm block opacity-80">{value}</span>
           </div>
         </div>
       </div>
