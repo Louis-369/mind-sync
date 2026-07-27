@@ -7,6 +7,7 @@ import { BoardCard } from "../../types/game";
 interface BoardSlotProps {
   slotId: string;
   card?: BoardCard;
+  status?: string;
   isCurrentPlayer: boolean;
   isFlipped?: boolean;
   onRecall?: (slotId: string) => void;
@@ -16,6 +17,7 @@ interface BoardSlotProps {
 export function BoardSlot({
   slotId,
   card,
+  status = "playing",
   isCurrentPlayer,
   isFlipped = false,
   onRecall,
@@ -24,7 +26,7 @@ export function BoardSlot({
   if (!card) {
     return (
       <div className="w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed border-ukiyo-foam/20 bg-ukiyo-surface/30 flex items-center justify-center text-ukiyo-mist/40">
-        <span className="text-[11px] font-serif">席位</span>
+        <span className="text-[11px] font-serif">空席位</span>
       </div>
     );
   }
@@ -33,9 +35,14 @@ export function BoardSlot({
     // 若已翻開則點擊無效
     if (card.flipped) return;
 
-    // 自己出的牌，未翻開時可翻牌
-    if (isCurrentPlayer && onFlip) {
-      onFlip(slotId);
+    if (isCurrentPlayer) {
+      if (status === "playing" && onRecall) {
+        // 未全鎖定前：點擊自己的牌為「收回手牌」
+        onRecall(slotId);
+      } else if (status === "locked" && onFlip) {
+        // 已全鎖定後：點擊自己的牌為「翻開亮牌」
+        onFlip(slotId);
+      }
     }
   };
 
@@ -62,10 +69,14 @@ export function BoardSlot({
         </span>
       </div>
 
-      {/* 提示可點擊翻開標籤 (僅自己且未翻開時) */}
+      {/* 提示標籤 (僅自己且未翻開時) */}
       {isCurrentPlayer && !card.flipped && (
-        <span className="absolute -top-2.5 bg-ukiyo-gold text-ukiyo-bg text-[9px] font-serif font-bold px-1.5 py-0.5 rounded-full shadow animate-pulse">
-          點擊翻牌
+        <span
+          className={`absolute -top-2.5 text-[9px] font-serif font-bold px-1.5 py-0.5 rounded-full shadow animate-pulse ${
+            status === "locked" ? "bg-ukiyo-gold text-ukiyo-bg" : "bg-ukiyo-wave text-ukiyo-cream"
+          }`}
+        >
+          {status === "locked" ? "點擊翻牌" : "點擊收回"}
         </span>
       )}
     </div>

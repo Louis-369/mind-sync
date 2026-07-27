@@ -1,16 +1,19 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Eye, ChevronDown } from "lucide-react";
 import { Button } from "../ui/Button";
 
 interface ResultOverlayProps {
   result: "win" | "lose" | null;
+  isHost: boolean;
   onRestart: () => void;
 }
 
-export function ResultOverlay({ result, onRestart }: ResultOverlayProps) {
+export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps) {
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+
   useEffect(() => {
     if (result === "win") {
       try {
@@ -24,6 +27,8 @@ export function ResultOverlay({ result, onRestart }: ResultOverlayProps) {
         console.error("觸發彩帶動畫失敗:", error);
       }
     }
+    // 結算產生時預設展開
+    if (result) setIsCollapsed(false);
     return () => {};
   }, [result]);
 
@@ -32,35 +37,67 @@ export function ResultOverlay({ result, onRestart }: ResultOverlayProps) {
   const isWin = result === "win";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ukiyo-bg/90 backdrop-blur-md animate-fade-in">
-      <div className="glass-panel w-full max-w-md rounded-3xl p-6 md:p-8 text-center border border-ukiyo-foam/20 shadow-2xl relative overflow-hidden flex flex-col items-center">
-        {/* 日式朱紅/金箔大印章 */}
-        <div
-          className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-serif font-bold mb-4 shadow-xl ${
-            isWin ? "bg-ukiyo-gold text-ukiyo-bg" : "ukiyo-seal text-ukiyo-cream animate-wave-float"
-          }`}
+    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 animate-fade-in pointer-events-auto">
+      <div className="glass-panel rounded-2xl p-4 text-center border border-ukiyo-foam/20 shadow-2xl relative overflow-hidden flex flex-col items-center">
+        {/* 頂部隱藏/收起按鈕 */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="absolute top-2 right-2 text-ukiyo-mist hover:text-ukiyo-foam text-xs flex items-center gap-1 bg-ukiyo-surface/80 px-2 py-0.5 rounded-lg border border-ukiyo-foam/10 transition-colors"
         >
-          {isWin ? "勝" : "敗"}
-        </div>
+          {isCollapsed ? <Eye className="w-3.5 h-3.5 text-ukiyo-gold" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          <span>{isCollapsed ? "查看結算" : "查看盤面"}</span>
+        </button>
 
-        <h2 className={`text-2xl md:text-3xl font-serif font-black mb-2 tracking-widest ${isWin ? "text-ukiyo-gold" : "text-ukiyo-vermillion"}`}>
-          {isWin ? "心靈極限極致同步" : "心靈感應中斷"}
-        </h2>
+        {isCollapsed ? (
+          <div className="py-1 flex items-center space-x-3">
+            <span className={`text-sm font-serif font-bold ${isWin ? "text-ukiyo-gold" : "text-ukiyo-vermillion"}`}>
+              {isWin ? "勝：極致同步成功" : "敗：心靈感應中斷"}
+            </span>
+            <button
+              onClick={() => setIsCollapsed(false)}
+              className="text-xs text-ukiyo-gold underline font-serif"
+            >
+              展開詳情
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center w-full pt-1">
+            {/* 印章 */}
+            <div
+              className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl font-serif font-bold mb-2 shadow-lg ${
+                isWin ? "bg-ukiyo-gold text-ukiyo-bg" : "ukiyo-seal text-ukiyo-cream"
+              }`}
+            >
+              {isWin ? "勝" : "敗"}
+            </div>
 
-        <p className="text-xs md:text-sm text-ukiyo-mist mb-6 max-w-xs leading-relaxed font-serif">
-          {isWin
-            ? "無需隻字片語，默契如潮水般流暢，牌陣順序完美達成！"
-            : "卡牌數值發生倒置衝突，心靈修練尚未結束，重組心境再試一次。"}
-        </p>
+            <h2 className={`text-xl font-serif font-black mb-1 tracking-widest ${isWin ? "text-ukiyo-gold" : "text-ukiyo-vermillion"}`}>
+              {isWin ? "心靈極限極致同步" : "心靈感應中斷"}
+            </h2>
 
-        <Button
-          variant={isWin ? "primary" : "danger"}
-          size="lg"
-          onClick={onRestart}
-          className="flex items-center gap-2 font-serif tracking-widest"
-        >
-          <RotateCcw className="w-4 h-4" /> 重新開局
-        </Button>
+            <p className="text-xs text-ukiyo-mist mb-4 max-w-xs leading-relaxed font-serif">
+              {isWin
+                ? "默契如潮水般流暢，全員牌陣順序完美達成！"
+                : "卡牌數值順序發生碰撞，重組心境再試一次。"}
+            </p>
+
+            {/* 操作按鈕 (僅房主可點擊重新開局) */}
+            {isHost ? (
+              <Button
+                variant={isWin ? "primary" : "danger"}
+                size="md"
+                onClick={onRestart}
+                className="w-full max-w-xs flex items-center justify-center gap-2 font-serif tracking-widest"
+              >
+                <RotateCcw className="w-4 h-4" /> 房主重新開局
+              </Button>
+            ) : (
+              <div className="text-xs text-ukiyo-mist font-serif py-1.5 bg-ukiyo-surface/60 w-full rounded-xl border border-ukiyo-foam/10">
+                靜候房主重新開局...
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

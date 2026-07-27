@@ -46,9 +46,11 @@ export function useGameState() {
       storage.set("hostId", String(self.connectionId));
     }
 
-    // 發牌給當前線上所有人 (包括自己)
+    // 發牌給當前線上所有人 (包括自己，注意 connectionId 可能為 0，不能用 Boolean 過濾)
     let cardIndex = 0;
-    const allConnectionIds = [self?.connectionId, ...others.map((o) => o.connectionId)].filter(Boolean);
+    const allConnectionIds = [self?.connectionId, ...others.map((o) => o.connectionId)].filter(
+      (id) => id !== undefined && id !== null
+    );
 
     allConnectionIds.forEach((connId) => {
       const playerHandCards = deck.slice(cardIndex, cardIndex + cardsPerPlayer).sort((a, b) => a - b);

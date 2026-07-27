@@ -19,8 +19,9 @@ import { Button } from "../../components/ui/Button";
 function RoomInner() {
   const router = useRouter();
   const roomId = useRoomId();
-  const { playerId, playerName } = usePlayerId();
+  const { playerId, playerName, setPlayerName } = usePlayerId();
   const [isHostModalOpen, setIsHostModalOpen] = React.useState<boolean>(false);
+  const [inputNameTemp, setInputNameTemp] = React.useState<string>("");
 
   const {
     settings,
@@ -48,13 +49,26 @@ function RoomInner() {
     autoResetStaleRoom,
   } = useGameState();
 
-  // 更新 Presence 與維護房主身分，並自動清除殘留無人的舊房間
+  const totalPlayers = others.length + 1;
+  const maxPlayers = settings?.maxPlayers || 4;
+  const isOverflow = totalPlayers > maxPlayers;
+
+  // 更新 Presence 與維護房主身分，並自動清除殘留無人的舊房間 (唯有未滿員時才執行，防止擠退已有玩家)
   useEffect(() => {
     try {
+      if (isOverflow) return; // 滿員阻斷，不發送 Presence 避免干擾房內玩家
+
       if (playerId && playerName) {
+        // 檢查是否撞名
+        const isDuplicateName = others.some((o) => o.presence?.playerName === playerName);
+        let finalName = playerName;
+        if (isDuplicateName) {
+          finalName = `${playerName} #2`;
+        }
+
         updateMyPresence({
           playerId,
-          playerName,
+          playerName: finalName,
           isReady: false,
         });
       }
@@ -64,22 +78,51 @@ function RoomInner() {
       console.error("更新玩家 Presence 失敗:", error);
     }
     return () => {};
-  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, others]);
+  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, others, isOverflow]);
 
   const isHost = Boolean(self?.connectionId && String(self.connectionId) === hostId);
   const currentConnId = String(self?.connectionId);
   const isLocked = lockedList.includes(currentConnId);
-  const totalPlayers = others.length + 1;
-  const maxPlayers = settings?.maxPlayers || 4;
 
-  // 滿員阻斷檢測
-  if (totalPlayers > maxPlayers) {
+  // 1. 暱稱未填寫阻斷 (靠複製網址直連近來)
+  if (!playerName) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-        <div className="glass-panel p-8 rounded-3xl max-w-md border-ukiyo-vermillion/40">
-          <h2 className="text-2xl font-serif font-bold text-ukiyo-vermillion mb-2">房間人數已滿</h2>
+        <div className="glass-panel p-6 rounded-3xl max-w-sm w-full border border-ukiyo-foam/20 flex flex-col items-center space-y-4">
+          <h2 className="text-xl font-serif font-bold text-ukiyo-gold">請輸入心靈稱號</h2>
+          <p className="text-xs text-ukiyo-mist font-serif">
+            你正在進入暗號房間 <span className="text-ukiyo-foam font-mono font-bold">{roomId}</span>
+          </p>
+          <input
+            type="text"
+            value={inputNameTemp}
+            onChange={(e) => setInputNameTemp(e.target.value)}
+            placeholder="請輸入暱稱..."
+            maxLength={12}
+            className="w-full bg-ukiyo-bg border border-ukiyo-foam/20 rounded-xl px-4 py-2.5 text-center text-sm font-serif text-ukiyo-foam focus:outline-none focus:border-ukiyo-gold"
+          />
+          <Button
+            variant="primary"
+            size="md"
+            disabled={!inputNameTemp.trim()}
+            onClick={() => setPlayerName(inputNameTemp.trim())}
+            className="w-full font-serif"
+          >
+            入座牌席
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. 滿員阻斷檢測 (防擠退)
+  if (isOverflow) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
+        <div className="glass-panel p-8 rounded-3xl max-w-md border border-ukiyo-vermillion/40">
+          <h2 className="text-2xl font-serif font-bold text-ukiyo-vermillion mb-2">席位已滿</h2>
           <p className="text-xs md:text-sm text-ukiyo-mist mb-6 font-serif">
-            此心靈席位已達上限 ({maxPlayers} 人)，請選擇其他 Emoji 暗號房間。
+            此暗號房間已達人數上限 ({maxPlayers} 人)，為維護牌席秩序，請選擇其他暗號房間。
           </p>
           <Button variant="primary" onClick={() => router.push("/")}>
             返回大廳
@@ -131,11 +174,13 @@ function RoomInner() {
         selfPresence={self?.presence}
       />
 
-      {/* 中央極簡禪意盤面 */}
+      {/* 中央極簡禪意盤面 (傳入容量數據) */}
       <GameBoard
         board={board}
         currentConnectionId={currentConnId}
         status={status || "waiting"}
+        totalPlayers={totalPlayers}
+        cardsPerPlayer={settings?.cardsPerPlayer || 2}
         onRecallCard={recallCard}
         onFlipCard={(slotId) => flipCard(slotId)}
       />
@@ -158,7 +203,7 @@ function RoomInner() {
         <div className="w-full glass-panel rounded-2xl p-4 my-2 text-center flex flex-col items-center">
           <p className="text-xs text-ukiyo-mist font-serif mb-3">
             {isHost
-              ? "全員入座後，請點擊下按鈕開始遊戲。"
+              ? "全員入座後，請點擊下方按鈕開始發牌。"
               : "靜候房主開始牌局..."}
           </p>
           {isHost && (
@@ -180,7 +225,7 @@ function RoomInner() {
       />
 
       {/* 勝負結果彈窗 */}
-      <ResultOverlay result={result || null} onRestart={resetGame} />
+      <ResultOverlay result={result || null} isHost={isHost} onRestart={resetGame} />
     </main>
   );
 }
