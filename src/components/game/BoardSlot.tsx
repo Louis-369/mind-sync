@@ -10,10 +10,11 @@ interface BoardSlotProps {
   card?: BoardCard;
   status?: string;
   isOwnerLocked?: boolean;
-  isCurrentPlayer: boolean;
+  isCurrentPlayer?: boolean;
   currentConnectionId?: string;
   isFlipped?: boolean;
   isSelected?: boolean;
+  isCorrectOrder?: boolean;
   onSelectSlot?: (slotId: string) => void;
   onRecall?: (targetKey: string) => void;
   onFlip?: (targetKey: string) => void;
@@ -25,43 +26,42 @@ export function BoardSlot({
   card,
   status = "playing",
   isOwnerLocked = false,
-  isCurrentPlayer,
+  isCurrentPlayer = false,
   currentConnectionId,
   isFlipped = false,
   isSelected = false,
+  isCorrectOrder,
   onSelectSlot,
   onRecall,
   onFlip,
 }: BoardSlotProps) {
-  // 相容單張卡牌與多張卡牌槽位
+  // 相容單卡與多卡模式
   const allCards = cards.length > 0 ? cards : card ? [card] : [];
   const topCard = allCards[allCards.length - 1];
   const hasCollision = allCards.length > 1;
-  // 頂部極簡撞牌標籤 (例如：撞牌 2張)
-  const collisionNamesText = hasCollision ? `撞牌 ${allCards.length}張` : "";
 
-  // 判定該槽位中是否有屬於當前玩家的卡牌
-  const isAnyCardMine = allCards.some(
-    (c) =>
-      (currentConnectionId && c.playerId === currentConnectionId) ||
-      (c.playerId === topCard?.playerId && isCurrentPlayer)
-  );
-
-  // 尋找此槽位中屬於當前玩家且未翻開的卡牌
+  // 找尋當前玩家在這個槽位放置的未翻開卡牌
   const myUnflippedCard = allCards.find(
     (c) =>
+      !c.flipped &&
       ((currentConnectionId && c.playerId === currentConnectionId) ||
-        (c.playerId === topCard?.playerId && isCurrentPlayer)) &&
-      !c.flipped
+        (c.playerName && isCurrentPlayer))
   );
 
-  // 底部玩家名稱標籤 (撞牌時顯示所有參與玩家：例如「你、小華」)
+  // 整理參與碰撞的所有玩家名字
+  const collisionNamesText = allCards
+    .map((c) =>
+      currentConnectionId && c.playerId === currentConnectionId
+        ? "你"
+        : c.playerName || "匿名"
+    )
+    .join("、");
+
   const bottomPlayerNamesText = hasCollision
     ? Array.from(
         new Set(
           allCards.map((c) =>
-            (currentConnectionId && c.playerId === currentConnectionId) ||
-            (c.playerId === topCard?.playerId && isCurrentPlayer)
+            currentConnectionId && c.playerId === currentConnectionId
               ? "你"
               : c.playerName || "匿名"
           )
@@ -70,6 +70,10 @@ export function BoardSlot({
     : isCurrentPlayer
     ? "你"
     : topCard?.playerName || "匿名";
+
+  const isAnyCardMine = allCards.some(
+    (c) => currentConnectionId && c.playerId === currentConnectionId
+  );
 
   if (allCards.length === 0) {
     const canSelect = status === "playing";
@@ -126,12 +130,17 @@ export function BoardSlot({
 
   const isHighlightSelected = status === "playing" && isSelected;
   const slotIndex = parseInt(slotId.replace("slot-", ""), 10) + 1;
+  const isFinishedReveal = status === "finished" || (allCards.length > 0 && allCards.every(c => c.flipped));
 
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
       className={`relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border touch-manipulation ${
-        isHighlightSelected
+        isFinishedReveal && isCorrectOrder === true
+          ? "ring-2 ring-emerald-500/80 bg-emerald-500/10 border-emerald-500/80 shadow-[0_0_16px_rgba(16,185,129,0.45)]"
+          : isFinishedReveal && isCorrectOrder === false
+          ? "ring-2 ring-ukiyo-vermillion/90 bg-ukiyo-vermillion/15 border-ukiyo-vermillion shadow-[0_0_18px_rgba(196,43,28,0.6)]"
+          : isHighlightSelected
           ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
           : hasCollision
           ? "ring-2 ring-ukiyo-vermillion border-ukiyo-vermillion bg-ukiyo-vermillion/10 shadow-[0_0_18px_rgba(196,43,28,0.5)]"
@@ -145,8 +154,16 @@ export function BoardSlot({
         </span>
       </div>
 
-      {/* 標籤權重化渲染 (權重：撞牌 > 動作提示；每個席位上方最多顯示單一標籤) */}
-      {hasCollision ? (
+      {/* 標籤權重化渲染 (權重：結算正確性 > 撞牌 > 動作提示；每個席位上方最多顯示單一標籤) */}
+      {isFinishedReveal && isCorrectOrder === true ? (
+        <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-emerald-950 border border-emerald-500 text-emerald-400 font-bold pointer-events-none whitespace-nowrap">
+          ✓ 順序正確
+        </span>
+      ) : isFinishedReveal && isCorrectOrder === false ? (
+        <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
+          ✕ 順序錯誤
+        </span>
+      ) : hasCollision ? (
         <div className="absolute -top-3.5 z-50 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
           {collisionNamesText}
         </div>

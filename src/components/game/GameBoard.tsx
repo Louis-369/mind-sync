@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Sparkles } from "lucide-react";
 import { BoardSlot } from "./BoardSlot";
 import { BoardCard } from "../../types/game";
 
@@ -50,6 +51,26 @@ export function GameBoard({
     }
   });
 
+  // 在結算階段 (status === "finished" 或全部翻開) 計算各席位卡牌順序正確性
+  const slotCorrectnessMap: Record<string, boolean> = {};
+  if (status === "finished" || (board.length > 0 && board.every((c) => c.flipped))) {
+    const slotValues: { slotKey: string; val: number }[] = [];
+    for (let i = 0; i < totalSlotsCount; i++) {
+      const key = `slot-${i}`;
+      const cards = slotsMap[key] || [];
+      const topCard = cards[cards.length - 1];
+      if (topCard) {
+        slotValues.push({ slotKey: key, val: topCard.cardValue });
+      }
+    }
+
+    slotValues.forEach(({ slotKey, val }, idx) => {
+      const prevMax = idx > 0 ? Math.max(...slotValues.slice(0, idx).map((v) => v.val)) : -Infinity;
+      const nextMin = idx < slotValues.length - 1 ? Math.min(...slotValues.slice(idx + 1).map((v) => v.val)) : Infinity;
+      slotCorrectnessMap[slotKey] = val > prevMax && val < nextMin;
+    });
+  }
+
   return (
     <div className="w-full flex-1 min-h-[320px] md:min-h-[380px] bg-gradient-to-b from-ukiyo-surface/90 via-ukiyo-bg/95 to-ukiyo-surface/90 rounded-3xl p-4 md:p-6 border border-ukiyo-foam/20 shadow-2xl relative flex flex-col items-center justify-between overflow-hidden my-2 washi-texture">
       {/* 背景水墨波浪浮水印 */}
@@ -59,34 +80,18 @@ export function GameBoard({
         </div>
       </div>
 
-      {/* 頂部狀態與說明 */}
-      <div className="relative z-10 text-center">
-        <span className="text-xs tracking-widest text-ukiyo-gold font-serif font-bold bg-ukiyo-bg/60 px-3 py-1 rounded-full border border-ukiyo-foam/10">
-          {status === "playing"
-            ? selectedSlotId
-              ? `已選定第 ${parseInt(selectedSlotId.replace("slot-", ""), 10) + 1} 個席位！點擊手牌即可落牌`
-              : `已落牌 ${board.length} / ${totalSlotsCount} 張 (點擊席位選位 ➔ 點擊手牌落牌)`
-            : status === "locked"
-            ? "全員已同意鎖定！點擊自己的牌翻開"
-            : "中央預留牌陣"}
-        </span>
-      </div>
-
-      {/* 由小到大 順序視覺引導軸 */}
-      <div className="relative z-10 w-full max-w-xl flex items-center justify-between px-2 my-2 text-[11px] font-serif text-ukiyo-mist">
-        <div className="flex items-center space-x-1 bg-ukiyo-bg/80 px-2.5 py-0.5 rounded border border-ukiyo-foam/10">
-          <span className="text-ukiyo-gold font-bold">小</span>
-          <span className="text-[10px] font-mono opacity-60">(1)</span>
-        </div>
-        <div className="flex-1 mx-2 flex items-center justify-center space-x-1.5">
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-ukiyo-gold/40 via-ukiyo-foam/20 to-ukiyo-gold/40" />
-          <span className="text-[10px] text-ukiyo-gold/90 font-serif font-bold tracking-wider">
-            由上至下、由左至右 ➔ 由小到大
+      {/* 頂部說明引導與計數器 */}
+      <div className="relative z-10 w-full flex items-center justify-between px-2 py-1 text-xs text-ukiyo-mist font-serif border-b border-ukiyo-foam/10 pb-2">
+        <div className="flex items-center gap-1.5 font-bold text-ukiyo-foam">
+          <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" />
+          <span>
+            已落牌 {board.length} / {totalSlotsCount} 張 (點擊席位選位 ➔ 點擊手牌落牌)
           </span>
-          <div className="h-[1px] flex-1 bg-gradient-to-r from-ukiyo-gold/40 via-ukiyo-foam/20 to-ukiyo-gold/40" />
         </div>
-        <div className="flex items-center space-x-1 bg-ukiyo-bg/80 px-2.5 py-0.5 rounded border border-ukiyo-foam/10">
-          <span className="text-ukiyo-gold font-bold">大</span>
+
+        {/* 右側多排順序指示 */}
+        <div className="hidden sm:flex items-center gap-1 text-[11px] text-ukiyo-gold font-mono">
+          <span>由上至下、由左至右 ➔ 由小到大</span>
           <span className="text-[10px] font-mono opacity-60">(100)</span>
         </div>
       </div>

@@ -62,8 +62,8 @@ export function Card({
           </div>
         </div>
 
-        {/* 卡牌正面 (和紙古紙墨書風 - 加入真實和紙紙紋與溫潤漸層) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-[#f8f4e6] via-[#f3edd9] to-[#e6d9bd] text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/20 shadow-inner overflow-hidden washi-texture">
+        {/* 卡牌正面 (100% 不透明天然和紙實體牌面) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 washi-card-front text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/25 shadow-md overflow-hidden">
           {/* 右上角 ↗ 斜對角小數字 */}
           <div className="absolute top-1.5 right-2 flex flex-col items-center">
             <span
