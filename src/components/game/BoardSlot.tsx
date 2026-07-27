@@ -8,6 +8,7 @@ interface BoardSlotProps {
   slotId: string;
   card?: BoardCard;
   status?: string;
+  isOwnerLocked?: boolean;
   isCurrentPlayer: boolean;
   isFlipped?: boolean;
   onRecall?: (slotId: string) => void;
@@ -18,6 +19,7 @@ export function BoardSlot({
   slotId,
   card,
   status = "playing",
+  isOwnerLocked = false,
   isCurrentPlayer,
   isFlipped = false,
   onRecall,
@@ -51,16 +53,18 @@ export function BoardSlot({
       <Card
         value={card.cardValue}
         flipped={card.flipped || isFlipped}
-        isOwner={isCurrentPlayer}
+        isOwner={isCurrentPlayer || isOwnerLocked}
         playerName={card.playerName}
         onClick={handleCardClick}
       />
 
-      {/* 出牌者標籤 (底部固定顯示) */}
+      {/* 出牌者標籤 (鎖定時發光) */}
       <div className="mt-1 flex items-center space-x-1">
         <span
-          className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[80px] ${
-            isCurrentPlayer
+          className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[80px] transition-all ${
+            isOwnerLocked
+              ? "bg-ukiyo-gold/30 text-ukiyo-gold border-ukiyo-gold shadow-ukiyo-glow font-bold animate-pulse"
+              : isCurrentPlayer
               ? "bg-ukiyo-gold/20 text-ukiyo-gold border-ukiyo-gold/40 font-bold"
               : "bg-ukiyo-surface/80 text-ukiyo-mist border-ukiyo-foam/10"
           }`}

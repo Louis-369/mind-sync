@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Lock, Unlock } from "lucide-react";
+import { clsx } from "clsx";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
 
@@ -27,15 +28,27 @@ export function PlayerHand({
   disabled = false,
 }: PlayerHandProps) {
   return (
-    <div className="w-full glass-panel rounded-2xl p-3 md:p-4 mt-2 flex flex-col md:flex-row items-center justify-between gap-3 border-ukiyo-foam/15 shadow-xl">
+    <div
+      className={clsx(
+        "w-full glass-panel rounded-2xl p-3 md:p-4 mt-2 flex flex-col md:flex-row items-center justify-between gap-3 transition-all duration-300 shadow-xl",
+        isLocked
+          ? "border-ukiyo-gold shadow-ukiyo-glow ring-2 ring-ukiyo-gold/40 bg-ukiyo-surface/90"
+          : "border-ukiyo-foam/15"
+      )}
+    >
       {/* 左側/頂部：玩家名稱與手牌數量 */}
       <div className="flex items-center justify-between w-full md:w-auto gap-4">
         <div className="flex items-center space-x-2">
-          <span className="text-xs font-serif font-bold text-ukiyo-gold">
+          <span className="text-xs font-serif font-bold text-ukiyo-gold flex items-center gap-1.5">
             {playerName}
+            {isLocked && (
+              <span className="text-[9px] bg-ukiyo-gold text-ukiyo-bg font-bold px-1.5 py-0.2 rounded-full animate-pulse">
+                心靈鎖定
+              </span>
+            )}
           </span>
           <span className="text-[11px] text-ukiyo-mist bg-ukiyo-surface/80 px-2 py-0.5 rounded-full border border-ukiyo-foam/10">
-            {hand.length} 張牌
+            {hand.length} 張手牌
           </span>
         </div>
 
@@ -47,15 +60,15 @@ export function PlayerHand({
               size="sm"
               onClick={onToggleLock}
               disabled={disabled}
-              className="text-xs"
+              className="text-xs font-serif"
             >
               {isLocked ? (
-                <span className="flex items-center gap-1">
-                  <Lock className="w-3.5 h-3.5 text-emerald-400" /> 已鎖定 ({lockedCount}/{totalPlayers})
+                <span className="flex items-center gap-1 text-ukiyo-gold font-bold">
+                  <Lock className="w-3.5 h-3.5" /> 已鎖定 ({lockedCount}/{totalPlayers})
                 </span>
               ) : (
                 <span className="flex items-center gap-1">
-                  <Unlock className="w-3.5 h-3.5" /> 鎖定 ({lockedCount}/{totalPlayers})
+                  <Unlock className="w-3.5 h-3.5" /> 同意鎖定 ({lockedCount}/{totalPlayers})
                 </span>
               )}
             </Button>
@@ -92,11 +105,14 @@ export function PlayerHand({
             size="md"
             onClick={onToggleLock}
             disabled={disabled}
-            className="w-full text-xs font-serif"
+            className={clsx(
+              "w-full text-xs font-serif transition-all",
+              isLocked && "border-ukiyo-gold text-ukiyo-gold font-bold"
+            )}
           >
             {isLocked ? (
               <span className="flex items-center justify-center gap-1.5">
-                <Lock className="w-4 h-4 text-emerald-400" /> 已同意鎖定
+                <Lock className="w-4 h-4 text-ukiyo-gold" /> 已同意鎖定
               </span>
             ) : (
               <span className="flex items-center justify-center gap-1.5">
@@ -105,7 +121,7 @@ export function PlayerHand({
             )}
           </Button>
           <span className="text-[10px] text-ukiyo-mist mt-1 font-mono">
-            鎖定進度: {lockedCount}/{totalPlayers} 人
+            同意進度: {lockedCount}/{totalPlayers} 人
           </span>
         </div>
       )}

@@ -61,31 +61,6 @@ export function HostPanel({
                 ))}
               </select>
             </div>
-
-            {/* 開關勾選項 */}
-            <div className="flex flex-col justify-center col-span-2 space-y-2 pt-2 border-t border-ukiyo-foam/10">
-              <label className="flex items-center space-x-2 cursor-pointer text-xs text-ukiyo-foam">
-                <input
-                  type="checkbox"
-                  checked={settings.shuriken}
-                  disabled={status !== "waiting"}
-                  onChange={(e) => onUpdateSettings({ shuriken: e.target.checked })}
-                  className="accent-ukiyo-gold"
-                />
-                <span>啟用手裏劍技能（拋棄個人最小牌）</span>
-              </label>
-
-              <label className="flex items-center space-x-2 cursor-pointer text-xs text-ukiyo-foam">
-                <input
-                  type="checkbox"
-                  checked={settings.healthSystem}
-                  disabled={status !== "waiting"}
-                  onChange={(e) => onUpdateSettings({ healthSystem: e.target.checked })}
-                  className="accent-ukiyo-gold"
-                />
-                <span>生命值系統</span>
-              </label>
-            </div>
           </div>
         )}
 

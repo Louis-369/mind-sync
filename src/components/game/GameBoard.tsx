@@ -10,6 +10,7 @@ interface GameBoardProps {
   status: string;
   totalPlayers?: number;
   cardsPerPlayer?: number;
+  lockedList?: string[];
   onRecallCard?: (slotId: string) => void;
   onFlipCard?: (slotId: string) => void;
 }
@@ -20,18 +21,19 @@ export function GameBoard({
   status,
   totalPlayers = 2,
   cardsPerPlayer = 2,
+  lockedList = [],
   onRecallCard,
   onFlipCard,
 }: GameBoardProps) {
   // 按放置時間排序展示已打出的牌
   const sortedBoard = [...board].sort((a, b) => a.placedAt - b.placedAt);
 
-  // 計算本局總共預計發出的卡牌總數 (總空槽數)
-  const totalSlotsCount = Math.max(totalPlayers * cardsPerPlayer, 4);
+  // 計算本局總共預計發出的卡牌總數 (精確等於發牌總數)
+  const totalSlotsCount = totalPlayers * cardsPerPlayer;
   const emptySlotsCount = Math.max(totalSlotsCount - sortedBoard.length, 0);
 
   return (
-    <div className="w-full flex-1 min-h-[300px] md:min-h-[360px] bg-gradient-to-b from-ukiyo-surface/90 via-ukiyo-bg/95 to-ukiyo-surface/90 rounded-3xl p-4 md:p-6 border border-ukiyo-foam/15 shadow-2xl relative flex flex-col items-center justify-center overflow-hidden my-2">
+    <div className="w-full flex-1 min-h-[320px] md:min-h-[380px] bg-gradient-to-b from-ukiyo-surface/90 via-ukiyo-bg/95 to-ukiyo-surface/90 rounded-3xl p-4 md:p-6 border border-ukiyo-foam/15 shadow-2xl relative flex flex-col items-center justify-between overflow-hidden my-2">
       {/* 背景水墨波浪浮水印 */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
         <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border-8 border-ukiyo-foam flex items-center justify-center">
@@ -39,8 +41,8 @@ export function GameBoard({
         </div>
       </div>
 
-      {/* 狀態提示 */}
-      <div className="relative z-10 text-center mb-3">
+      {/* 頂部狀態與說明 */}
+      <div className="relative z-10 text-center">
         <span className="text-xs tracking-widest text-ukiyo-gold font-serif font-bold bg-ukiyo-bg/60 px-3 py-1 rounded-full border border-ukiyo-foam/10">
           {status === "playing"
             ? `已落牌 ${sortedBoard.length} / ${totalSlotsCount} 張 (未全員同意前不可翻牌)`
@@ -50,8 +52,25 @@ export function GameBoard({
         </span>
       </div>
 
-      {/* 盤面槽位 (固定容量) */}
-      <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 md:gap-4 max-w-2xl min-h-[140px]">
+      {/* 由小到大 順序視覺引導軸 */}
+      <div className="relative z-10 w-full max-w-xl flex items-center justify-between px-2 my-2 text-[11px] font-serif text-ukiyo-mist">
+        <div className="flex items-center space-x-1 bg-ukiyo-bg/80 px-2 py-0.5 rounded border border-ukiyo-foam/10">
+          <span className="text-ukiyo-gold font-bold">小</span>
+          <span className="text-[10px] font-mono opacity-60">(1)</span>
+        </div>
+        <div className="flex-1 mx-3 flex items-center justify-center space-x-2">
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-ukiyo-gold/40 via-ukiyo-foam/20 to-ukiyo-gold/40" />
+          <span className="text-[10px] text-ukiyo-gold/80 tracking-widest uppercase">放置順序 ➔</span>
+          <div className="h-[1px] flex-1 bg-gradient-to-r from-ukiyo-gold/40 via-ukiyo-foam/20 to-ukiyo-gold/40" />
+        </div>
+        <div className="flex items-center space-x-1 bg-ukiyo-bg/80 px-2 py-0.5 rounded border border-ukiyo-foam/10">
+          <span className="text-ukiyo-gold font-bold">大</span>
+          <span className="text-[10px] font-mono opacity-60">(100)</span>
+        </div>
+      </div>
+
+      {/* 盤面槽位 (精確容量) */}
+      <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 md:gap-4 max-w-2xl min-h-[140px] my-auto">
         {/* 已打出的卡牌 */}
         {sortedBoard.map((item) => (
           <BoardSlot
@@ -59,6 +78,7 @@ export function GameBoard({
             slotId={item.slotId}
             card={item}
             status={status}
+            isOwnerLocked={lockedList.includes(item.playerId)}
             isCurrentPlayer={item.playerId === currentConnectionId}
             onRecall={onRecallCard}
             onFlip={onFlipCard}

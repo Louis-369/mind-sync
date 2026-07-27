@@ -174,13 +174,14 @@ function RoomInner() {
         selfPresence={self?.presence}
       />
 
-      {/* 中央極簡禪意盤面 (傳入容量數據) */}
+      {/* 中央極簡禪意盤面 (傳入容量與鎖定清單) */}
       <GameBoard
         board={board}
         currentConnectionId={currentConnId}
         status={status || "waiting"}
         totalPlayers={totalPlayers}
         cardsPerPlayer={settings?.cardsPerPlayer || 2}
+        lockedList={lockedList}
         onRecallCard={recallCard}
         onFlipCard={(slotId) => flipCard(slotId)}
       />

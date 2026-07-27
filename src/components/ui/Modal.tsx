@@ -14,8 +14,8 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ukiyo-bg/85 backdrop-blur-md animate-fade-in">
-      <div className="glass-panel w-full max-w-lg rounded-2xl p-5 md:p-6 border border-ukiyo-foam/20 shadow-2xl relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ukiyo-bg/85 backdrop-blur-md animate-fade-in pointer-events-auto">
+      <div className="glass-panel w-full max-w-md rounded-2xl p-5 md:p-6 border border-ukiyo-foam/20 shadow-2xl relative my-auto">
         <div className="flex items-center justify-between pb-3 border-b border-ukiyo-foam/15 mb-4">
           <h3 className="text-base md:text-lg font-serif font-bold text-ukiyo-foam tracking-wide flex items-center gap-2">
             {title}
