@@ -45,9 +45,10 @@ function RoomInner() {
     updateSettings,
     resetGame,
     claimHost,
+    autoResetStaleRoom,
   } = useGameState();
 
-  // 更新 Presence 與維護房主身分
+  // 更新 Presence 與維護房主身分，並自動清除殘留無人的舊房間
   useEffect(() => {
     try {
       if (playerId && playerName) {
@@ -58,11 +59,12 @@ function RoomInner() {
         });
       }
       claimHost();
+      autoResetStaleRoom();
     } catch (error) {
       console.error("更新玩家 Presence 失敗:", error);
     }
     return () => {};
-  }, [playerId, playerName, updateMyPresence, claimHost, others]);
+  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, others]);
 
   const isHost = Boolean(self?.connectionId && String(self.connectionId) === hostId);
   const currentConnId = String(self?.connectionId);
@@ -174,9 +176,6 @@ function RoomInner() {
         onClose={() => setIsHostModalOpen(false)}
         status={status || "waiting"}
         settings={settings}
-        onDealCards={dealCards}
-        onFlipAll={() => flipCard()}
-        onResetGame={resetGame}
         onUpdateSettings={updateSettings}
       />
 
@@ -191,7 +190,7 @@ export default function RoomPage() {
 
   if (!roomId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-poker-bg text-poker-accent">
+      <div className="flex items-center justify-center min-h-screen bg-ukiyo-bg text-ukiyo-gold font-serif">
         載入中...
       </div>
     );

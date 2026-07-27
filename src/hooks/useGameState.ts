@@ -131,44 +131,53 @@ export function useGameState() {
     }
   }, [self, others]);
 
-  // 翻開盤面上特定或全部卡牌
-  const flipCard = useMutation(({ storage }, slotId?: string) => {
+  // 翻開盤面上屬於自己的特定卡牌
+  const flipCard = useMutation(({ storage }, slotId: string) => {
+    const connId = String(self?.connectionId);
     const mutableBoard = storage.get("board");
+    const card = mutableBoard.get(slotId);
 
-    if (slotId) {
-      const card = mutableBoard.get(slotId);
-      if (card) {
-        card.set("flipped", true);
-      }
-    } else {
-      // 一鍵翻開所有盤面上未翻的卡片
-      mutableBoard.forEach((card) => {
-        card.set("flipped", true);
-      });
-    }
+    // 只能翻開自己出的牌
+    if (card && card.get("playerId") === connId && !card.get("flipped")) {
+      card.set("flipped", true);
 
-    // 檢查判定結果
-    const cardsArray = Array.from(mutableBoard.values()).map((c) => ({
-      cardValue: c.get("cardValue"),
-      placedAt: c.get("placedAt"),
-    }));
+      // 檢查是否盤面上所有卡片都已翻開
+      const allCards = Array.from(mutableBoard.values());
+      const allFlipped = allCards.length > 0 && allCards.every((c) => c.get("flipped"));
 
-    // 按放置時間排序比對
-    cardsArray.sort((a, b) => a.placedAt - b.placedAt);
-    let isCorrectOrder = true;
-
-    for (let i = 0; i < cardsArray.length - 1; i++) {
-      if (cardsArray[i].cardValue > cardsArray[i + 1].cardValue) {
-        isCorrectOrder = false;
-        break;
+      if (allFlipped) {
+        // 檢查順序
+        const sorted = [...allCards].sort((a, b) => a.get("placedAt") - b.get("placedAt"));
+        let isCorrect = true;
+        for (let i = 0; i < sorted.length - 1; i++) {
+          if (sorted[i].get("cardValue") > sorted[i + 1].get("cardValue")) {
+            isCorrect = false;
+            break;
+          }
+        }
+        storage.set("status", "finished");
+        storage.set("result", isCorrect ? "win" : "lose");
       }
     }
+  }, [self]);
 
-    if (cardsArray.length > 0 && Array.from(mutableBoard.values()).every((c) => c.get("flipped"))) {
-      storage.set("status", "finished");
-      storage.set("result", isCorrectOrder ? "win" : "lose");
+  // 當發現舊房間狀態殘留（例如非等待狀態但無其他玩家），自動清理重置
+  const autoResetStaleRoom = useMutation(({ storage }) => {
+    const currentStatus = storage.get("status");
+    // 如果不是等待階段，且全房只有自己一人（others.length === 0）
+    if (currentStatus !== "waiting" && others.length === 0) {
+      const boardMap = storage.get("board");
+      const handsMap = storage.get("hands");
+      Array.from(boardMap.keys()).forEach((k) => boardMap.delete(k));
+      storage.get("lockedPlayers").clear();
+      Array.from(handsMap.keys()).forEach((k) => handsMap.delete(k));
+      storage.set("status", "waiting");
+      storage.set("result", null);
+      if (self?.connectionId) {
+        storage.set("hostId", String(self.connectionId));
+      }
     }
-  }, []);
+  }, [others, self]);
 
   // 使用手裏劍技能 (每人自動亮出並移除手上最小的一張牌)
   const useShuriken = useMutation(({ storage }) => {
@@ -269,5 +278,6 @@ export function useGameState() {
     updateSettings,
     resetGame,
     claimHost,
+    autoResetStaleRoom,
   };
 }

@@ -30,19 +30,17 @@ export function BoardSlot({
   }
 
   const handleCardClick = () => {
+    // 若已翻開則點擊無效
     if (card.flipped) return;
 
-    if (isCurrentPlayer && onRecall) {
-      // 自己的未翻牌，可以點擊收回
-      onRecall(slotId);
-    } else if (onFlip) {
-      // 點擊翻開
+    // 自己出的牌，未翻開時可翻牌
+    if (isCurrentPlayer && onFlip) {
       onFlip(slotId);
     }
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group flex flex-col items-center">
       <Card
         value={card.cardValue}
         flipped={card.flipped || isFlipped}
@@ -50,9 +48,24 @@ export function BoardSlot({
         playerName={card.playerName}
         onClick={handleCardClick}
       />
+
+      {/* 出牌者標籤 (底部固定顯示) */}
+      <div className="mt-1 flex items-center space-x-1">
+        <span
+          className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[80px] ${
+            isCurrentPlayer
+              ? "bg-ukiyo-gold/20 text-ukiyo-gold border-ukiyo-gold/40 font-bold"
+              : "bg-ukiyo-surface/80 text-ukiyo-mist border-ukiyo-foam/10"
+          }`}
+        >
+          {card.playerName || "匿名"} {isCurrentPlayer ? "(你)" : ""}
+        </span>
+      </div>
+
+      {/* 提示可點擊翻開標籤 (僅自己且未翻開時) */}
       {isCurrentPlayer && !card.flipped && (
-        <span className="absolute -top-2 -right-2 bg-poker-accent text-poker-bg text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-          點擊收回
+        <span className="absolute -top-2.5 bg-ukiyo-gold text-ukiyo-bg text-[9px] font-serif font-bold px-1.5 py-0.5 rounded-full shadow animate-pulse">
+          點擊翻牌
         </span>
       )}
     </div>

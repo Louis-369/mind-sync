@@ -53,9 +53,9 @@ export function LiveblocksWrapper({ roomId, children, fallback }: LiveblocksWrap
 
 function LoadingFallback() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-poker-bg text-poker-accent">
-      <div className="w-12 h-12 border-4 border-poker-accent border-t-transparent rounded-full animate-spin mb-4" />
-      <p className="text-lg font-medium animate-pulse">心靈連線建立中，請稍候...</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-ukiyo-bg text-ukiyo-gold">
+      <div className="w-12 h-12 border-4 border-ukiyo-gold border-t-transparent rounded-full animate-spin mb-4" />
+      <p className="text-sm font-serif animate-pulse">心靈連線建立中，請稍候...</p>
     </div>
   );
 }
