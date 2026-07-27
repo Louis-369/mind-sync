@@ -34,7 +34,6 @@ export function PlayerHand({
 
   const getLockHintText = () => {
     if (hasBoardCollision) return "⚠️ 盤面有撞牌，請先收回卡牌";
-    if (hasUnplayedCards) return "⚠️ 請先將手牌全部出完";
     return `同意進度: ${lockedCount}/${totalPlayers} 人`;
   };
 
@@ -146,7 +145,7 @@ export function PlayerHand({
               </span>
             )}
           </Button>
-          <span className={`text-[10px] mt-1 font-serif ${hasBoardCollision || hasUnplayedCards ? "text-ukiyo-vermillion font-bold animate-pulse" : "text-ukiyo-mist font-mono"}`}>
+          <span className={`text-[10px] mt-1 font-serif ${hasBoardCollision ? "text-ukiyo-vermillion font-bold animate-pulse" : "text-ukiyo-mist font-mono"}`}>
             {getLockHintText()}
           </span>
         </div>
