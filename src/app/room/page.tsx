@@ -22,6 +22,7 @@ function RoomInner() {
   const { playerId, playerName, setPlayerName } = usePlayerId();
   const [isHostModalOpen, setIsHostModalOpen] = React.useState<boolean>(false);
   const [inputNameTemp, setInputNameTemp] = React.useState<string>("");
+  const [selectedSlotId, setSelectedSlotId] = React.useState<string | null>(null);
 
   const {
     settings,
@@ -52,6 +53,12 @@ function RoomInner() {
   const totalPlayers = others.length + 1;
   const maxPlayers = settings?.maxPlayers || 4;
   const isOverflow = totalPlayers > maxPlayers;
+
+  // 處理卡牌放置事件 (若有選擇特定槽位則放入該槽位，否則自動遞補)
+  const handlePlayCard = (cardValue: number) => {
+    placeCard(cardValue, playerName, selectedSlotId || undefined);
+    setSelectedSlotId(null);
+  };
 
   // 更新 Presence 與維護房主身分，並自動清除殘留無人的舊房間 (唯有未滿員時才執行，防止擠退已有玩家)
   useEffect(() => {
@@ -182,6 +189,8 @@ function RoomInner() {
         totalPlayers={totalPlayers}
         cardsPerPlayer={settings?.cardsPerPlayer || 2}
         lockedList={lockedList}
+        selectedSlotId={selectedSlotId}
+        onSelectSlot={(slotId) => setSelectedSlotId((prev) => (prev === slotId ? null : slotId))}
         onRecallCard={recallCard}
         onFlipCard={(slotId) => flipCard(slotId)}
       />
@@ -191,7 +200,7 @@ function RoomInner() {
         <PlayerHand
           hand={myHand}
           playerName={playerName}
-          onPlayCard={(val) => placeCard(val, playerName)}
+          onPlayCard={handlePlayCard}
           isLocked={isLocked}
           lockedCount={lockedList.length}
           totalPlayers={totalPlayers}

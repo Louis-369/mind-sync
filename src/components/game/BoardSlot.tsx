@@ -12,9 +12,10 @@ interface BoardSlotProps {
   isOwnerLocked?: boolean;
   isCurrentPlayer: boolean;
   isFlipped?: boolean;
+  isSelected?: boolean;
   onSelectSlot?: (slotId: string) => void;
-  onRecall?: (slotId: string) => void;
-  onFlip?: (slotId: string) => void;
+  onRecall?: (targetKey: string) => void;
+  onFlip?: (targetKey: string) => void;
 }
 
 export function BoardSlot({
@@ -25,6 +26,7 @@ export function BoardSlot({
   isOwnerLocked = false,
   isCurrentPlayer,
   isFlipped = false,
+  isSelected = false,
   onSelectSlot,
   onRecall,
   onFlip,
@@ -38,31 +40,54 @@ export function BoardSlot({
     return (
       <div
         onClick={() => onSelectSlot && onSelectSlot(slotId)}
-        className="w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed border-ukiyo-foam/25 bg-ukiyo-surface/30 flex flex-col items-center justify-center text-ukiyo-mist/50 hover:border-ukiyo-gold/60 hover:text-ukiyo-gold cursor-pointer transition-all hover:scale-105"
+        className={`w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+          isSelected
+            ? "border-ukiyo-gold bg-ukiyo-gold/20 text-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+            : "border-ukiyo-foam/25 bg-ukiyo-surface/30 text-ukiyo-mist/50 hover:border-ukiyo-gold/60 hover:text-ukiyo-gold"
+        }`}
       >
-        <span className="text-[11px] font-serif">空席位</span>
-        <span className="text-[9px] font-mono opacity-50 mt-1">點擊落牌</span>
+        <span className="text-[11px] font-serif font-bold">
+          {isSelected ? "已選定" : "空席位"}
+        </span>
+        <span className="text-[9px] font-mono opacity-60 mt-1">
+          {isSelected ? "點擊手牌落牌" : "點擊選位"}
+        </span>
       </div>
     );
   }
 
-  const handleCardClick = () => {
-    // 已翻開則無法操作
+  const handleCardClick = (e?: React.MouseEvent) => {
+    // 點擊卡片本體時進行收回或翻牌
+    if (e) e.stopPropagation();
     if (topCard?.flipped) return;
+
+    const targetKey = topCard?.uniqueKey || slotId;
 
     if (isCurrentPlayer) {
       if (status === "playing" && onRecall) {
         // 未全鎖定前：點擊收回手牌
-        onRecall(slotId);
+        onRecall(targetKey);
       } else if (status === "locked" && onFlip) {
         // 全員鎖定後：點擊翻開卡牌
-        onFlip(slotId);
+        onFlip(targetKey);
+      }
+    } else {
+      // 點擊非自己的卡牌槽位時，視為選擇該槽位以供落牌
+      if (onSelectSlot) {
+        onSelectSlot(slotId);
       }
     }
   };
 
   return (
-    <div className="relative group flex flex-col items-center">
+    <div
+      onClick={() => onSelectSlot && onSelectSlot(slotId)}
+      className={`relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border ${
+        isSelected
+          ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+          : "border-transparent hover:border-ukiyo-foam/20"
+      }`}
+    >
       {/* 💥 撞牌碰撞警示標籤 (多牌重疊放進同槽位，保持蓋著) */}
       {hasCollision && (
         <div className="absolute -top-3.5 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 animate-bounce">

@@ -13,6 +13,12 @@ interface CardProps {
   className?: string;
 }
 
+// 判斷是否為顛倒易混淆的數字（包含 6、9 或顛倒後可能看錯的數字）
+function isAmbiguousNumber(num: number): boolean {
+  const str = String(num);
+  return str.includes("6") || str.includes("9") || num === 18 || num === 81;
+}
+
 export function Card({
   value,
   flipped = false,
@@ -27,6 +33,8 @@ export function Card({
     md: "w-16 h-24 text-2xl md:w-20 md:h-28 md:text-3xl",
     lg: "w-24 h-36 text-4xl md:w-28 md:h-40 md:text-5xl",
   };
+
+  const showUnderline = isAmbiguousNumber(value);
 
   return (
     <div
@@ -56,23 +64,38 @@ export function Card({
 
         {/* 卡牌正面 (和紙古紙墨書風 - 確保完美白底漸層) */}
         <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-[#f8f4e6] via-[#f3edd9] to-[#e6d9bd] text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/20 shadow-inner overflow-hidden">
-          {/* 右上角 ↗ 斜對角小數字 (帶腳底實體橫線) */}
+          {/* 右上角 ↗ 斜對角小數字 */}
           <div className="absolute top-1.5 right-2 flex flex-col items-center">
-            <span className="font-mono text-[10px] md:text-xs font-black text-ukiyo-ink border-b border-ukiyo-ink/70 pb-0.5 leading-none">
+            <span
+              className={clsx(
+                "font-mono text-[10px] md:text-xs font-black text-ukiyo-ink leading-none",
+                showUnderline && "border-b border-ukiyo-ink/70 pb-0.5"
+              )}
+            >
               {value}
             </span>
           </div>
 
-          {/* 中央大數字 (帶腳底實體橫線) */}
+          {/* 中央大數字 */}
           <div className="flex flex-col items-center justify-center">
-            <span className="font-mono text-xl md:text-3xl font-black text-ukiyo-ink tracking-tight border-b-2 md:border-b-4 border-ukiyo-ink/70 pb-0.5 leading-none">
+            <span
+              className={clsx(
+                "font-mono text-xl md:text-3xl font-black text-ukiyo-ink tracking-tight leading-none",
+                showUnderline && "border-b-2 md:border-b-4 border-ukiyo-ink/70 pb-0.5"
+              )}
+            >
               {value}
             </span>
           </div>
 
-          {/* 左下角 ↙ 斜對角小數字 (旋轉 180 度，帶腳底實體橫線) */}
+          {/* 左下角 ↙ 斜對角小數字 (旋轉 180 度) */}
           <div className="absolute bottom-1.5 left-2 flex flex-col items-center rotate-180">
-            <span className="font-mono text-[10px] md:text-xs font-black text-ukiyo-ink border-b border-ukiyo-ink/70 pb-0.5 leading-none">
+            <span
+              className={clsx(
+                "font-mono text-[10px] md:text-xs font-black text-ukiyo-ink leading-none",
+                showUnderline && "border-b border-ukiyo-ink/70 pb-0.5"
+              )}
+            >
               {value}
             </span>
           </div>
@@ -81,3 +104,4 @@ export function Card({
     </div>
   );
 }
+

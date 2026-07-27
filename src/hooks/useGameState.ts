@@ -3,7 +3,7 @@
 import { useStorage, useMutation, useOthers, useSelf, useMyPresence } from "@liveblocks/react";
 import { useCallback } from "react";
 import { generateShuffledDeck } from "../lib/gameLogic";
-import { GameSettings } from "../types/game";
+import { GameSettings, BoardCard } from "../types/game";
 
 export function useGameState() {
   const [myPresence, updateMyPresence] = useMyPresence();
@@ -23,7 +23,17 @@ export function useGameState() {
   const currentLevel = useStorage((root) => root.currentLevel);
 
   // 轉為純 JS 資料格式
-  const board = boardMap ? Array.from(boardMap.entries()).map(([slotId, card]) => ({ slotId, ...card })) : [];
+  const board: BoardCard[] = boardMap
+    ? Array.from(boardMap.entries()).map(([uniqueKey, card]: [string, any]) => ({
+        uniqueKey,
+        slotId: card?.slotId || uniqueKey,
+        playerId: card?.playerId || "",
+        playerName: card?.playerName || "玩家",
+        cardValue: card?.cardValue || 0,
+        flipped: Boolean(card?.flipped),
+        placedAt: card?.placedAt || Date.now(),
+      }))
+    : [];
   const lockedList = lockedPlayers ? Array.from(lockedPlayers) : [];
 
   // 發牌 mutation
@@ -98,15 +108,30 @@ export function useGameState() {
   }, [self]);
 
   // 玩家收回卡片 (從盤面收回手牌)
-  const recallCard = useMutation(({ storage }, slotId: string) => {
+  const recallCard = useMutation(({ storage }, targetKey: string) => {
     const connId = String(self?.connectionId);
     const mutableBoard = storage.get("board");
     const mutableHands = storage.get("hands");
 
-    const card = mutableBoard.get(slotId);
+    // 優先以 uniqueKey 直接取得卡牌
+    let targetBoardKey = targetKey;
+    let card = mutableBoard.get(targetKey);
+
+    // 若未直接找到，嘗試搜尋對應槽位且屬於該玩家的未翻開卡牌
+    if (!card) {
+      const boardEntries = Array.from(mutableBoard.entries());
+      for (const [k, v] of boardEntries) {
+        if ((k === targetKey || v.get("slotId") === targetKey) && v.get("playerId") === connId && !v.get("flipped")) {
+          card = v;
+          targetBoardKey = k;
+          break;
+        }
+      }
+    }
+
     if (card && card.get("playerId") === connId && !card.get("flipped")) {
       const cardValue = card.get("cardValue");
-      mutableBoard.delete(slotId);
+      mutableBoard.delete(targetBoardKey);
 
       const playerHand = mutableHands.get(connId);
       if (playerHand) {
@@ -139,10 +164,20 @@ export function useGameState() {
   }, [self, others]);
 
   // 翻開盤面上屬於自己的特定卡牌
-  const flipCard = useMutation(({ storage }, slotId: string) => {
+  const flipCard = useMutation(({ storage }, targetKey: string) => {
     const connId = String(self?.connectionId);
     const mutableBoard = storage.get("board");
-    const card = mutableBoard.get(slotId);
+    let card = mutableBoard.get(targetKey);
+
+    if (!card) {
+      const boardEntries = Array.from(mutableBoard.entries());
+      for (const [k, v] of boardEntries) {
+        if ((k === targetKey || v.get("slotId") === targetKey) && v.get("playerId") === connId && !v.get("flipped")) {
+          card = v;
+          break;
+        }
+      }
+    }
 
     // 只能翻開自己出的牌
     if (card && card.get("playerId") === connId && !card.get("flipped")) {

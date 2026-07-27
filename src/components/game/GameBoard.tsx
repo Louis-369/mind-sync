@@ -5,12 +5,13 @@ import { BoardSlot } from "./BoardSlot";
 import { BoardCard } from "../../types/game";
 
 interface GameBoardProps {
-  board: (BoardCard & { slotId: string })[];
+  board: BoardCard[];
   currentConnectionId: string;
   status: string;
   totalPlayers?: number;
   cardsPerPlayer?: number;
   lockedList?: string[];
+  selectedSlotId?: string | null;
   onSelectSlot?: (slotId: string) => void;
   onRecallCard?: (slotId: string) => void;
   onFlipCard?: (slotId: string) => void;
@@ -23,6 +24,7 @@ export function GameBoard({
   totalPlayers = 2,
   cardsPerPlayer = 2,
   lockedList = [],
+  selectedSlotId,
   onSelectSlot,
   onRecallCard,
   onFlipCard,
@@ -31,7 +33,7 @@ export function GameBoard({
   const totalSlotsCount = totalPlayers * cardsPerPlayer;
 
   // 根據 slotId 或是放置順序將卡牌歸類至各槽位
-  const slotsMap: Record<string, (BoardCard & { slotId: string })[]> = {};
+  const slotsMap: Record<string, BoardCard[]> = {};
   for (let i = 0; i < totalSlotsCount; i++) {
     slotsMap[`slot-${i}`] = [];
   }
@@ -61,7 +63,9 @@ export function GameBoard({
       <div className="relative z-10 text-center">
         <span className="text-xs tracking-widest text-ukiyo-gold font-serif font-bold bg-ukiyo-bg/60 px-3 py-1 rounded-full border border-ukiyo-foam/10">
           {status === "playing"
-            ? `已落牌 ${board.length} / ${totalSlotsCount} 張 (未全員同意前不可翻牌)`
+            ? selectedSlotId
+              ? `已選定槽位 [${selectedSlotId}]！點擊手牌即可將牌放至該位子`
+              : `已落牌 ${board.length} / ${totalSlotsCount} 張 (先點擊槽位，再點擊手牌放置)`
             : status === "locked"
             ? "全員已同意鎖定！點擊自己的牌翻開"
             : "中央預留牌陣"}
@@ -100,6 +104,7 @@ export function GameBoard({
               status={status}
               isOwnerLocked={topCard ? lockedList.includes(topCard.playerId) : false}
               isCurrentPlayer={topCard ? topCard.playerId === currentConnectionId : false}
+              isSelected={selectedSlotId === slotKey}
               onSelectSlot={onSelectSlot}
               onRecall={onRecallCard}
               onFlip={onFlipCard}

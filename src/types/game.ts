@@ -10,6 +10,8 @@ export interface GameSettings {
 
 // 盤面單張卡片放置狀態
 export interface BoardCard {
+  uniqueKey?: string;           // 盤面 Map 唯一的 key
+  slotId?: string;              // 放置槽位 ID
   playerId: string;             // 放置玩家 ID
   playerName: string;           // 放置玩家名稱
   cardValue: number;            // 卡片數值 (1-100)

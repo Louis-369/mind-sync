@@ -29,6 +29,7 @@ declare global {
         cardValue: number;
         flipped: boolean;
         placedAt: number;
+        slotId?: string;
       }>>;
       
       // 已手動鎖定的玩家 ID 陣列
