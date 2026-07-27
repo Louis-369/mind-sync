@@ -50,26 +50,34 @@ export function BoardSlot({
 
   return (
     <div className="relative group flex flex-col items-center">
+      {/* 鎖定同意朱紅落款小印章 */}
+      {isOwnerLocked && (
+        <div
+          title="已完成心靈確認"
+          className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded ukiyo-seal flex items-center justify-center text-[10px] shadow-md border border-ukiyo-cream/30 font-serif"
+        >
+          認
+        </div>
+      )}
+
       <Card
         value={card.cardValue}
         flipped={card.flipped || isFlipped}
-        isOwner={isCurrentPlayer || isOwnerLocked}
+        isOwner={isCurrentPlayer}
         playerName={card.playerName}
         onClick={handleCardClick}
       />
 
-      {/* 出牌者標籤 */}
+      {/* 出牌者標籤 (極簡和紙風) */}
       <div className="mt-1 flex items-center space-x-1">
         <span
           className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[85px] transition-colors ${
-            isOwnerLocked
-              ? "bg-ukiyo-surface/90 text-ukiyo-gold border-ukiyo-gold/60 font-bold"
-              : isCurrentPlayer
-              ? "bg-ukiyo-surface/80 text-ukiyo-foam border-ukiyo-foam/20"
+            isCurrentPlayer
+              ? "bg-ukiyo-surface/90 text-ukiyo-gold border-ukiyo-gold/40 font-bold"
               : "bg-ukiyo-surface/60 text-ukiyo-mist border-ukiyo-foam/10"
           }`}
         >
-          {isOwnerLocked ? "✓ " : ""}{card.playerName || "匿名"} {isCurrentPlayer ? "(你)" : ""}
+          {card.playerName || "匿名"} {isCurrentPlayer ? "(你)" : ""}
         </span>
       </div>
 

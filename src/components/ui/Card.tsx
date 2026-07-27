@@ -41,22 +41,17 @@ export function Card({
         className={clsx(
           "w-full h-full duration-500 transform-style-3d relative rounded-xl shadow-ukiyo-soft border transition-transform",
           flipped ? "rotate-y-180" : "",
-          isOwner ? "border-ukiyo-gold shadow-ukiyo-glow" : "border-ukiyo-wave/40"
+          isOwner ? "border-ukiyo-foam/50" : "border-ukiyo-wave/30"
         )}
       >
-        {/* 卡牌背面 (浮世繪海浪質感) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden ukiyo-card-back rounded-xl p-1 flex flex-col items-center justify-between border border-ukiyo-foam/20 overflow-hidden">
+        {/* 卡牌背面 (浮世繪海浪質感極簡純圖騰) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden ukiyo-card-back rounded-xl p-1 flex flex-col items-center justify-center border border-ukiyo-foam/20 overflow-hidden">
           <div className="w-full h-full rounded-lg border border-ukiyo-foam/15 flex items-center justify-center">
             {/* 朱紅日式心印 */}
             <div className="w-7 h-7 md:w-9 md:h-9 rounded-full ukiyo-seal flex items-center justify-center text-xs font-serif shadow-md">
               心
             </div>
           </div>
-          {playerName && (
-            <span className="absolute bottom-1 text-[10px] text-ukiyo-cream bg-ukiyo-bg/80 px-1.5 py-0.5 rounded truncate max-w-[90%] font-serif">
-              {playerName}
-            </span>
-          )}
         </div>
 
         {/* 卡牌正面 (和紙古紙墨書風) */}
