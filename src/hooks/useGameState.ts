@@ -1,0 +1,256 @@
+"use client";
+
+import { useStorage, useMutation, useOthers, useSelf, useMyPresence } from "@liveblocks/react";
+import { useCallback } from "react";
+import { generateShuffledDeck } from "../lib/gameLogic";
+import { GameSettings } from "../types/game";
+
+export function useGameState() {
+  const [myPresence, updateMyPresence] = useMyPresence();
+  const self = useSelf();
+  const others = useOthers();
+
+  // 讀取 Liveblocks Storage 狀態
+  const settings = useStorage((root) => root.settings);
+  const boardMap = useStorage((root) => root.board);
+  const lockedPlayers = useStorage((root) => root.lockedPlayers);
+  const handsMap = useStorage((root) => root.hands);
+  const status = useStorage((root) => root.status);
+  const result = useStorage((root) => root.result);
+  const hostId = useStorage((root) => root.hostId);
+  const lives = useStorage((root) => root.lives);
+  const shurikens = useStorage((root) => root.shurikens);
+  const currentLevel = useStorage((root) => root.currentLevel);
+
+  // 轉為純 JS 資料格式
+  const board = boardMap ? Array.from(boardMap.entries()).map(([slotId, card]) => ({ slotId, ...card })) : [];
+  const lockedList = lockedPlayers ? Array.from(lockedPlayers) : [];
+
+  // 發牌 mutation
+  const dealCards = useMutation(({ storage }) => {
+    const mutableSettings = storage.get("settings");
+    const mutableBoard = storage.get("board");
+    const mutableLocked = storage.get("lockedPlayers");
+    const mutableHands = storage.get("hands");
+
+    const cardsPerPlayer = mutableSettings.get("cardsPerPlayer");
+    const deck = generateShuffledDeck();
+
+    // 清空舊盤面與鎖定狀態
+    Array.from(mutableBoard.keys()).forEach((k) => mutableBoard.delete(k));
+    mutableLocked.clear();
+    Array.from(mutableHands.keys()).forEach((k) => mutableHands.delete(k));
+
+    // 給房主設定
+    if (!storage.get("hostId") && self?.connectionId) {
+      storage.set("hostId", String(self.connectionId));
+    }
+
+    // 發牌給當前線上所有人 (包括自己)
+    let cardIndex = 0;
+    const allConnectionIds = [self?.connectionId, ...others.map((o) => o.connectionId)].filter(Boolean);
+
+    allConnectionIds.forEach((connId) => {
+      const playerHandCards = deck.slice(cardIndex, cardIndex + cardsPerPlayer).sort((a, b) => a - b);
+      cardIndex += cardsPerPlayer;
+
+      // 建立 LiveList
+      const list = new (require("@liveblocks/client").LiveList)(playerHandCards);
+      mutableHands.set(String(connId), list);
+    });
+
+    storage.set("status", "playing");
+    storage.set("result", null);
+  }, [self, others]);
+
+  // 玩家出牌 (放置卡牌到盤面)
+  const placeCard = useMutation(({ storage }, cardValue: number, playerName: string) => {
+    const connId = String(self?.connectionId);
+    const mutableHands = storage.get("hands");
+    const mutableBoard = storage.get("board");
+
+    const playerHand = mutableHands.get(connId);
+    if (playerHand) {
+      const index = playerHand.indexOf(cardValue);
+      if (index !== -1) {
+        playerHand.delete(index);
+      }
+    }
+
+    // 將卡片放入盤面 (使用時間戳為唯一 key)
+    const slotId = `slot-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const newCard = new (require("@liveblocks/client").LiveObject)({
+      playerId: connId,
+      playerName: playerName || "玩家",
+      cardValue,
+      flipped: false,
+      placedAt: Date.now(),
+    });
+
+    mutableBoard.set(slotId, newCard);
+  }, [self]);
+
+  // 玩家收回卡片 (從盤面收回手牌)
+  const recallCard = useMutation(({ storage }, slotId: string) => {
+    const connId = String(self?.connectionId);
+    const mutableBoard = storage.get("board");
+    const mutableHands = storage.get("hands");
+
+    const card = mutableBoard.get(slotId);
+    if (card && card.get("playerId") === connId && !card.get("flipped")) {
+      const cardValue = card.get("cardValue");
+      mutableBoard.delete(slotId);
+
+      const playerHand = mutableHands.get(connId);
+      if (playerHand) {
+        playerHand.push(cardValue);
+        // 重新排序
+        const currentArr = playerHand.toArray().sort((a, b) => a - b);
+        playerHand.clear();
+        currentArr.forEach((val) => playerHand.push(val));
+      }
+    }
+  }, [self]);
+
+  // 切換玩家鎖定準備狀態
+  const toggleLock = useMutation(({ storage }, playerName: string) => {
+    const connId = String(self?.connectionId);
+    const mutableLocked = storage.get("lockedPlayers");
+    const lockIndex = mutableLocked.indexOf(connId);
+
+    if (lockIndex !== -1) {
+      mutableLocked.delete(lockIndex);
+    } else {
+      mutableLocked.push(connId);
+    }
+
+    // 檢查是否所有玩家都已鎖定
+    const totalPlayers = others.length + 1;
+    if (mutableLocked.length >= totalPlayers) {
+      storage.set("status", "locked");
+    }
+  }, [self, others]);
+
+  // 翻開盤面上特定或全部卡牌
+  const flipCard = useMutation(({ storage }, slotId?: string) => {
+    const mutableBoard = storage.get("board");
+
+    if (slotId) {
+      const card = mutableBoard.get(slotId);
+      if (card) {
+        card.set("flipped", true);
+      }
+    } else {
+      // 一鍵翻開所有盤面上未翻的卡片
+      mutableBoard.forEach((card) => {
+        card.set("flipped", true);
+      });
+    }
+
+    // 檢查判定結果
+    const cardsArray = Array.from(mutableBoard.values()).map((c) => ({
+      cardValue: c.get("cardValue"),
+      placedAt: c.get("placedAt"),
+    }));
+
+    // 按放置時間排序比對
+    cardsArray.sort((a, b) => a.placedAt - b.placedAt);
+    let isCorrectOrder = true;
+
+    for (let i = 0; i < cardsArray.length - 1; i++) {
+      if (cardsArray[i].cardValue > cardsArray[i + 1].cardValue) {
+        isCorrectOrder = false;
+        break;
+      }
+    }
+
+    if (cardsArray.length > 0 && Array.from(mutableBoard.values()).every((c) => c.get("flipped"))) {
+      storage.set("status", "finished");
+      storage.set("result", isCorrectOrder ? "win" : "lose");
+    }
+  }, []);
+
+  // 使用手裏劍技能 (每人自動亮出並移除手上最小的一張牌)
+  const useShuriken = useMutation(({ storage }) => {
+    const currentShurikens = storage.get("shurikens");
+    if (currentShurikens <= 0) return;
+
+    storage.set("shurikens", currentShurikens - 1);
+    const mutableHands = storage.get("hands");
+    const mutableBoard = storage.get("board");
+
+    // 所有玩家拋棄最小牌
+    mutableHands.forEach((handList, connId) => {
+      if (handList.length > 0) {
+        const sortedHand = handList.toArray().sort((a, b) => a - b);
+        const smallestCard = sortedHand[0];
+        
+        // 刪除最小牌
+        const idx = handList.indexOf(smallestCard);
+        if (idx !== -1) handList.delete(idx);
+
+        // 自動以翻開狀態放到盤面
+        const slotId = `shuriken-${Date.now()}-${connId}`;
+        const newCard = new (require("@liveblocks/client").LiveObject)({
+          playerId: connId,
+          playerName: "手裏劍棄牌",
+          cardValue: smallestCard,
+          flipped: true,
+          placedAt: Date.now(),
+        });
+        mutableBoard.set(slotId, newCard);
+      }
+    });
+  }, []);
+
+  // 更新遊戲設定
+  const updateSettings = useMutation(({ storage }, newSettings: Partial<GameSettings>) => {
+    const mutableSettings = storage.get("settings");
+    Object.entries(newSettings).forEach(([key, val]) => {
+      if (val !== undefined) {
+        mutableSettings.set(key as any, val as any);
+      }
+    });
+  }, []);
+
+  // 重置遊戲回到大廳等待
+  const resetGame = useMutation(({ storage }) => {
+    const boardMap = storage.get("board");
+    const handsMap = storage.get("hands");
+    Array.from(boardMap.keys()).forEach((k) => boardMap.delete(k));
+    storage.get("lockedPlayers").clear();
+    Array.from(handsMap.keys()).forEach((k) => handsMap.delete(k));
+    storage.set("status", "waiting");
+    storage.set("result", null);
+  }, []);
+
+  // 取得當前自己的手牌
+  const connIdStr = String(self?.connectionId);
+  const myHandList = handsMap ? handsMap.get(connIdStr) : null;
+  const myHand = myHandList ? Array.from(myHandList) : [];
+
+  return {
+    settings,
+    board,
+    lockedList,
+    status,
+    result,
+    hostId,
+    lives,
+    shurikens,
+    currentLevel,
+    myHand,
+    myPresence,
+    updateMyPresence,
+    self,
+    others,
+    dealCards,
+    placeCard,
+    recallCard,
+    toggleLock,
+    flipCard,
+    useShuriken,
+    updateSettings,
+    resetGame,
+  };
+}

@@ -1,0 +1,73 @@
+"use client";
+
+import React from "react";
+import { Heart, Sparkles, Users } from "lucide-react";
+
+interface GameStatusProps {
+  roomId: string;
+  lives: number;
+  shurikens: number;
+  currentLevel: number;
+  connectedCount: number;
+  maxPlayers: number;
+  onUseShuriken?: () => void;
+  canUseShuriken?: boolean;
+}
+
+export function GameStatus({
+  roomId,
+  lives,
+  shurikens,
+  currentLevel,
+  connectedCount,
+  maxPlayers,
+  onUseShuriken,
+  canUseShuriken = false,
+}: GameStatusProps) {
+  return (
+    <div className="w-full glass-panel rounded-2xl p-4 mb-4 flex flex-wrap items-center justify-between gap-4 border-amber-500/30">
+      {/* 房間 ID 資訊 */}
+      <div className="flex items-center space-x-2">
+        <span className="text-xs text-gray-400 font-mono">房間代碼:</span>
+        <span className="text-base md:text-lg font-bold text-poker-neonGold bg-poker-bg/60 px-3 py-1 rounded-lg border border-poker-accent/30">
+          {roomId.replace("room-", "")}
+        </span>
+      </div>
+
+      {/* 核心數據統計 */}
+      <div className="flex items-center space-x-6">
+        {/* 生命值 */}
+        <div className="flex items-center space-x-1.5" title="團隊生命值">
+          <Heart className="w-5 h-5 text-red-500 fill-red-500 animate-pulse" />
+          <span className="text-lg font-bold text-white">{lives}</span>
+        </div>
+
+        {/* 手裏劍 */}
+        <div className="flex items-center space-x-1.5" title="手裏劍 (集體丟棄最小牌)">
+          <Sparkles className="w-5 h-5 text-yellow-400" />
+          <span className="text-lg font-bold text-white">{shurikens}</span>
+          {canUseShuriken && (
+            <button
+              onClick={onUseShuriken}
+              className="ml-2 text-xs bg-amber-500/20 text-amber-300 hover:bg-amber-500/40 px-2 py-1 rounded border border-amber-400/40 transition-colors"
+            >
+              發動手裏劍
+            </button>
+          )}
+        </div>
+
+        {/* 關卡 */}
+        <div className="flex items-center space-x-1">
+          <span className="text-xs text-gray-400 uppercase">Level</span>
+          <span className="text-xl font-black text-poker-accent">{currentLevel}</span>
+        </div>
+
+        {/* 人數 */}
+        <div className="flex items-center space-x-1 text-gray-300">
+          <Users className="w-4 h-4 text-poker-accent" />
+          <span className="text-sm font-semibold">{`${connectedCount}/${maxPlayers}`}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
