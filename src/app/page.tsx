@@ -67,14 +67,26 @@ export default function LobbyPage() {
 
         {/* 遊戲說明引導 */}
         <div className="mt-8 pt-6 border-t border-ukiyo-foam/10 w-full text-left">
-          <h4 className="text-xs font-serif font-bold text-ukiyo-gold uppercase tracking-widest mb-2">
-            默契法則:
+          <h4 className="text-xs font-serif font-bold text-ukiyo-gold uppercase tracking-widest mb-3 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 默契法則
           </h4>
-          <ul className="text-xs text-ukiyo-mist space-y-1.5 list-disc list-inside font-serif">
-            <li>選擇或與好友加入相同的 Emoji 暗號房間</li>
-            <li>點擊席位與手牌落牌，憑心靈默契將數值由小到大排列</li>
-            <li>若有槽位撞牌，請溝通並點擊屬於自己的卡牌收回手牌</li>
-            <li>手牌全部清空後所有人同意鎖定，點擊卡牌翻開進行默契判定</li>
+          <ul className="text-xs text-ukiyo-mist space-y-2 font-serif">
+            <li className="flex items-start gap-1.5">
+              <span className="text-ukiyo-gold font-bold shrink-0">☯️ 心靈對頻：</span>
+              <span>輸入相同 Emoji 暗號入座</span>
+            </li>
+            <li className="flex items-start gap-1.5">
+              <span className="text-ukiyo-gold font-bold shrink-0">🌊 默契落牌：</span>
+              <span>選位暗出手牌，由小至大流暢排列</span>
+            </li>
+            <li className="flex items-start gap-1.5">
+              <span className="text-ukiyo-gold font-bold shrink-0">⚡ 碰撞應變：</span>
+              <span>重疊撞牌時，及時收回調頻</span>
+            </li>
+            <li className="flex items-start gap-1.5">
+              <span className="text-ukiyo-gold font-bold shrink-0">🌸 心印結算：</span>
+              <span>手牌清空全員鎖定，翻牌印證默契</span>
+            </li>
           </ul>
         </div>
       </div>

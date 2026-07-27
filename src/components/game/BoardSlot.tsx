@@ -124,11 +124,13 @@ export function BoardSlot({
     }
   };
 
+  const isHighlightSelected = status === "playing" && isSelected;
+
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
       className={`relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border touch-manipulation ${
-        isSelected
+        isHighlightSelected
           ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
           : hasCollision
           ? "ring-2 ring-ukiyo-vermillion border-ukiyo-vermillion bg-ukiyo-vermillion/10 shadow-[0_0_18px_rgba(196,43,28,0.5)]"
@@ -152,8 +154,8 @@ export function BoardSlot({
         ) : null
       ) : null}
 
-      {/* 鎖定同意朱紅落款小印章「確」(僅在同意鎖定、未翻牌且未結束時顯示) */}
-      {isOwnerLocked && !topCard?.flipped && status !== "finished" && (
+      {/* 鎖定同意朱紅落款小印章「確」(僅在個人同意鎖定、遊戲進行中、且牌未翻開時顯示) */}
+      {isOwnerLocked && status === "playing" && !topCard?.flipped && (
         <div
           title="已完成心靈確認"
           className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded ukiyo-seal flex items-center justify-center text-[10px] shadow-md border border-ukiyo-cream/30 font-serif pointer-events-none"
