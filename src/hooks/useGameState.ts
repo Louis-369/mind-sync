@@ -65,8 +65,8 @@ export function useGameState() {
     storage.set("result", null);
   }, [self, others]);
 
-  // 玩家出牌 (放置卡牌到盤面)
-  const placeCard = useMutation(({ storage }, cardValue: number, playerName: string) => {
+  // 玩家出牌 (放置卡牌到盤面，可指定 targetSlotId 槽位)
+  const placeCard = useMutation(({ storage }, cardValue: number, playerName: string, targetSlotId?: string) => {
     const connId = String(self?.connectionId);
     const mutableHands = storage.get("hands");
     const mutableBoard = storage.get("board");
@@ -79,17 +79,22 @@ export function useGameState() {
       }
     }
 
-    // 將卡片放入盤面 (使用時間戳為唯一 key)
-    const slotId = `slot-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    // 將卡片放入盤面 (若未指定槽位，自動取目前卡牌總數為槽位索引)
+    const existingCount = Array.from(mutableBoard.keys()).length;
+    const finalSlotId = targetSlotId || `slot-${existingCount}`;
+
+    // 使用時間戳與唯一的 slotId 複合鍵
+    const uniqueKey = `${finalSlotId}_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`;
     const newCard = new (require("@liveblocks/client").LiveObject)({
       playerId: connId,
       playerName: playerName || "玩家",
       cardValue,
       flipped: false,
       placedAt: Date.now(),
+      slotId: finalSlotId, // 儲存指定的槽位
     });
 
-    mutableBoard.set(slotId, newCard);
+    mutableBoard.set(uniqueKey, newCard);
   }, [self]);
 
   // 玩家收回卡片 (從盤面收回手牌)

@@ -54,8 +54,8 @@ export function Card({
           </div>
         </div>
 
-        {/* 卡牌正面 (和紙古紙墨書風) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 ukiyo-card-front rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/20 shadow-inner overflow-hidden">
+        {/* 卡牌正面 (和紙古紙墨書風 - 確保完美白底漸層) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-[#f8f4e6] via-[#f3edd9] to-[#e6d9bd] text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/20 shadow-inner overflow-hidden">
           {/* 右上角 ↗ 斜對角小數字 (帶腳底實體橫線) */}
           <div className="absolute top-1.5 right-2 flex flex-col items-center">
             <span className="font-mono text-[10px] md:text-xs font-black text-ukiyo-ink border-b border-ukiyo-ink/70 pb-0.5 leading-none">

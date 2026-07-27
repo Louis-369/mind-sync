@@ -36,13 +36,16 @@ export function GameBoard({
     slotsMap[`slot-${i}`] = [];
   }
 
-  // 將已經放置在盤面上的卡牌配對至槽位
-  board.forEach((item, idx) => {
-    const slotKey = item.slotId.startsWith("slot-") ? item.slotId : `slot-${idx % totalSlotsCount}`;
-    if (!slotsMap[slotKey]) {
-      slotsMap[slotKey] = [];
+  // 將已經放置在盤面上的卡牌配對至槽位 (按放置時間順序排序，確保無死角渲染)
+  const sortedBoard = [...board].sort((a, b) => a.placedAt - b.placedAt);
+  sortedBoard.forEach((item, idx) => {
+    // 優先匹配 item.slotId，若無則依序歸類到 slot-${idx % totalSlotsCount}
+    const targetKey = item.slotId && slotsMap[item.slotId] ? item.slotId : `slot-${idx % totalSlotsCount}`;
+    if (slotsMap[targetKey]) {
+      slotsMap[targetKey].push(item);
+    } else {
+      slotsMap[`slot-${idx % totalSlotsCount}`].push(item);
     }
-    slotsMap[slotKey].push(item);
   });
 
   return (
