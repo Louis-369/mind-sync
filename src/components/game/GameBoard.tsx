@@ -89,7 +89,7 @@ export function GameBoard({
         <div className="flex items-center gap-1.5 font-bold text-ukiyo-foam">
           <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" />
           <span>
-            已落牌 {board.length} / {totalSlotsCount} 張 (點擊席位選位 ➔ 點擊手牌落牌)
+            已落牌 {board.length} / {totalSlotsCount} 張 (點擊席位選位 ➔ 點擊手牌落牌 ｜ 點擊盤面卡牌可收回)
           </span>
         </div>
 

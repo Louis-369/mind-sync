@@ -68,7 +68,11 @@ export function BoardSlot({
         )
       ).join("、")
     : isCurrentPlayer
-    ? "你"
+    ? myUnflippedCard && status === "playing" && !isOwnerLocked
+      ? "你 (點擊收回)"
+      : myUnflippedCard && status === "locked" && !topCard?.flipped
+      ? "你 (點擊翻牌)"
+      : "你"
     : topCard?.playerName || "匿名";
 
   const isAnyCardMine = allCards.some(
@@ -137,14 +141,16 @@ export function BoardSlot({
       onClick={(e) => handleCardClick(undefined, e)}
       className="relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-ukiyo-foam/20 touch-manipulation"
     >
-      {/* 席位編號標籤 (#1, #2, #3... 方便玩家溝通) */}
-      <div className="absolute top-1 left-1.5 z-20 pointer-events-none">
-        <span className="text-[9px] font-mono font-bold text-ukiyo-mist/70 bg-ukiyo-bg/60 px-1 py-0.2 rounded border border-ukiyo-foam/10">
-          #{slotIndex}
-        </span>
-      </div>
+      {/* 席位編號標籤 (#1, #2, #3... 僅在牌未翻開揭示時顯示金箔色標籤) */}
+      {!isSlotRevealed && (
+        <div className="absolute top-1 left-1.5 z-20 pointer-events-none">
+          <span className="text-[10px] font-mono font-bold text-ukiyo-gold bg-ukiyo-surface/90 px-1.5 py-0.2 rounded border border-ukiyo-gold/40 shadow-sm">
+            #{slotIndex}
+          </span>
+        </div>
+      )}
 
-      {/* 標籤權重化渲染 (錯誤時顯示 ✕ 錯誤，正確時隱藏標籤極簡美觀) */}
+      {/* 標籤權重化渲染 (錯誤時顯示 ✕ 錯誤，碰撞時顯示碰撞名字；正確與正常時維持極簡乾淨) */}
       {isSlotRevealed && isCorrectOrder === false ? (
         <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
           ✕ 錯誤
@@ -153,16 +159,6 @@ export function BoardSlot({
         <div className="absolute -top-3.5 z-50 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
           {collisionNamesText}
         </div>
-      ) : myUnflippedCard && status !== "finished" ? (
-        status === "locked" ? (
-          <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold pointer-events-none whitespace-nowrap">
-            點擊翻牌
-          </span>
-        ) : !isOwnerLocked ? (
-          <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-foam/30 text-ukiyo-mist pointer-events-none whitespace-nowrap">
-            點擊收回
-          </span>
-        ) : null
       ) : null}
 
       {/* 鎖定同意朱紅落款小印章「確」(僅在個人同意鎖定、遊戲進行中、且牌未翻開時顯示) */}
