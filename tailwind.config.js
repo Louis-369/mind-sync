@@ -40,6 +40,10 @@ module.exports = {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-6px)' },
         },
+        tenbinSway: {
+          '0%, 100%': { transform: 'rotate(-32deg) translateY(0px)' },
+          '50%': { transform: 'rotate(-18deg) translateY(-4px)' },
+        },
         fadeIn: {
           '0%': { opacity: '0', transform: 'scale(0.98)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
@@ -48,6 +52,7 @@ module.exports = {
       animation: {
         'card-flip': 'flip 0.6s ease-in-out forwards',
         'wave-float': 'waveFloat 4s ease-in-out infinite',
+        'tenbin-sway': 'tenbinSway 3.5s ease-in-out infinite',
         'fade-in': 'fadeIn 0.3s ease-out forwards',
       },
     },

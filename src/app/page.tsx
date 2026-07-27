@@ -31,7 +31,7 @@ export default function LobbyPage() {
       {/* 主面板容器 */}
       <div className="glass-panel w-full max-w-lg rounded-3xl p-6 md:p-10 border border-ukiyo-foam/20 shadow-2xl relative z-10 flex flex-col items-center text-center">
         {/* 日式硃砂圓圖騰 */}
-        <div className="w-14 h-14 rounded-full ukiyo-seal flex items-center justify-center text-2xl font-serif mb-4 shadow-lg animate-wave-float">
+        <div className="w-14 h-14 rounded-full ukiyo-seal flex items-center justify-center text-2xl font-serif mb-4 shadow-lg animate-tenbin-sway">
           心
         </div>
 
