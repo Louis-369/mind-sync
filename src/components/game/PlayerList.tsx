@@ -54,7 +54,11 @@ export function PlayerList({
             >
               {isHost && <Crown className="w-3.5 h-3.5 text-ukiyo-gold fill-ukiyo-gold" />}
               <span>{p.name} {p.isSelf ? "(你)" : ""}</span>
-              {isLocked && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
+              {isLocked ? (
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              ) : (
+                <span className="text-[10px] font-mono font-bold text-ukiyo-gold/90 animate-pulse">...</span>
+              )}
             </div>
           );
         })}
