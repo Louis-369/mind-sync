@@ -71,9 +71,10 @@ export default function LobbyPage() {
             默契法則:
           </h4>
           <ul className="text-xs text-ukiyo-mist space-y-1.5 list-disc list-inside font-serif">
-            <li>選擇或加入相同的 3 個 Emoji 暗號房間</li>
-            <li>所有人拿牌後，憑心靈感覺打出最小的牌</li>
-            <li>確認無牌後全員鎖定，進行翻牌結算</li>
+            <li>選擇或與好友加入相同的 Emoji 暗號房間</li>
+            <li>點擊席位與手牌落牌，憑心靈默契將數值由小到大排列</li>
+            <li>若有槽位撞牌，請溝通並點擊屬於自己的卡牌收回手牌</li>
+            <li>手牌全部清空後所有人同意鎖定，點擊卡牌翻開進行默契判定</li>
           </ul>
         </div>
       </div>

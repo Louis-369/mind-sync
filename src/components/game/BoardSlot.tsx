@@ -72,10 +72,13 @@ export function BoardSlot({
     : topCard?.playerName || "匿名";
 
   if (allCards.length === 0) {
+    const canSelect = status === "playing";
     return (
       <div
-        onClick={() => onSelectSlot && onSelectSlot(slotId)}
-        className={`w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:scale-105 ${
+        onClick={() => canSelect && onSelectSlot && onSelectSlot(slotId)}
+        className={`w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed flex flex-col items-center justify-center transition-all ${
+          canSelect ? "cursor-pointer hover:scale-105" : "cursor-default opacity-60"
+        } ${
           isSelected
             ? "border-ukiyo-gold bg-ukiyo-gold/20 text-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.4)]"
             : "border-ukiyo-foam/25 bg-ukiyo-surface/30 text-ukiyo-mist/50 hover:border-ukiyo-gold/60 hover:text-ukiyo-gold"
@@ -85,7 +88,7 @@ export function BoardSlot({
           {isSelected ? "已選定" : "空席位"}
         </span>
         <span className="text-[9px] font-mono opacity-60 mt-1">
-          {isSelected ? "點擊手牌落牌" : "點擊選位"}
+          {isSelected ? "點擊手牌落牌" : canSelect ? "點擊選位" : "靜候發牌"}
         </span>
       </div>
     );
@@ -115,8 +118,8 @@ export function BoardSlot({
       }
     }
 
-    // 若該槽位沒有自己的未翻開卡牌，則點擊進行選位
-    if (onSelectSlot) {
+    // 若該槽位沒有自己的未翻開卡牌，則點擊進行選位 (僅遊戲進行中允許選位)
+    if (status === "playing" && onSelectSlot) {
       onSelectSlot(slotId);
     }
   };

@@ -220,7 +220,7 @@ function RoomInner() {
           </p>
           {isHost && (
             <Button variant="primary" size="lg" onClick={dealCards} className="font-serif tracking-widest">
-              發牌啟局
+              發牌開局
             </Button>
           )}
         </div>

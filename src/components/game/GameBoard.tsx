@@ -91,8 +91,8 @@ export function GameBoard({
         </div>
       </div>
 
-      {/* 盤面槽位 (精確容量) */}
-      <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 md:gap-4 max-w-2xl min-h-[140px] my-auto">
+      {/* 盤面槽位 (所有裝置固定一排 4 個) */}
+      <div className="relative z-10 grid grid-cols-4 gap-3 md:gap-4 items-center justify-items-center max-w-xl min-h-[140px] my-auto">
         {Array.from({ length: totalSlotsCount }).map((_, idx) => {
           const slotKey = `slot-${idx}`;
           const slotCards = slotsMap[slotKey] || [];
