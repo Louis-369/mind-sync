@@ -75,6 +75,10 @@ export function GameBoard({
     });
   }
 
+  // 檢查全場卡牌是否已全部翻開 (全數翻開或 status === "finished" 才開啟微光與錯誤標籤)
+  const isAllCardsFlipped = board.length > 0 && board.every((c) => c.flipped);
+  const isFinishedReveal = status === "finished" || isAllCardsFlipped;
+
   return (
     <div className="w-full flex-1 min-h-[320px] md:min-h-[380px] bg-gradient-to-b from-ukiyo-surface/90 via-ukiyo-bg/95 to-ukiyo-surface/90 rounded-3xl p-4 md:p-6 border border-ukiyo-foam/20 shadow-2xl relative flex flex-col items-center justify-between overflow-hidden my-2 washi-texture">
       {/* 背景水墨波浪浮水印 */}
@@ -89,7 +93,7 @@ export function GameBoard({
         <div className="flex items-center gap-1.5 font-bold text-ukiyo-foam">
           <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" />
           <span>
-            已落牌 {board.length} / {totalSlotsCount} 張 (點擊席位選位 ➔ 點擊手牌落牌 ｜ 點擊盤面卡牌可收回)
+            已落牌 {board.length} / {totalSlotsCount} 張 (點擊席位選位 ➔ 點擊手牌落牌)
           </span>
         </div>
 
@@ -118,6 +122,7 @@ export function GameBoard({
               currentConnectionId={currentConnectionId}
               isSelected={selectedSlotId === slotKey}
               isCorrectOrder={slotCorrectnessMap[slotKey]}
+              isFinishedReveal={isFinishedReveal}
               onSelectSlot={onSelectSlot}
               onRecall={onRecallCard}
               onFlip={onFlipCard}

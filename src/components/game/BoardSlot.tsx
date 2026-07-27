@@ -15,6 +15,7 @@ interface BoardSlotProps {
   isFlipped?: boolean;
   isSelected?: boolean;
   isCorrectOrder?: boolean;
+  isFinishedReveal?: boolean;
   onSelectSlot?: (slotId: string) => void;
   onRecall?: (targetKey: string) => void;
   onFlip?: (targetKey: string) => void;
@@ -31,6 +32,7 @@ export function BoardSlot({
   isFlipped = false,
   isSelected = false,
   isCorrectOrder,
+  isFinishedReveal = false,
   onSelectSlot,
   onRecall,
   onFlip,
@@ -68,11 +70,7 @@ export function BoardSlot({
         )
       ).join("、")
     : isCurrentPlayer
-    ? myUnflippedCard && status === "playing" && !isOwnerLocked
-      ? "你 (點擊收回)"
-      : myUnflippedCard && status === "locked" && !topCard?.flipped
-      ? "你 (點擊翻牌)"
-      : "你"
+    ? "你"
     : topCard?.playerName || "匿名";
 
   const isAnyCardMine = allCards.some(
@@ -134,15 +132,15 @@ export function BoardSlot({
 
   const isHighlightSelected = status === "playing" && isSelected;
   const slotIndex = parseInt(slotId.replace("slot-", ""), 10) + 1;
-  const isSlotRevealed = topCard?.flipped === true || status === "finished";
+  const isCardFlipped = topCard?.flipped === true;
 
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
       className="relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-ukiyo-foam/20 touch-manipulation"
     >
-      {/* 席位編號標籤 (#1, #2, #3... 僅在牌未翻開揭示時顯示金箔色標籤) */}
-      {!isSlotRevealed && (
+      {/* 席位編號標籤 (#1, #2, #3... 僅在卡牌未翻開時顯示金箔色標籤) */}
+      {!isCardFlipped && (
         <div className="absolute top-1 left-1.5 z-20 pointer-events-none">
           <span className="text-[10px] font-mono font-bold text-ukiyo-gold bg-ukiyo-surface/90 px-1.5 py-0.2 rounded border border-ukiyo-gold/40 shadow-sm">
             #{slotIndex}
@@ -150,8 +148,8 @@ export function BoardSlot({
         </div>
       )}
 
-      {/* 標籤權重化渲染 (錯誤時顯示 ✕ 錯誤，碰撞時顯示碰撞名字；正確與正常時維持極簡乾淨) */}
-      {isSlotRevealed && isCorrectOrder === false ? (
+      {/* 標籤權重化渲染 (全場翻開結算後：錯誤時顯示 ✕ 錯誤；碰撞時顯示碰撞名字) */}
+      {isFinishedReveal && isCorrectOrder === false ? (
         <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
           ✕ 錯誤
         </span>
@@ -171,12 +169,12 @@ export function BoardSlot({
         </div>
       )}
 
-      {/* 卡牌實體區域 (紅/綠/金高亮微光僅包覆卡片本身，不含底部玩家標籤) */}
+      {/* 卡牌實體區域 (紅/綠/金高亮微光：全場卡牌皆翻開後才展示微光特效) */}
       <div
         className={`relative flex items-center justify-center p-1 rounded-2xl transition-all border ${
-          isSlotRevealed && isCorrectOrder === true
+          isFinishedReveal && isCorrectOrder === true
             ? "ring-2 ring-emerald-500 bg-emerald-500/10 border-emerald-500 shadow-[0_0_18px_rgba(16,185,129,0.5)]"
-            : isSlotRevealed && isCorrectOrder === false
+            : isFinishedReveal && isCorrectOrder === false
             ? "ring-2 ring-ukiyo-vermillion bg-ukiyo-vermillion/15 border-ukiyo-vermillion shadow-[0_0_20px_rgba(196,43,28,0.7)]"
             : isHighlightSelected
             ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"

@@ -73,6 +73,15 @@ export function PlayerHand({
           <span className="text-[11px] text-ukiyo-mist bg-ukiyo-surface/80 px-2 py-0.5 rounded-full border border-ukiyo-foam/10">
             {hand.length} 張手牌
           </span>
+          {!isLocked ? (
+            <span className="text-[10px] text-ukiyo-gold font-serif bg-ukiyo-gold/10 px-2 py-0.5 rounded-full border border-ukiyo-gold/30 flex items-center gap-1 shadow-sm">
+              💡 點擊盤面卡牌可收回
+            </span>
+          ) : (
+            <span className="text-[10px] text-ukiyo-mist font-serif bg-ukiyo-surface/80 px-2 py-0.5 rounded-full border border-ukiyo-foam/10 flex items-center gap-1">
+              💡 全員鎖定後點擊盤面卡牌翻開
+            </span>
+          )}
         </div>
 
         {/* 鎖定按鈕 (手機端顯示) */}
