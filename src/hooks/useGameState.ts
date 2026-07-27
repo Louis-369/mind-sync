@@ -156,9 +156,16 @@ export function useGameState() {
   // 切換玩家鎖定準備狀態
   const toggleLock = useMutation(({ storage }, playerName: string) => {
     const connId = String(self?.connectionId);
+    const mutableHands = storage.get("hands");
     const mutableBoard = storage.get("board");
 
-    // 檢查盤面上是否有撞牌 (多張牌放置在同一槽位)
+    // 1. 檢查該玩家是否手牌已全部清空 (手牌 > 0 禁止發起鎖定)
+    const playerHand = mutableHands.get(connId);
+    if (playerHand && playerHand.length > 0) {
+      return;
+    }
+
+    // 2. 檢查盤面上是否有撞牌 (多張牌放置在同一槽位)
     const currentBoard = Array.from(mutableBoard.values());
     const counts: Record<string, number> = {};
     currentBoard.forEach((c) => {

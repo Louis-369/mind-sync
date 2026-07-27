@@ -29,7 +29,26 @@ export function PlayerHand({
   onToggleLock,
   disabled = false,
 }: PlayerHandProps) {
-  const isLockDisabled = disabled || hasBoardCollision;
+  const hasUnplayedCards = hand.length > 0;
+  const isLockDisabled = (disabled || hasBoardCollision || hasUnplayedCards) && !isLocked;
+
+  const getLockHintText = () => {
+    if (hasBoardCollision) return "⚠️ 盤面有撞牌，請先收回卡牌";
+    if (hasUnplayedCards) return "⚠️ 請先將手牌全部出完";
+    return `同意進度: ${lockedCount}/${totalPlayers} 人`;
+  };
+
+  const getButtonTextMobile = () => {
+    if (hasBoardCollision) return "撞牌無法鎖定";
+    if (hasUnplayedCards) return "請先清空手牌";
+    return `同意鎖定 (${lockedCount}/${totalPlayers})`;
+  };
+
+  const getButtonTextDesktop = () => {
+    if (hasBoardCollision) return "撞牌無法鎖定";
+    if (hasUnplayedCards) return "請先清空手牌";
+    return "同意鎖定";
+  };
 
   return (
     <div
@@ -63,7 +82,7 @@ export function PlayerHand({
               variant={isLocked ? "secondary" : "primary"}
               size="sm"
               onClick={onToggleLock}
-              disabled={isLockDisabled && !isLocked}
+              disabled={isLockDisabled}
               className="text-xs font-serif"
             >
               {isLocked ? (
@@ -72,7 +91,7 @@ export function PlayerHand({
                 </span>
               ) : (
                 <span className="flex items-center gap-1">
-                  <Unlock className="w-3.5 h-3.5" /> {hasBoardCollision ? "撞牌無法鎖定" : `同意鎖定 (${lockedCount}/${totalPlayers})`}
+                  <Unlock className="w-3.5 h-3.5" /> {getButtonTextMobile()}
                 </span>
               )}
             </Button>
@@ -103,16 +122,16 @@ export function PlayerHand({
 
       {/* 右側：心靈鎖定按鈕 (桌面端顯示) */}
       {onToggleLock && (
-        <div className="hidden md:flex flex-col items-end min-w-[170px]">
+        <div className="hidden md:flex flex-col items-end min-w-[180px]">
           <Button
             variant={isLocked ? "secondary" : "primary"}
             size="md"
             onClick={onToggleLock}
-            disabled={isLockDisabled && !isLocked}
+            disabled={isLockDisabled}
             className={clsx(
               "w-full text-xs font-serif transition-all touch-manipulation",
               isLocked && "border-ukiyo-gold text-ukiyo-gold font-bold",
-              hasBoardCollision && !isLocked && "opacity-60 cursor-not-allowed"
+              isLockDisabled && "opacity-60 cursor-not-allowed"
             )}
           >
             {isLocked ? (
@@ -121,12 +140,12 @@ export function PlayerHand({
               </span>
             ) : (
               <span className="flex items-center justify-center gap-1.5">
-                <Unlock className="w-4 h-4 text-ukiyo-gold" /> {hasBoardCollision ? "撞牌無法鎖定" : "同意鎖定"}
+                <Unlock className="w-4 h-4 text-ukiyo-gold" /> {getButtonTextDesktop()}
               </span>
             )}
           </Button>
-          <span className={`text-[10px] mt-1 font-serif ${hasBoardCollision ? "text-ukiyo-vermillion font-bold animate-pulse" : "text-ukiyo-mist font-mono"}`}>
-            {hasBoardCollision ? "⚠️ 盤面有撞牌，請先收回卡牌" : `同意進度: ${lockedCount}/${totalPlayers} 人`}
+          <span className={`text-[10px] mt-1 font-serif ${hasBoardCollision || hasUnplayedCards ? "text-ukiyo-vermillion font-bold animate-pulse" : "text-ukiyo-mist font-mono"}`}>
+            {getLockHintText()}
           </span>
         </div>
       )}

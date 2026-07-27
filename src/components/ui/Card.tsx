@@ -81,7 +81,7 @@ export function Card({
             <span
               className={clsx(
                 "font-mono text-xl md:text-3xl font-black text-ukiyo-ink tracking-tight leading-none",
-                showUnderline && "border-b-2 md:border-b-4 border-ukiyo-ink/70 pb-0.5"
+                showUnderline && "border-b md:border-b-2 border-ukiyo-ink/80 pb-0.5"
               )}
             >
               {value}

@@ -29,8 +29,8 @@ export function GameBoard({
   onRecallCard,
   onFlipCard,
 }: GameBoardProps) {
-  // 計算本局總共預計發出的卡牌總數 (精確等於發牌總數)
-  const totalSlotsCount = totalPlayers * cardsPerPlayer;
+  // 計算本局總共預計發出的卡牌總數 (全場最大上限 12 個席位)
+  const totalSlotsCount = Math.min(12, totalPlayers * cardsPerPlayer);
 
   // 根據 slotId 或是放置順序將卡牌歸類至各槽位
   const slotsMap: Record<string, BoardCard[]> = {};
@@ -64,8 +64,8 @@ export function GameBoard({
         <span className="text-xs tracking-widest text-ukiyo-gold font-serif font-bold bg-ukiyo-bg/60 px-3 py-1 rounded-full border border-ukiyo-foam/10">
           {status === "playing"
             ? selectedSlotId
-              ? `已選定第 ${parseInt(selectedSlotId.replace("slot-", ""), 10) + 1} 個席位！點擊手牌即可將牌放至該位子`
-              : `已落牌 ${board.length} / ${totalSlotsCount} 張 (先點擊槽位，再點擊手牌放置)`
+              ? `已選定第 ${parseInt(selectedSlotId.replace("slot-", ""), 10) + 1} 個席位！點擊手牌即可落牌`
+              : `已落牌 ${board.length} / ${totalSlotsCount} 張 (點擊席位選位 ➔ 點擊手牌落牌)`
             : status === "locked"
             ? "全員已同意鎖定！點擊自己的牌翻開"
             : "中央預留牌陣"}
@@ -78,9 +78,11 @@ export function GameBoard({
           <span className="text-ukiyo-gold font-bold">小</span>
           <span className="text-[10px] font-mono opacity-60">(1)</span>
         </div>
-        <div className="flex-1 mx-3 flex items-center justify-center space-x-2">
+        <div className="flex-1 mx-2 flex items-center justify-center space-x-1.5">
           <div className="h-[1px] flex-1 bg-gradient-to-r from-ukiyo-gold/40 via-ukiyo-foam/20 to-ukiyo-gold/40" />
-          <span className="text-[10px] text-ukiyo-gold/80 tracking-widest uppercase">放置順序 ➔</span>
+          <span className="text-[10px] text-ukiyo-gold/90 font-serif font-bold tracking-wider">
+            由上至下、由左至右 ➔ 由小到大
+          </span>
           <div className="h-[1px] flex-1 bg-gradient-to-r from-ukiyo-gold/40 via-ukiyo-foam/20 to-ukiyo-gold/40" />
         </div>
         <div className="flex items-center space-x-1 bg-ukiyo-bg/80 px-2.5 py-0.5 rounded border border-ukiyo-foam/10">

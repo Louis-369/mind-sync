@@ -90,14 +90,14 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
               </div>
             )}
 
-            {/* 大顆顯眼的次要操作按鈕：暫存收起檢視盤面 */}
+            {/* 大顆顯眼的次要操作按鈕：檢視盤面 */}
             <Button
               variant="secondary"
               size="md"
               onClick={() => setIsCollapsed(true)}
               className="w-full flex items-center justify-center gap-2 font-serif tracking-widest text-ukiyo-gold border-ukiyo-gold/40 hover:bg-ukiyo-gold/10"
             >
-              <Eye className="w-4 h-4 text-ukiyo-gold" /> 暫存收起並檢視盤面
+              <Eye className="w-4 h-4 text-ukiyo-gold" /> 檢視盤面
             </Button>
           </div>
         </div>

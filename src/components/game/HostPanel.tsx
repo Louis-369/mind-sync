@@ -23,7 +23,21 @@ export function HostPanel({
   settings,
   onUpdateSettings,
 }: HostPanelProps) {
-  if (!isHost) return null;
+  const getMaxCardsForPlayers = (numPlayers: number) => {
+    if (numPlayers === 2) return 6;
+    if (numPlayers === 3) return 4;
+    return 3; // 4 人遊戲最高 3 張
+  };
+
+  const maxAllowedCards = settings ? getMaxCardsForPlayers(settings.maxPlayers) : 6;
+  const currentCardsPerPlayer = settings ? Math.min(settings.cardsPerPlayer, maxAllowedCards) : 2;
+
+  const handleMaxPlayersChange = (newMax: number) => {
+    if (!onUpdateSettings) return;
+    const maxForNew = getMaxCardsForPlayers(newMax);
+    const newCardsPerPlayer = Math.min(settings?.cardsPerPlayer || 2, maxForNew);
+    onUpdateSettings({ maxPlayers: newMax, cardsPerPlayer: newCardsPerPlayer });
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="房主規則設定">
@@ -36,12 +50,12 @@ export function HostPanel({
               <select
                 value={settings.maxPlayers}
                 disabled={status !== "waiting"}
-                onChange={(e) => onUpdateSettings({ maxPlayers: Number(e.target.value) })}
+                onChange={(e) => handleMaxPlayersChange(Number(e.target.value))}
                 className="bg-ukiyo-bg border border-ukiyo-foam/20 rounded-lg px-2.5 py-1.5 text-xs text-ukiyo-foam focus:outline-none focus:border-ukiyo-gold cursor-pointer"
               >
-                <option value={2}>2 人席</option>
-                <option value={3}>3 人席</option>
-                <option value={4}>4 人席</option>
+                <option value={2}>2 人席 (最高 6 張)</option>
+                <option value={3}>3 人席 (最高 4 張)</option>
+                <option value={4}>4 人席 (最高 3 張)</option>
               </select>
             </div>
 
@@ -49,12 +63,12 @@ export function HostPanel({
             <div className="flex flex-col">
               <label className="text-xs text-ukiyo-mist mb-1 font-bold">每人手牌張數</label>
               <select
-                value={settings.cardsPerPlayer}
+                value={currentCardsPerPlayer}
                 disabled={status !== "waiting"}
                 onChange={(e) => onUpdateSettings({ cardsPerPlayer: Number(e.target.value) })}
                 className="bg-ukiyo-bg border border-ukiyo-foam/20 rounded-lg px-2.5 py-1.5 text-xs text-ukiyo-foam focus:outline-none focus:border-ukiyo-gold cursor-pointer"
               >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
+                {Array.from({ length: maxAllowedCards }, (_, i) => i + 1).map((num) => (
                   <option key={num} value={num}>
                     {num} 張
                   </option>
