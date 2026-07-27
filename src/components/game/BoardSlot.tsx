@@ -37,21 +37,39 @@ export function BoardSlot({
   const allCards = cards.length > 0 ? cards : card ? [card] : [];
   const topCard = allCards[allCards.length - 1];
   const hasCollision = allCards.length > 1;
+  // 頂部極簡撞牌標籤 (例如：撞牌 2張)
+  const collisionNamesText = hasCollision ? `撞牌 ${allCards.length}張` : "";
 
-  // 取得撞牌玩家名字清單 (例如：你與小華撞牌 2張)
-  const collisionNamesText = hasCollision
+  // 判定該槽位中是否有屬於當前玩家的卡牌
+  const isAnyCardMine = allCards.some(
+    (c) =>
+      (currentConnectionId && c.playerId === currentConnectionId) ||
+      (c.playerId === topCard?.playerId && isCurrentPlayer)
+  );
+
+  // 尋找此槽位中屬於當前玩家且未翻開的卡牌
+  const myUnflippedCard = allCards.find(
+    (c) =>
+      ((currentConnectionId && c.playerId === currentConnectionId) ||
+        (c.playerId === topCard?.playerId && isCurrentPlayer)) &&
+      !c.flipped
+  );
+
+  // 底部玩家名稱標籤 (撞牌時顯示所有參與玩家：例如「你、小華」)
+  const bottomPlayerNamesText = hasCollision
     ? Array.from(
         new Set(
           allCards.map((c) =>
-            currentConnectionId && c.playerId === currentConnectionId
-              ? "你"
-              : c.playerId === topCard?.playerId && isCurrentPlayer
+            (currentConnectionId && c.playerId === currentConnectionId) ||
+            (c.playerId === topCard?.playerId && isCurrentPlayer)
               ? "你"
               : c.playerName || "匿名"
           )
         )
-      ).join("與") + `撞牌 ${allCards.length}張`
-    : "";
+      ).join("、")
+    : isCurrentPlayer
+    ? "你"
+    : topCard?.playerName || "匿名";
 
   if (allCards.length === 0) {
     return (
@@ -73,32 +91,39 @@ export function BoardSlot({
     );
   }
 
-  const handleCardClick = (e?: React.MouseEvent) => {
-    // 點擊卡片本體時進行收回或翻牌
+  // 智慧點擊處理常式 (支援手機觸控與桌機點擊，優先處理個人卡牌收回/翻牌)
+  const handleCardClick = (clickedCard?: BoardCard, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    if (topCard?.flipped) return;
 
-    const targetKey = topCard?.uniqueKey || slotId;
+    // 優先認定點擊屬於自己的卡牌
+    const targetCard =
+      clickedCard &&
+      ((currentConnectionId && clickedCard.playerId === currentConnectionId) ||
+        (clickedCard.playerId === topCard?.playerId && isCurrentPlayer))
+        ? clickedCard
+        : myUnflippedCard;
 
-    if (isCurrentPlayer) {
+    if (targetCard && !targetCard.flipped) {
       if (status === "playing" && !isOwnerLocked && onRecall) {
         // 未同意鎖定前：點擊收回手牌
-        onRecall(targetKey);
+        onRecall(targetCard.uniqueKey || slotId);
+        return;
       } else if (status === "locked" && onFlip) {
         // 全員鎖定後：點擊翻開卡牌
-        onFlip(targetKey);
+        onFlip(targetCard.uniqueKey || slotId);
+        return;
       }
-    } else {
-      // 點擊非自己的卡牌槽位時，視為選擇該槽位以供落牌
-      if (onSelectSlot) {
-        onSelectSlot(slotId);
-      }
+    }
+
+    // 若該槽位沒有自己的未翻開卡牌，則點擊進行選位
+    if (onSelectSlot) {
+      onSelectSlot(slotId);
     }
   };
 
   return (
     <div
-      onClick={() => onSelectSlot && onSelectSlot(slotId)}
+      onClick={(e) => handleCardClick(undefined, e)}
       className={`relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border ${
         isSelected
           ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
@@ -107,7 +132,20 @@ export function BoardSlot({
           : "border-transparent hover:border-ukiyo-foam/20"
       }`}
     >
-      {/* 撞牌碰撞警示標籤 (顯示撞牌玩家姓名、無 Emoji、無括號、不換行) */}
+      {/* 提示標籤 (圖層 z-50 置頂，僅自己有未翻開卡牌且未結算時；去「可」字) */}
+      {myUnflippedCard && status !== "finished" && (
+        status === "locked" ? (
+          <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold pointer-events-none whitespace-nowrap">
+            點擊翻牌
+          </span>
+        ) : !isOwnerLocked ? (
+          <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-foam/30 text-ukiyo-mist pointer-events-none whitespace-nowrap">
+            點擊收回
+          </span>
+        ) : null
+      )}
+
+      {/* 撞牌碰撞警示標籤 (純極簡文字：撞牌 X張、無 Emoji、無括號、不換行) */}
       {hasCollision && (
         <div className="absolute -top-3.5 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce">
           {collisionNamesText}
@@ -134,7 +172,7 @@ export function BoardSlot({
         {allCards.map((c, idx) => {
           const isMe =
             (currentConnectionId && c.playerId === currentConnectionId) ||
-            (c.playerId === topCard.playerId && isCurrentPlayer);
+            (c.playerId === topCard?.playerId && isCurrentPlayer);
           return (
             <div
               key={`${c.placedAt}-${idx}`}
@@ -149,7 +187,7 @@ export function BoardSlot({
                 flipped={c.flipped || isFlipped}
                 isOwner={isMe}
                 playerName={c.playerName}
-                onClick={handleCardClick}
+                onClick={() => handleCardClick(c)}
               />
 
               {/* 自己蓋著的牌：在右下角呈現半透明可記憶數字 (不加括號) */}
@@ -163,31 +201,18 @@ export function BoardSlot({
         })}
       </div>
 
-      {/* 出牌者標籤 (自己的牌極簡為「你」) */}
-      <div className="mt-1 flex items-center space-x-1">
+      {/* 出牌者標籤 (碰撞時顯示參與的所有玩家，如「你、小華」) */}
+      <div className="mt-1 flex items-center space-x-1 z-10">
         <span
-          className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[85px] transition-colors ${
-            isCurrentPlayer
+          className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[130px] transition-colors ${
+            isAnyCardMine
               ? "bg-ukiyo-surface/90 text-ukiyo-gold border-ukiyo-gold/40 font-bold"
               : "bg-ukiyo-surface/60 text-ukiyo-mist border-ukiyo-foam/10"
           }`}
         >
-          {isCurrentPlayer ? "你" : topCard.playerName || "匿名"}
+          {bottomPlayerNamesText}
         </span>
       </div>
-
-      {/* 提示標籤 (僅自己未翻開且未結算時；鎖定後隱藏收回提示，去「可」字) */}
-      {isCurrentPlayer && !topCard?.flipped && status !== "finished" && (
-        status === "locked" ? (
-          <span className="absolute -top-2 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold">
-            點擊翻牌
-          </span>
-        ) : !isOwnerLocked ? (
-          <span className="absolute -top-2 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-foam/30 text-ukiyo-mist">
-            點擊收回
-          </span>
-        ) : null
-      )}
     </div>
   );
 }
