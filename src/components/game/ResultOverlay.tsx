@@ -53,15 +53,6 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ukiyo-bg/85 backdrop-blur-md animate-fade-in pointer-events-auto">
       <div className="glass-panel rounded-3xl p-6 text-center border border-ukiyo-foam/20 shadow-2xl relative overflow-hidden flex flex-col items-center w-full max-w-md my-auto">
-        {/* 頂部收起/查看盤面按鈕 */}
-        <button
-          onClick={() => setIsCollapsed(true)}
-          className="absolute top-3 right-3 text-ukiyo-mist hover:text-ukiyo-foam text-xs flex items-center gap-1 bg-ukiyo-surface/80 px-2.5 py-1 rounded-lg border border-ukiyo-foam/10 transition-colors"
-        >
-          <Eye className="w-3.5 h-3.5 text-ukiyo-gold" />
-          <span>查看盤面</span>
-        </button>
-
         <div className="flex flex-col items-center w-full pt-2">
           {/* 印章 */}
           <div
@@ -82,21 +73,33 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
               : "卡牌數值順序發生碰撞，重組心境再試一次。"}
           </p>
 
-          {/* 操作按鈕 (僅房主可點擊重新開局) */}
-          {isHost ? (
+          {/* 操作按鈕組：重新開局與顯眼的查看盤面 */}
+          <div className="flex flex-col gap-2.5 w-full max-w-xs">
+            {isHost ? (
+              <Button
+                variant={isWin ? "primary" : "danger"}
+                size="md"
+                onClick={onRestart}
+                className="w-full flex items-center justify-center gap-2 font-serif tracking-widest"
+              >
+                <RotateCcw className="w-4 h-4" /> 房主重新開局
+              </Button>
+            ) : (
+              <div className="text-xs text-ukiyo-mist font-serif py-2.5 text-center bg-ukiyo-surface/60 w-full rounded-xl border border-ukiyo-foam/10">
+                靜候房主重新開局...
+              </div>
+            )}
+
+            {/* 大顆顯眼的次要操作按鈕：暫存收起檢視盤面 */}
             <Button
-              variant={isWin ? "primary" : "danger"}
+              variant="secondary"
               size="md"
-              onClick={onRestart}
-              className="w-full max-w-xs flex items-center justify-center gap-2 font-serif tracking-widest"
+              onClick={() => setIsCollapsed(true)}
+              className="w-full flex items-center justify-center gap-2 font-serif tracking-widest text-ukiyo-gold border-ukiyo-gold/40 hover:bg-ukiyo-gold/10"
             >
-              <RotateCcw className="w-4 h-4" /> 房主重新開局
+              <Eye className="w-4 h-4 text-ukiyo-gold" /> 暫存收起並檢視盤面
             </Button>
-          ) : (
-            <div className="text-xs text-ukiyo-mist font-serif py-2 bg-ukiyo-surface/60 w-full rounded-xl border border-ukiyo-foam/10">
-              靜候房主重新開局...
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

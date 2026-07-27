@@ -81,8 +81,8 @@ export function BoardSlot({
     const targetKey = topCard?.uniqueKey || slotId;
 
     if (isCurrentPlayer) {
-      if (status === "playing" && onRecall) {
-        // 未全鎖定前：點擊收回手牌
+      if (status === "playing" && !isOwnerLocked && onRecall) {
+        // 未同意鎖定前：點擊收回手牌
         onRecall(targetKey);
       } else if (status === "locked" && onFlip) {
         // 全員鎖定後：點擊翻開卡牌
@@ -114,8 +114,8 @@ export function BoardSlot({
         </div>
       )}
 
-      {/* 鎖定同意朱紅落款小印章「確」 */}
-      {isOwnerLocked && (
+      {/* 鎖定同意朱紅落款小印章「確」(僅在同意鎖定、未翻牌且未結束時顯示) */}
+      {isOwnerLocked && !topCard?.flipped && status !== "finished" && (
         <div
           title="已完成心靈確認"
           className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded ukiyo-seal flex items-center justify-center text-[10px] shadow-md border border-ukiyo-cream/30 font-serif"
@@ -176,17 +176,17 @@ export function BoardSlot({
         </span>
       </div>
 
-      {/* 提示標籤 (僅自己且未翻開時) */}
-      {isCurrentPlayer && !topCard.flipped && (
-        <span
-          className={`absolute -top-2 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow ${
-            status === "locked"
-              ? "bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold"
-              : "bg-ukiyo-surface border border-ukiyo-foam/30 text-ukiyo-mist"
-          }`}
-        >
-          {status === "locked" ? "可點擊翻牌" : "可點擊收回"}
-        </span>
+      {/* 提示標籤 (僅自己未翻開且未結算時；鎖定後隱藏收回提示，去「可」字) */}
+      {isCurrentPlayer && !topCard?.flipped && status !== "finished" && (
+        status === "locked" ? (
+          <span className="absolute -top-2 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold">
+            點擊翻牌
+          </span>
+        ) : !isOwnerLocked ? (
+          <span className="absolute -top-2 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-foam/30 text-ukiyo-mist">
+            點擊收回
+          </span>
+        ) : null
       )}
     </div>
   );
