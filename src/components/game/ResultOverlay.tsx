@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import confetti from "canvas-confetti";
 import { RotateCcw, Eye, Trophy } from "lucide-react";
 import { Button } from "../ui/Button";
@@ -14,11 +14,18 @@ interface ResultOverlayProps {
 export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps) {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const activeResultRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (result) {
-      // 延遲 1.8 秒登場，讓玩家先在盤面上滿眼觀賞 1.8 秒的紅綠微光揭示特效！
-      const timer = setTimeout(() => {
+      // 若該勝負結果已經啟動過計時器，避免 LiveblocksPresence 心跳重繪引起 clearTimeout 重置
+      if (activeResultRef.current === result) return;
+      activeResultRef.current = result;
+
+      if (timerRef.current) clearTimeout(timerRef.current);
+
+      timerRef.current = setTimeout(() => {
         setShowModal(true);
         setIsCollapsed(false);
 
@@ -34,12 +41,14 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
             console.error("觸發彩帶動畫失敗:", error);
           }
         }
-      }, 1800);
-
-      return () => clearTimeout(timer);
+      }, 1500);
     } else {
+      activeResultRef.current = null;
+      if (timerRef.current) clearTimeout(timerRef.current);
       setShowModal(false);
     }
+
+    return () => {};
   }, [result]);
 
   if (!result || !showModal) return null;

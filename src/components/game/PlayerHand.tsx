@@ -60,13 +60,8 @@ export function PlayerHand({
       {/* 左側/頂部：玩家名稱、手牌數量與溫馨提示標籤 */}
       <div className="flex flex-wrap items-center justify-between w-full md:w-auto gap-2 md:gap-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-serif font-bold text-ukiyo-gold flex items-center gap-1.5">
+          <span className="text-xs font-serif font-bold text-ukiyo-gold">
             {playerName}
-            {isLocked && (
-              <span className="text-[9px] bg-ukiyo-gold/20 text-ukiyo-gold border border-ukiyo-gold/40 font-serif px-2 py-0.5 rounded-full">
-                ✓ 已確認
-              </span>
-            )}
           </span>
           <span className="text-[11px] text-ukiyo-mist bg-ukiyo-surface/80 px-2 py-0.5 rounded-full border border-ukiyo-foam/10">
             {hand.length} 張手牌
