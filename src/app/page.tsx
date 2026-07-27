@@ -35,9 +35,12 @@ export default function LobbyPage() {
           心
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-serif font-black text-ukiyo-foam tracking-widest mb-3">
-          心天秤
+        <h1 className="text-4xl md:text-5xl font-serif font-black text-ukiyo-foam tracking-widest mb-1">
+          心秤
         </h1>
+        <p className="text-xs md:text-sm font-sans font-medium text-ukiyo-gold/80 tracking-[0.25em] uppercase mb-4">
+          Kokoro Tenbin
+        </p>
 
         <p className="text-xs md:text-sm text-ukiyo-mist mb-8 max-w-sm leading-relaxed font-serif">
           透過言語構築，在心的天秤上取得平衡，最純粹的默契卡牌遊戲。
