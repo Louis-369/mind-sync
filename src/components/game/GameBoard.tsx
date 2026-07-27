@@ -11,6 +11,7 @@ interface GameBoardProps {
   totalPlayers?: number;
   cardsPerPlayer?: number;
   lockedList?: string[];
+  onSelectSlot?: (slotId: string) => void;
   onRecallCard?: (slotId: string) => void;
   onFlipCard?: (slotId: string) => void;
 }
@@ -22,15 +23,27 @@ export function GameBoard({
   totalPlayers = 2,
   cardsPerPlayer = 2,
   lockedList = [],
+  onSelectSlot,
   onRecallCard,
   onFlipCard,
 }: GameBoardProps) {
-  // 按放置時間排序展示已打出的牌
-  const sortedBoard = [...board].sort((a, b) => a.placedAt - b.placedAt);
-
   // 計算本局總共預計發出的卡牌總數 (精確等於發牌總數)
   const totalSlotsCount = totalPlayers * cardsPerPlayer;
-  const emptySlotsCount = Math.max(totalSlotsCount - sortedBoard.length, 0);
+
+  // 根據 slotId 或是放置順序將卡牌歸類至各槽位
+  const slotsMap: Record<string, (BoardCard & { slotId: string })[]> = {};
+  for (let i = 0; i < totalSlotsCount; i++) {
+    slotsMap[`slot-${i}`] = [];
+  }
+
+  // 將已經放置在盤面上的卡牌配對至槽位
+  board.forEach((item, idx) => {
+    const slotKey = item.slotId.startsWith("slot-") ? item.slotId : `slot-${idx % totalSlotsCount}`;
+    if (!slotsMap[slotKey]) {
+      slotsMap[slotKey] = [];
+    }
+    slotsMap[slotKey].push(item);
+  });
 
   return (
     <div className="w-full flex-1 min-h-[320px] md:min-h-[380px] bg-gradient-to-b from-ukiyo-surface/90 via-ukiyo-bg/95 to-ukiyo-surface/90 rounded-3xl p-4 md:p-6 border border-ukiyo-foam/15 shadow-2xl relative flex flex-col items-center justify-between overflow-hidden my-2">
@@ -45,7 +58,7 @@ export function GameBoard({
       <div className="relative z-10 text-center">
         <span className="text-xs tracking-widest text-ukiyo-gold font-serif font-bold bg-ukiyo-bg/60 px-3 py-1 rounded-full border border-ukiyo-foam/10">
           {status === "playing"
-            ? `已落牌 ${sortedBoard.length} / ${totalSlotsCount} 張 (未全員同意前不可翻牌)`
+            ? `已落牌 ${board.length} / ${totalSlotsCount} 張 (未全員同意前不可翻牌)`
             : status === "locked"
             ? "全員已同意鎖定！點擊自己的牌翻開"
             : "中央預留牌陣"}
@@ -54,7 +67,7 @@ export function GameBoard({
 
       {/* 由小到大 順序視覺引導軸 */}
       <div className="relative z-10 w-full max-w-xl flex items-center justify-between px-2 my-2 text-[11px] font-serif text-ukiyo-mist">
-        <div className="flex items-center space-x-1 bg-ukiyo-bg/80 px-2 py-0.5 rounded border border-ukiyo-foam/10">
+        <div className="flex items-center space-x-1 bg-ukiyo-bg/80 px-2.5 py-0.5 rounded border border-ukiyo-foam/10">
           <span className="text-ukiyo-gold font-bold">小</span>
           <span className="text-[10px] font-mono opacity-60">(1)</span>
         </div>
@@ -63,7 +76,7 @@ export function GameBoard({
           <span className="text-[10px] text-ukiyo-gold/80 tracking-widest uppercase">放置順序 ➔</span>
           <div className="h-[1px] flex-1 bg-gradient-to-r from-ukiyo-gold/40 via-ukiyo-foam/20 to-ukiyo-gold/40" />
         </div>
-        <div className="flex items-center space-x-1 bg-ukiyo-bg/80 px-2 py-0.5 rounded border border-ukiyo-foam/10">
+        <div className="flex items-center space-x-1 bg-ukiyo-bg/80 px-2.5 py-0.5 rounded border border-ukiyo-foam/10">
           <span className="text-ukiyo-gold font-bold">大</span>
           <span className="text-[10px] font-mono opacity-60">(100)</span>
         </div>
@@ -71,29 +84,25 @@ export function GameBoard({
 
       {/* 盤面槽位 (精確容量) */}
       <div className="relative z-10 flex flex-wrap items-center justify-center gap-3 md:gap-4 max-w-2xl min-h-[140px] my-auto">
-        {/* 已打出的卡牌 */}
-        {sortedBoard.map((item) => (
-          <BoardSlot
-            key={item.slotId}
-            slotId={item.slotId}
-            card={item}
-            status={status}
-            isOwnerLocked={lockedList.includes(item.playerId)}
-            isCurrentPlayer={item.playerId === currentConnectionId}
-            onRecall={onRecallCard}
-            onFlip={onFlipCard}
-          />
-        ))}
+        {Array.from({ length: totalSlotsCount }).map((_, idx) => {
+          const slotKey = `slot-${idx}`;
+          const slotCards = slotsMap[slotKey] || [];
+          const topCard = slotCards[slotCards.length - 1];
 
-        {/* 預留的空席位槽 */}
-        {Array.from({ length: emptySlotsCount }).map((_, idx) => (
-          <BoardSlot
-            key={`empty-slot-${idx}`}
-            slotId={`empty-${idx}`}
-            status={status}
-            isCurrentPlayer={false}
-          />
-        ))}
+          return (
+            <BoardSlot
+              key={slotKey}
+              slotId={slotKey}
+              cards={slotCards}
+              status={status}
+              isOwnerLocked={topCard ? lockedList.includes(topCard.playerId) : false}
+              isCurrentPlayer={topCard ? topCard.playerId === currentConnectionId : false}
+              onSelectSlot={onSelectSlot}
+              onRecall={onRecallCard}
+              onFlip={onFlipCard}
+            />
+          );
+        })}
       </div>
     </div>
   );
