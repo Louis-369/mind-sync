@@ -23,5 +23,6 @@ export const DEFAULT_SETTINGS: GameSettings = {
 // 預設玩家隨機稱號
 export const RANDOM_NAMES = [
   "秤心者", "調頻師", "默契匠", "平衡者",
+  "靈魂感應者", "讀心術師", "默契大師",
   "幸運星", "牌皇", "閃電俠", "終極玩家"
 ];

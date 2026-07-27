@@ -69,7 +69,7 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
 
           <p className="text-xs text-ukiyo-mist mb-5 max-w-xs leading-relaxed font-serif">
             {isWin
-              ? "默契如潮水般流暢，天秤完美歸位！"
+              ? "默契如潮水般流暢，全員牌陣順序完美達成！"
               : "天秤傾斜，牌序失衡。重新調頻再試一次。"}
           </p>
 
