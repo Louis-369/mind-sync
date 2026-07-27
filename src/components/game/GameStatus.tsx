@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Heart, Sparkles, Users } from "lucide-react";
+import React, { useState } from "react";
+import { Heart, Sparkles, Users, Copy, Check } from "lucide-react";
 
 interface GameStatusProps {
   roomId: string;
@@ -24,14 +24,41 @@ export function GameStatus({
   onUseShuriken,
   canUseShuriken = false,
 }: GameStatusProps) {
+  const [copied, setCopied] = useState<boolean>(false);
+
+  const handleCopyLink = async () => {
+    try {
+      if (typeof window !== "undefined") {
+        await navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch (error) {
+      console.error("複製房間網址失敗:", error);
+    }
+  };
+
   return (
     <div className="w-full glass-panel rounded-2xl p-4 mb-4 flex flex-wrap items-center justify-between gap-4 border-amber-500/30">
-      {/* 房間 ID 資訊 */}
+      {/* 房間 ID 資訊 與 一鍵複製 */}
       <div className="flex items-center space-x-2">
         <span className="text-xs text-gray-400 font-mono">房間代碼:</span>
-        <span className="text-base md:text-lg font-bold text-poker-neonGold bg-poker-bg/60 px-3 py-1 rounded-lg border border-poker-accent/30">
-          {roomId}
-        </span>
+        <div className="flex items-center space-x-1.5 bg-poker-bg/60 px-3 py-1 rounded-lg border border-poker-accent/30">
+          <span className="text-base md:text-lg font-bold text-poker-neonGold">{roomId}</span>
+          <button
+            onClick={handleCopyLink}
+            title="複製房間邀請連結"
+            className="ml-1 text-gray-400 hover:text-poker-accent transition-colors flex items-center gap-1 text-xs"
+          >
+            {copied ? (
+              <span className="text-emerald-400 font-semibold flex items-center gap-0.5">
+                <Check className="w-3.5 h-3.5" /> 已複製網址
+              </span>
+            ) : (
+              <Copy className="w-3.5 h-3.5" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* 核心數據統計 */}
