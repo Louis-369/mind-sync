@@ -30,9 +30,9 @@ export function PlayerHand({
   return (
     <div
       className={clsx(
-        "w-full glass-panel rounded-2xl p-3 md:p-4 mt-2 flex flex-col md:flex-row items-center justify-between gap-3 transition-all duration-300 shadow-xl",
+        "w-full glass-panel rounded-2xl p-3 md:p-4 mt-2 flex flex-col md:flex-row items-center justify-between gap-3 transition-all duration-300 shadow-xl border",
         isLocked
-          ? "border-ukiyo-gold shadow-ukiyo-glow ring-2 ring-ukiyo-gold/40 bg-ukiyo-surface/90"
+          ? "border-ukiyo-gold/60 bg-ukiyo-surface/90"
           : "border-ukiyo-foam/15"
       )}
     >
@@ -42,8 +42,8 @@ export function PlayerHand({
           <span className="text-xs font-serif font-bold text-ukiyo-gold flex items-center gap-1.5">
             {playerName}
             {isLocked && (
-              <span className="text-[9px] bg-ukiyo-gold text-ukiyo-bg font-bold px-1.5 py-0.2 rounded-full animate-pulse">
-                心靈鎖定
+              <span className="text-[9px] bg-ukiyo-gold/20 text-ukiyo-gold border border-ukiyo-gold/40 font-serif px-2 py-0.5 rounded-full">
+                ✓ 心靈確認
               </span>
             )}
           </span>

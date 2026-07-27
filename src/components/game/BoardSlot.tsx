@@ -58,29 +58,31 @@ export function BoardSlot({
         onClick={handleCardClick}
       />
 
-      {/* 出牌者標籤 (鎖定時發光) */}
+      {/* 出牌者標籤 */}
       <div className="mt-1 flex items-center space-x-1">
         <span
-          className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[80px] transition-all ${
+          className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[85px] transition-colors ${
             isOwnerLocked
-              ? "bg-ukiyo-gold/30 text-ukiyo-gold border-ukiyo-gold shadow-ukiyo-glow font-bold animate-pulse"
+              ? "bg-ukiyo-surface/90 text-ukiyo-gold border-ukiyo-gold/60 font-bold"
               : isCurrentPlayer
-              ? "bg-ukiyo-gold/20 text-ukiyo-gold border-ukiyo-gold/40 font-bold"
-              : "bg-ukiyo-surface/80 text-ukiyo-mist border-ukiyo-foam/10"
+              ? "bg-ukiyo-surface/80 text-ukiyo-foam border-ukiyo-foam/20"
+              : "bg-ukiyo-surface/60 text-ukiyo-mist border-ukiyo-foam/10"
           }`}
         >
-          {card.playerName || "匿名"} {isCurrentPlayer ? "(你)" : ""}
+          {isOwnerLocked ? "✓ " : ""}{card.playerName || "匿名"} {isCurrentPlayer ? "(你)" : ""}
         </span>
       </div>
 
       {/* 提示標籤 (僅自己且未翻開時) */}
       {isCurrentPlayer && !card.flipped && (
         <span
-          className={`absolute -top-2.5 text-[9px] font-serif font-bold px-1.5 py-0.5 rounded-full shadow animate-pulse ${
-            status === "locked" ? "bg-ukiyo-gold text-ukiyo-bg" : "bg-ukiyo-wave text-ukiyo-cream"
+          className={`absolute -top-2.5 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow ${
+            status === "locked"
+              ? "bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold"
+              : "bg-ukiyo-surface border border-ukiyo-foam/30 text-ukiyo-mist"
           }`}
         >
-          {status === "locked" ? "點擊翻牌" : "點擊收回"}
+          {status === "locked" ? "可點擊翻牌" : "可點擊收回"}
         </span>
       )}
     </div>
