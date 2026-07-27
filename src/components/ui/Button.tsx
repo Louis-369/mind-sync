@@ -21,10 +21,10 @@ export function Button({
   const baseStyles = "inline-flex items-center justify-center font-bold rounded-xl transition-all duration-200 shadow-md active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer tracking-wider";
 
   const variants = {
-    primary: "bg-ukiyo-indigo hover:bg-ukiyo-indigoHover text-ukiyo-foam border border-ukiyo-foam/20 shadow-ukiyo-soft",
-    secondary: "bg-ukiyo-wave hover:bg-ukiyo-wave/80 text-ukiyo-foam border border-ukiyo-foam/20",
+    primary: "bg-ukiyo-indigo hover:bg-ukiyo-indigoHover text-ukiyo-cream border border-ukiyo-ash/40 shadow-lg",
+    secondary: "bg-ukiyo-surface hover:bg-ukiyo-surface/80 text-ukiyo-ink border border-ukiyo-ash/50",
     danger: "bg-ukiyo-vermillion hover:bg-red-800 text-ukiyo-cream border border-red-400/30",
-    ghost: "bg-ukiyo-surface/60 hover:bg-ukiyo-surface text-ukiyo-mist border border-ukiyo-foam/10",
+    ghost: "bg-ukiyo-surface/70 hover:bg-ukiyo-surface text-ukiyo-ink border border-ukiyo-ash/40",
   };
 
   const sizes = {

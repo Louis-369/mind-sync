@@ -25,11 +25,11 @@ export default function LobbyPage() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative overflow-hidden">
       {/* 背景浮世繪深海波浪暈光 */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-ukiyo-wave/25 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-80 h-80 bg-ukiyo-gold/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-ukiyo-wave/15 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-80 h-80 bg-ukiyo-surface/40 rounded-full blur-[120px] pointer-events-none" />
 
       {/* 主面板容器 */}
-      <div className="glass-panel w-full max-w-lg rounded-3xl p-6 md:p-10 border border-ukiyo-foam/20 shadow-2xl relative z-10 flex flex-col items-center text-center">
+      <div className="glass-panel w-full max-w-lg rounded-3xl p-6 md:p-10 border border-ukiyo-ash/40 shadow-xl relative z-10 flex flex-col items-center text-center">
         {/* 日式硃砂圓圖騰 */}
         <div className="w-14 h-14 rounded-full ukiyo-seal flex items-center justify-center text-2xl font-serif mb-4 shadow-lg animate-wave-float">
           心
