@@ -104,6 +104,7 @@ export function GameBoard({
               status={status}
               isOwnerLocked={topCard ? lockedList.includes(topCard.playerId) : false}
               isCurrentPlayer={topCard ? topCard.playerId === currentConnectionId : false}
+              currentConnectionId={currentConnectionId}
               isSelected={selectedSlotId === slotKey}
               onSelectSlot={onSelectSlot}
               onRecall={onRecallCard}

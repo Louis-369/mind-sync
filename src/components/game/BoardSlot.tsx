@@ -11,6 +11,7 @@ interface BoardSlotProps {
   status?: string;
   isOwnerLocked?: boolean;
   isCurrentPlayer: boolean;
+  currentConnectionId?: string;
   isFlipped?: boolean;
   isSelected?: boolean;
   onSelectSlot?: (slotId: string) => void;
@@ -25,6 +26,7 @@ export function BoardSlot({
   status = "playing",
   isOwnerLocked = false,
   isCurrentPlayer,
+  currentConnectionId,
   isFlipped = false,
   isSelected = false,
   onSelectSlot,
@@ -35,6 +37,21 @@ export function BoardSlot({
   const allCards = cards.length > 0 ? cards : card ? [card] : [];
   const topCard = allCards[allCards.length - 1];
   const hasCollision = allCards.length > 1;
+
+  // 取得撞牌玩家名字清單 (例如：你與小華撞牌)
+  const collisionNamesText = hasCollision
+    ? Array.from(
+        new Set(
+          allCards.map((c) =>
+            currentConnectionId && c.playerId === currentConnectionId
+              ? "你"
+              : c.playerId === topCard?.playerId && isCurrentPlayer
+              ? "你"
+              : c.playerName || "匿名"
+          )
+        )
+      ).join("與") + "撞牌"
+    : "";
 
   if (allCards.length === 0) {
     return (
@@ -88,10 +105,10 @@ export function BoardSlot({
           : "border-transparent hover:border-ukiyo-foam/20"
       }`}
     >
-      {/* 💥 撞牌碰撞警示標籤 (多牌重疊放進同槽位，保持蓋著) */}
+      {/* 撞牌碰撞警示標籤 (顯示撞牌玩家姓名、無 Emoji、不換行) */}
       {hasCollision && (
-        <div className="absolute -top-3.5 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 animate-bounce">
-          💥 撞牌 ({allCards.length}張)
+        <div className="absolute -top-3.5 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce">
+          {collisionNamesText}
         </div>
       )}
 
@@ -108,7 +125,9 @@ export function BoardSlot({
       {/* 卡牌渲染 (堆疊層次效果) */}
       <div className="relative flex items-center justify-center">
         {allCards.map((c, idx) => {
-          const isMe = c.playerId === topCard.playerId && isCurrentPlayer;
+          const isMe =
+            (currentConnectionId && c.playerId === currentConnectionId) ||
+            (c.playerId === topCard.playerId && isCurrentPlayer);
           return (
             <div
               key={`${c.placedAt}-${idx}`}
@@ -125,10 +144,10 @@ export function BoardSlot({
                 onClick={handleCardClick}
               />
 
-              {/* 自己蓋著的牌：在右下角呈現半透明可記憶數字 (24) */}
+              {/* 自己蓋著的牌：在右下角呈現半透明可記憶數字 (不加括號) */}
               {isMe && !c.flipped && (
                 <div className="absolute bottom-1 right-1.5 z-20 pointer-events-none bg-ukiyo-bg/85 border border-ukiyo-gold/40 px-1 py-0.2 rounded text-[10px] font-mono font-bold text-ukiyo-gold shadow-sm">
-                  ({c.cardValue})
+                  {c.cardValue}
                 </div>
               )}
             </div>
