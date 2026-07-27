@@ -79,6 +79,16 @@ export function GameBoard({
   const isAllCardsFlipped = board.length > 0 && board.every((c) => c.flipped);
   const isFinishedReveal = status === "finished" || isAllCardsFlipped;
 
+  // 每 4 個槽位分一組 (Row)，強制單行上限絕不超過 4 個，且每一行皆獨自信仰水平置中
+  const slotRows: number[][] = [];
+  for (let i = 0; i < totalSlotsCount; i += 4) {
+    const row: number[] = [];
+    for (let j = i; j < Math.min(i + 4, totalSlotsCount); j++) {
+      row.push(j);
+    }
+    slotRows.push(row);
+  }
+
   return (
     <div className="w-full flex-1 min-h-[320px] md:min-h-[380px] bg-gradient-to-b from-ukiyo-surface/90 via-ukiyo-bg/95 to-ukiyo-surface/90 rounded-3xl p-2.5 md:p-6 border border-ukiyo-foam/20 shadow-2xl relative flex flex-col items-center justify-between overflow-hidden my-2 washi-texture">
       {/* 背景水墨波浪浮水印 */}
@@ -104,35 +114,38 @@ export function GameBoard({
         </div>
       </div>
 
-      {/* 盤面槽位 (4 個與 4 個以下強制作 flex-nowrap 絕不折行，超過 4 個自動折行) */}
-      <div
-        className={`relative z-10 flex items-center justify-center w-full max-w-full gap-1 sm:gap-2.5 md:gap-4 min-h-[140px] my-auto ${
-          totalSlotsCount <= 4 ? "flex-nowrap" : "flex-wrap"
-        }`}
-      >
-        {Array.from({ length: totalSlotsCount }).map((_, idx) => {
-          const slotKey = `slot-${idx}`;
-          const slotCards = slotsMap[slotKey] || [];
-          const topCard = slotCards[slotCards.length - 1];
+      {/* 盤面槽位 (4 個一組分組演算法：單行上限嚴格固定最多 4 個，每一行皆獨立彈性水平置中) */}
+      <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-full gap-2 sm:gap-3 md:gap-4 min-h-[140px] my-auto">
+        {slotRows.map((rowSlotIndexes, rowIndex) => (
+          <div
+            key={`row-${rowIndex}`}
+            className="flex items-center justify-center gap-1 sm:gap-2.5 md:gap-4 w-full flex-nowrap"
+          >
+            {rowSlotIndexes.map((idx) => {
+              const slotKey = `slot-${idx}`;
+              const slotCards = slotsMap[slotKey] || [];
+              const topCard = slotCards[slotCards.length - 1];
 
-          return (
-            <BoardSlot
-              key={slotKey}
-              slotId={slotKey}
-              cards={slotCards}
-              status={status}
-              isOwnerLocked={topCard ? lockedList.includes(topCard.playerId) : false}
-              isCurrentPlayer={topCard ? topCard.playerId === currentConnectionId : false}
-              currentConnectionId={currentConnectionId}
-              isSelected={selectedSlotId === slotKey}
-              isCorrectOrder={slotCorrectnessMap[slotKey]}
-              isFinishedReveal={isFinishedReveal}
-              onSelectSlot={onSelectSlot}
-              onRecall={onRecallCard}
-              onFlip={onFlipCard}
-            />
-          );
-        })}
+              return (
+                <BoardSlot
+                  key={slotKey}
+                  slotId={slotKey}
+                  cards={slotCards}
+                  status={status}
+                  isOwnerLocked={topCard ? lockedList.includes(topCard.playerId) : false}
+                  isCurrentPlayer={topCard ? topCard.playerId === currentConnectionId : false}
+                  currentConnectionId={currentConnectionId}
+                  isSelected={selectedSlotId === slotKey}
+                  isCorrectOrder={slotCorrectnessMap[slotKey]}
+                  isFinishedReveal={isFinishedReveal}
+                  onSelectSlot={onSelectSlot}
+                  onRecall={onRecallCard}
+                  onFlip={onFlipCard}
+                />
+              );
+            })}
+          </div>
+        ))}
       </div>
     </div>
   );
