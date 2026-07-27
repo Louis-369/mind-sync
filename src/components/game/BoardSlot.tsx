@@ -125,6 +125,7 @@ export function BoardSlot({
   };
 
   const isHighlightSelected = status === "playing" && isSelected;
+  const slotIndex = parseInt(slotId.replace("slot-", ""), 10) + 1;
 
   return (
     <div
@@ -137,6 +138,13 @@ export function BoardSlot({
           : "border-transparent hover:border-ukiyo-foam/20"
       }`}
     >
+      {/* 席位編號標籤 (#1, #2, #3... 方便玩家溝通) */}
+      <div className="absolute top-1 left-1.5 z-20 pointer-events-none">
+        <span className="text-[9px] font-mono font-bold text-ukiyo-mist/70 bg-ukiyo-bg/60 px-1 py-0.2 rounded border border-ukiyo-foam/10">
+          #{slotIndex}
+        </span>
+      </div>
+
       {/* 標籤權重化渲染 (權重：撞牌 > 動作提示；每個席位上方最多顯示單一標籤) */}
       {hasCollision ? (
         <div className="absolute -top-3.5 z-50 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
@@ -192,8 +200,8 @@ export function BoardSlot({
                 onClick={() => handleCardClick(c)}
               />
 
-              {/* 自己蓋著的牌：在右下角呈現半透明可記憶數字 (不加括號) */}
-              {isMe && !c.flipped && (
+              {/* 自己蓋著的牌：在右下角呈現半透明可記憶數字 (同意鎖定與全員鎖定後自動隱藏) */}
+              {isMe && !c.flipped && !isOwnerLocked && status === "playing" && (
                 <div className="absolute bottom-1 right-1.5 z-20 pointer-events-none bg-ukiyo-bg/85 border border-ukiyo-gold/40 px-1 py-0.2 rounded text-[10px] font-mono font-bold text-ukiyo-gold shadow-sm">
                   {c.cardValue}
                 </div>
