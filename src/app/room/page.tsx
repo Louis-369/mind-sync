@@ -191,7 +191,7 @@ function RoomInner() {
         cardsPerPlayer={settings?.cardsPerPlayer || 2}
         lockedList={lockedList}
         selectedSlotId={selectedSlotId}
-        onSelectSlot={(slotId) => setSelectedSlotId((prev) => (prev === slotId ? null : slotId))}
+        onSelectSlot={(slotId) => setSelectedSlotId(slotId)}
         onRecallCard={recallCard}
         onFlipCard={(slotId) => flipCard(slotId)}
       />

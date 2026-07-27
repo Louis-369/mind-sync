@@ -124,7 +124,7 @@ export function BoardSlot({
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
-      className={`relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border ${
+      className={`relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border touch-manipulation ${
         isSelected
           ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
           : hasCollision
@@ -132,8 +132,12 @@ export function BoardSlot({
           : "border-transparent hover:border-ukiyo-foam/20"
       }`}
     >
-      {/* 提示標籤 (圖層 z-50 置頂，僅自己有未翻開卡牌且未結算時；去「可」字) */}
-      {myUnflippedCard && status !== "finished" && (
+      {/* 標籤權重化渲染 (權重：撞牌 > 動作提示；每個席位上方最多顯示單一標籤) */}
+      {hasCollision ? (
+        <div className="absolute -top-3.5 z-50 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
+          {collisionNamesText}
+        </div>
+      ) : myUnflippedCard && status !== "finished" ? (
         status === "locked" ? (
           <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-1.5 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold pointer-events-none whitespace-nowrap">
             點擊翻牌
@@ -143,20 +147,13 @@ export function BoardSlot({
             點擊收回
           </span>
         ) : null
-      )}
-
-      {/* 撞牌碰撞警示標籤 (純極簡文字：撞牌 X張、無 Emoji、無括號、不換行) */}
-      {hasCollision && (
-        <div className="absolute -top-3.5 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce">
-          {collisionNamesText}
-        </div>
-      )}
+      ) : null}
 
       {/* 鎖定同意朱紅落款小印章「確」(僅在同意鎖定、未翻牌且未結束時顯示) */}
       {isOwnerLocked && !topCard?.flipped && status !== "finished" && (
         <div
           title="已完成心靈確認"
-          className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded ukiyo-seal flex items-center justify-center text-[10px] shadow-md border border-ukiyo-cream/30 font-serif"
+          className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded ukiyo-seal flex items-center justify-center text-[10px] shadow-md border border-ukiyo-cream/30 font-serif pointer-events-none"
         >
           確
         </div>

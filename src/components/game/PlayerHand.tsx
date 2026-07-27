@@ -63,12 +63,12 @@ export function PlayerHand({
               variant={isLocked ? "secondary" : "primary"}
               size="sm"
               onClick={onToggleLock}
-              disabled={isLockDisabled}
+              disabled={isLockDisabled && !isLocked}
               className="text-xs font-serif"
             >
               {isLocked ? (
                 <span className="flex items-center gap-1 text-ukiyo-gold font-bold">
-                  <Lock className="w-3.5 h-3.5" /> 已鎖定 ({lockedCount}/{totalPlayers})
+                  <Lock className="w-3.5 h-3.5" /> 已鎖定 (點擊解開)
                 </span>
               ) : (
                 <span className="flex items-center gap-1">
@@ -108,16 +108,16 @@ export function PlayerHand({
             variant={isLocked ? "secondary" : "primary"}
             size="md"
             onClick={onToggleLock}
-            disabled={isLockDisabled}
+            disabled={isLockDisabled && !isLocked}
             className={clsx(
-              "w-full text-xs font-serif transition-all",
+              "w-full text-xs font-serif transition-all touch-manipulation",
               isLocked && "border-ukiyo-gold text-ukiyo-gold font-bold",
-              hasBoardCollision && "opacity-60 cursor-not-allowed"
+              hasBoardCollision && !isLocked && "opacity-60 cursor-not-allowed"
             )}
           >
             {isLocked ? (
               <span className="flex items-center justify-center gap-1.5">
-                <Lock className="w-4 h-4 text-ukiyo-gold" /> 已同意鎖定
+                <Lock className="w-4 h-4 text-ukiyo-gold" /> 已鎖定 (點擊解開)
               </span>
             ) : (
               <span className="flex items-center justify-center gap-1.5">
