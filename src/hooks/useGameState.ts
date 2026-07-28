@@ -195,17 +195,23 @@ export function useGameState() {
     const mutableHands = storage.get("hands");
     const mutableBoard = storage.get("board");
 
-    // 1. 檢查該玩家是否手牌已全部清空
+    // 1. 嚴格檢查該玩家檯面上出牌張數是否到達規定每人發牌張數
+    const cardsPerPlayer = storage.get("settings")?.get("cardsPerPlayer") || 2;
+    const currentBoard = Array.from(mutableBoard.values());
+    const playerBoardCount = currentBoard.filter(
+      (c) => c.get("playerId") === myPId || c.get("playerId") === connId
+    ).length;
+
     let playerHand = mutableHands.get(myPId);
-    if (!playerHand || playerHand.length === 0) {
-      playerHand = mutableHands.get(connId);
-    }
-    if (playerHand && playerHand.length > 0) {
+    if (!playerHand) playerHand = mutableHands.get(connId);
+    const remainingHandCount = playerHand ? playerHand.length : 0;
+
+    // 嚴格阻斷：若該玩家檯面出牌未滿規定張數，或手牌尚有剩餘，絕對禁止同意鎖定！
+    if (playerBoardCount < cardsPerPlayer || remainingHandCount > 0) {
       return;
     }
 
     // 2. 檢查盤面上是否有撞牌 (多張牌放置在同一槽位)
-    const currentBoard = Array.from(mutableBoard.values());
     const counts: Record<string, number> = {};
     currentBoard.forEach((c) => {
       const sId = c.get("slotId");
@@ -291,7 +297,7 @@ export function useGameState() {
     }
   }, [self]);
 
-  // 當發現舊房間狀態殘留（線上獨立玩家為 1 人且有舊狀態），自動清理重置
+  // 自動清理舊殘留房間與極端無牌卡死救援 (autoResetStaleRoom & autoRecoverStaleState)
   const autoResetStaleRoom = useMutation(({ storage }, currentMyPlayerId?: string) => {
     const activePlayerIds = new Set<string>();
     const myPId = self?.presence?.playerId || currentMyPlayerId;
@@ -307,7 +313,7 @@ export function useGameState() {
     const handsMap = storage.get("hands");
     const currentStatus = storage.get("status");
 
-    // 全房僅剩 1 位獨立玩家且存在舊牌局殘留，進行清理 (一併清空歷史進房順序，維護房間乾淨度)
+    // 1. 全房僅剩 1 位獨立玩家且存在舊牌局殘留，進行清理 (維護房間乾淨度)
     if (activePlayerIds.size <= 1) {
       if (boardMap.size > 0 || handsMap.size > 0 || currentStatus !== "waiting") {
         Array.from(boardMap.keys()).forEach((k) => boardMap.delete(k));
@@ -323,6 +329,21 @@ export function useGameState() {
       }
       if (myPId && storage.get("hostId") !== myPId) {
         storage.set("hostId", myPId);
+      }
+    }
+
+    // 2. 極端卡死救援 (autoRecoverStaleState)：若狀態為 playing 或 locked，但檯面張數為 0 且線上手牌皆為空，自動重置為 waiting
+    if (currentStatus === "playing" || currentStatus === "locked") {
+      let totalHandCards = 0;
+      handsMap.forEach((hList) => {
+        totalHandCards += hList.length;
+      });
+      if (boardMap.size === 0 && totalHandCards === 0) {
+        Array.from(boardMap.keys()).forEach((k) => boardMap.delete(k));
+        storage.get("lockedPlayers").clear();
+        Array.from(handsMap.keys()).forEach((k) => handsMap.delete(k));
+        storage.set("status", "waiting");
+        storage.set("result", null);
       }
     }
   }, [others, self]);
@@ -417,7 +438,7 @@ export function useGameState() {
     });
   }, []);
 
-  // 當玩家離線時，自動清理其 Storage 鎖定標籤與殘留手牌，並推進進度
+  // 當玩家離線時，自動清理其 Storage 鎖定標籤與歷史進房順序 UUID (保留已發手牌以相容重新整理重連)
   const syncOfflinePlayers = useMutation(({ storage }, currentMyPlayerId?: string) => {
     const activePlayerIds = new Set<string>();
     const myPId = self?.presence?.playerId || currentMyPlayerId;
