@@ -105,23 +105,13 @@ export function GameBoard({
         </div>
       </div>
 
-      {/* 遊戲結束顯眼狀態橫條 (支援房主直接重開) */}
+      {/* 遊戲結束顯眼狀態橫條 */}
       {status === "finished" && (
         <div className="relative z-20 w-full mb-2 p-2 rounded-xl bg-ukiyo-surface/95 border border-ukiyo-gold/40 shadow-lg flex items-center justify-between text-xs font-serif animate-fade-in">
           <div className="flex items-center gap-1.5 text-ukiyo-gold font-bold">
             <Trophy className="w-4 h-4 text-ukiyo-gold animate-bounce" />
-            <span>盤面檢視模式</span>
+            <span>盤面檢視模式（可使用下方列查看結算卡或重開局）</span>
           </div>
-          {isHost && onRestart && (
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={onRestart}
-              className="font-serif text-xs px-3 py-1 flex items-center gap-1"
-            >
-              <RotateCcw className="w-3.5 h-3.5" /> 房主重開下一局
-            </Button>
-          )}
         </div>
       )}
 
