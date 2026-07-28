@@ -47,7 +47,7 @@ export function useGameState() {
   const hasBoardCollision = Object.values(slotCounts).some((cnt) => cnt > 1);
 
   // 發牌 mutation
-  const dealCards = useMutation(({ storage }) => {
+  const dealCards = useMutation(({ storage }, currentMyPlayerId?: string) => {
     const mutableSettings = storage.get("settings");
     const mutableBoard = storage.get("board");
     const mutableLocked = storage.get("lockedPlayers");
@@ -61,24 +61,36 @@ export function useGameState() {
     mutableLocked.clear();
     Array.from(mutableHands.keys()).forEach((k) => mutableHands.delete(k));
 
-    // 給房主設定
-    if (!storage.get("hostId") && self?.connectionId) {
-      storage.set("hostId", String(self.connectionId));
+    // 給房主設定 (優先使用穩定 playerId)
+    const myPId = self?.presence?.playerId || currentMyPlayerId;
+    if (!storage.get("hostId") && myPId) {
+      storage.set("hostId", myPId);
     }
 
-    // 發牌給當前線上所有人 (包括自己，注意 connectionId 可能為 0，不能用 Boolean 過濾)
+    // 發牌給當前線上所有人 (收集 unique playerId，雙重備用相容 connectionId)
     let cardIndex = 0;
-    const allConnectionIds = [self?.connectionId, ...others.map((o) => o.connectionId)].filter(
-      (id) => id !== undefined && id !== null
-    );
+    const playerMap = new Map<string, string>(); // pId -> connIdStr
+    if (myPId) {
+      playerMap.set(myPId, String(self?.connectionId));
+    }
+    others.forEach((o) => {
+      const pId = o.presence?.playerId || String(o.connectionId);
+      if (pId) {
+        playerMap.set(pId, String(o.connectionId));
+      }
+    });
 
-    allConnectionIds.forEach((connId) => {
+    playerMap.forEach((connIdStr, pId) => {
       const playerHandCards = deck.slice(cardIndex, cardIndex + cardsPerPlayer).sort((a, b) => a - b);
       cardIndex += cardsPerPlayer;
 
-      // 建立 LiveList
       const list = new LiveList(playerHandCards);
-      mutableHands.set(String(connId), list);
+      // 以 playerId 作為主鍵
+      mutableHands.set(pId, list);
+      // 亦同步設一份以 connectionId 為備用鍵
+      if (connIdStr && connIdStr !== pId) {
+        mutableHands.set(connIdStr, new LiveList(playerHandCards));
+      }
     });
 
     storage.set("status", "playing");
@@ -86,52 +98,65 @@ export function useGameState() {
   }, [self, others]);
 
   // 玩家出牌 (放置卡牌到盤面，可指定 targetSlotId 槽位)
-  const placeCard = useMutation(({ storage }, cardValue: number, playerName: string, targetSlotId?: string) => {
-    const connId = String(self?.connectionId);
-    const mutableHands = storage.get("hands");
-    const mutableBoard = storage.get("board");
+  const placeCard = useMutation(
+    ({ storage }, cardValue: number, playerName: string, targetSlotId?: string, currentMyPlayerId?: string) => {
+      const connId = String(self?.connectionId);
+      const myPId = self?.presence?.playerId || currentMyPlayerId || connId;
+      const mutableHands = storage.get("hands");
+      const mutableBoard = storage.get("board");
 
-    const playerHand = mutableHands.get(connId);
-    if (playerHand) {
-      const index = playerHand.indexOf(cardValue);
-      if (index !== -1) {
-        playerHand.delete(index);
+      // 優先以 myPId 從手牌扣除，若無則降級為 connId
+      let playerHand = mutableHands.get(myPId);
+      if (!playerHand || playerHand.length === 0) {
+        playerHand = mutableHands.get(connId);
       }
-    }
 
-    // 將卡片放入盤面 (若未指定槽位，自動取目前卡牌總數為槽位索引)
-    const existingCount = Array.from(mutableBoard.keys()).length;
-    const finalSlotId = targetSlotId || `slot-${existingCount}`;
+      if (playerHand) {
+        const index = playerHand.indexOf(cardValue);
+        if (index !== -1) {
+          playerHand.delete(index);
+        }
+      }
 
-    // 使用時間戳與唯一的 slotId 複合鍵
-    const uniqueKey = `${finalSlotId}_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`;
-    const newCard = new LiveObject({
-      playerId: connId,
-      playerName: playerName || "玩家",
-      cardValue,
-      flipped: false,
-      placedAt: Date.now(),
-      slotId: finalSlotId, // 儲存指定的槽位
-    });
+      const existingCount = Array.from(mutableBoard.keys()).length;
+      const finalSlotId = targetSlotId || `slot-${existingCount}`;
 
-    mutableBoard.set(uniqueKey, newCard);
-  }, [self]);
+      const uniqueKey = `${finalSlotId}_${Date.now()}_${Math.random().toString(36).substring(2, 5)}`;
+      const newCard = new LiveObject({
+        playerId: myPId,
+        connectionId: connId,
+        playerName: playerName || "玩家",
+        cardValue,
+        flipped: false,
+        placedAt: Date.now(),
+        slotId: finalSlotId,
+      });
 
-  // 玩家收回卡片 (從盤面收回手牌)
-  const recallCard = useMutation(({ storage }, targetKey: string) => {
+      mutableBoard.set(uniqueKey, newCard);
+    },
+    [self]
+  );
+
+  // 玩家收回卡牌 (從盤面收回手牌)
+  const recallCard = useMutation(({ storage }, targetKey: string, currentMyPlayerId?: string) => {
     const connId = String(self?.connectionId);
+    const myPId = self?.presence?.playerId || currentMyPlayerId || connId;
     const mutableBoard = storage.get("board");
     const mutableHands = storage.get("hands");
 
-    // 優先以 uniqueKey 直接取得卡牌
     let targetBoardKey = targetKey;
     let card = mutableBoard.get(targetKey);
 
-    // 若未直接找到，嘗試搜尋對應槽位且屬於該玩家的未翻開卡牌
-    if (!card) {
+    const isMyCard = (c: any) => {
+      const cardPId = c.get("playerId");
+      const cardConnId = c.get("connectionId");
+      return (cardPId === myPId || cardPId === connId || cardConnId === connId) && !c.get("flipped");
+    };
+
+    if (!card || !isMyCard(card)) {
       const boardEntries = Array.from(mutableBoard.entries());
       for (const [k, v] of boardEntries) {
-        if ((k === targetKey || v.get("slotId") === targetKey) && v.get("playerId") === connId && !v.get("flipped")) {
+        if ((k === targetKey || v.get("slotId") === targetKey) && isMyCard(v)) {
           card = v;
           targetBoardKey = k;
           break;
@@ -139,14 +164,15 @@ export function useGameState() {
       }
     }
 
-    if (card && card.get("playerId") === connId && !card.get("flipped")) {
+    if (card && isMyCard(card)) {
       const cardValue = card.get("cardValue");
       mutableBoard.delete(targetBoardKey);
 
-      const playerHand = mutableHands.get(connId);
+      let playerHand = mutableHands.get(myPId);
+      if (!playerHand) playerHand = mutableHands.get(connId);
+
       if (playerHand) {
         playerHand.push(cardValue);
-        // 重新排序
         const currentArr = playerHand.toArray().sort((a, b) => a - b);
         playerHand.clear();
         currentArr.forEach((val) => playerHand.push(val));
@@ -155,13 +181,17 @@ export function useGameState() {
   }, [self]);
 
   // 切換玩家鎖定準備狀態
-  const toggleLock = useMutation(({ storage }, playerName: string) => {
+  const toggleLock = useMutation(({ storage }, playerName: string, currentMyPlayerId?: string) => {
     const connId = String(self?.connectionId);
+    const myPId = self?.presence?.playerId || currentMyPlayerId || connId;
     const mutableHands = storage.get("hands");
     const mutableBoard = storage.get("board");
 
-    // 1. 檢查該玩家是否手牌已全部清空 (手牌 > 0 禁止發起鎖定)
-    const playerHand = mutableHands.get(connId);
+    // 1. 檢查該玩家是否手牌已全部清空
+    let playerHand = mutableHands.get(myPId);
+    if (!playerHand || playerHand.length === 0) {
+      playerHand = mutableHands.get(connId);
+    }
     if (playerHand && playerHand.length > 0) {
       return;
     }
@@ -173,39 +203,51 @@ export function useGameState() {
       const sId = c.get("slotId");
       if (sId) counts[sId] = (counts[sId] || 0) + 1;
     });
-    const isColliding = Object.values(counts).some((cnt) => cnt > 1);
-
-    if (isColliding) {
-      // 存在撞牌時，禁止鎖定！
+    if (Object.values(counts).some((cnt) => cnt > 1)) {
       return;
     }
 
     const mutableLocked = storage.get("lockedPlayers");
-    const lockIndex = mutableLocked.indexOf(connId);
+    const lockIndexPId = mutableLocked.indexOf(myPId);
+    const lockIndexConnId = mutableLocked.indexOf(connId);
 
-    if (lockIndex !== -1) {
-      mutableLocked.delete(lockIndex);
+    if (lockIndexPId !== -1) {
+      mutableLocked.delete(lockIndexPId);
+    } else if (lockIndexConnId !== -1) {
+      mutableLocked.delete(lockIndexConnId);
     } else {
-      mutableLocked.push(connId);
+      mutableLocked.push(myPId);
     }
 
-    // 檢查是否所有玩家都已鎖定
-    const totalPlayers = others.length + 1;
-    if (mutableLocked.length >= totalPlayers) {
+    // 統計線上獨立玩家人數
+    const activePlayerIds = new Set<string>();
+    if (myPId) activePlayerIds.add(myPId);
+    others.forEach((o) => {
+      if (o.presence?.playerId) activePlayerIds.add(o.presence.playerId);
+    });
+
+    if (mutableLocked.length >= activePlayerIds.size) {
       storage.set("status", "locked");
     }
   }, [self, others]);
 
   // 翻開盤面上屬於自己的特定卡牌
-  const flipCard = useMutation(({ storage }, targetKey: string) => {
+  const flipCard = useMutation(({ storage }, targetKey: string, currentMyPlayerId?: string) => {
     const connId = String(self?.connectionId);
+    const myPId = self?.presence?.playerId || currentMyPlayerId || connId;
     const mutableBoard = storage.get("board");
     let card = mutableBoard.get(targetKey);
 
-    if (!card) {
+    const isMyCard = (c: any) => {
+      const cardPId = c.get("playerId");
+      const cardConnId = c.get("connectionId");
+      return (cardPId === myPId || cardPId === connId || cardConnId === connId) && !c.get("flipped");
+    };
+
+    if (!card || !isMyCard(card)) {
       const boardEntries = Array.from(mutableBoard.entries());
       for (const [k, v] of boardEntries) {
-        if ((k === targetKey || v.get("slotId") === targetKey) && v.get("playerId") === connId && !v.get("flipped")) {
+        if ((k === targetKey || v.get("slotId") === targetKey) && isMyCard(v)) {
           card = v;
           break;
         }
@@ -213,7 +255,7 @@ export function useGameState() {
     }
 
     // 只能翻開自己出的牌
-    if (card && card.get("playerId") === connId && !card.get("flipped")) {
+    if (card && isMyCard(card)) {
       card.set("flipped", true);
 
       // 檢查是否盤面上所有卡片都已翻開
@@ -221,7 +263,6 @@ export function useGameState() {
       const allFlipped = allCards.length > 0 && allCards.every((c) => c.get("flipped"));
 
       if (allFlipped) {
-        // 按席位位置 (slotId 數字索引) 排序，而非放置時間
         const sorted = [...allCards].sort((a, b) => {
           const slotA = parseInt((a.get("slotId") || "").replace("slot-", ""), 10) || 0;
           const slotB = parseInt((b.get("slotId") || "").replace("slot-", ""), 10) || 0;
@@ -240,20 +281,33 @@ export function useGameState() {
     }
   }, [self]);
 
-  // 當發現舊房間狀態殘留（例如非等待狀態但無其他玩家），自動清理重置
-  const autoResetStaleRoom = useMutation(({ storage }) => {
+  // 當發現舊房間狀態殘留（線上獨立玩家為 1 人且有舊狀態），自動清理重置
+  const autoResetStaleRoom = useMutation(({ storage }, currentMyPlayerId?: string) => {
+    const activePlayerIds = new Set<string>();
+    const myPId = self?.presence?.playerId || currentMyPlayerId;
+    if (myPId) activePlayerIds.add(myPId);
+
+    others.forEach((o) => {
+      if (o.presence?.playerId) {
+        activePlayerIds.add(o.presence.playerId);
+      }
+    });
+
+    const boardMap = storage.get("board");
+    const handsMap = storage.get("hands");
     const currentStatus = storage.get("status");
-    // 如果不是等待階段，且全房只有自己一人（others.length === 0）
-    if (currentStatus !== "waiting" && others.length === 0) {
-      const boardMap = storage.get("board");
-      const handsMap = storage.get("hands");
-      Array.from(boardMap.keys()).forEach((k) => boardMap.delete(k));
-      storage.get("lockedPlayers").clear();
-      Array.from(handsMap.keys()).forEach((k) => handsMap.delete(k));
-      storage.set("status", "waiting");
-      storage.set("result", null);
-      if (self?.connectionId) {
-        storage.set("hostId", String(self.connectionId));
+
+    // 全房僅剩 1 位獨立玩家且存在舊牌局殘留，進行清理
+    if (activePlayerIds.size <= 1) {
+      if (boardMap.size > 0 || handsMap.size > 0 || currentStatus !== "waiting") {
+        Array.from(boardMap.keys()).forEach((k) => boardMap.delete(k));
+        storage.get("lockedPlayers").clear();
+        Array.from(handsMap.keys()).forEach((k) => handsMap.delete(k));
+        storage.set("status", "waiting");
+        storage.set("result", null);
+      }
+      if (myPId && storage.get("hostId") !== myPId) {
+        storage.set("hostId", myPId);
       }
     }
   }, [others, self]);
@@ -291,19 +345,29 @@ export function useGameState() {
     });
   }, []);
 
-  // 自動聲明/維護房主身分 (無房主或原房主離線時自動遞補)
-  const claimHost = useMutation(({ storage }) => {
+  // 自動聲明/維護房主身分 (無房主或原房主離線時自動遞補，使用穩定的 playerId)
+  const claimHost = useMutation(({ storage }, currentMyPlayerId?: string) => {
     const currentHost = storage.get("hostId");
-    const myConnId = self?.connectionId ? String(self.connectionId) : null;
-    if (!myConnId) return;
+    
+    // 收集線上所有獨立玩家的 playerId
+    const activePlayerIds: string[] = [];
+    const myPId = self?.presence?.playerId || currentMyPlayerId;
+    if (myPId) {
+      activePlayerIds.push(myPId);
+    }
 
-    const allIds = [self?.connectionId, ...others.map((o) => o.connectionId)].filter(Boolean).map(String);
-    const isHostPresent = currentHost && allIds.includes(currentHost);
+    others.forEach((o) => {
+      const pId = o.presence?.playerId;
+      if (pId && !activePlayerIds.includes(pId)) {
+        activePlayerIds.push(pId);
+      }
+    });
 
-    if (!isHostPresent && allIds.length > 0) {
-      // 最早連線的玩家自動繼承房主
-      const sortedIds = [...allIds].sort((a, b) => Number(a) - Number(b));
-      storage.set("hostId", sortedIds[0]);
+    const isHostPresent = currentHost && activePlayerIds.includes(currentHost);
+
+    // 若原房主離線或從未設定，將第一位線上玩家自動指定為房主
+    if (!isHostPresent && activePlayerIds.length > 0) {
+      storage.set("hostId", activePlayerIds[0]);
     }
   }, [self, others]);
 
@@ -328,9 +392,12 @@ export function useGameState() {
     storage.set("result", null);
   }, []);
 
-  // 取得當前自己的手牌
+  // 取得當前自己的手牌 (優先依據穩定 playerId 讀取，降級相容 connectionId)
+  const myPId = self?.presence?.playerId;
   const connIdStr = String(self?.connectionId);
-  const myHandList = handsMap ? handsMap.get(connIdStr) : null;
+  const myHandList = handsMap
+    ? (myPId && handsMap.get(myPId)) || handsMap.get(connIdStr)
+    : null;
   const myHand = myHandList ? Array.from(myHandList) : [];
 
   return {

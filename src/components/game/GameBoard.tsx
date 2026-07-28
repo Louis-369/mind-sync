@@ -1,18 +1,22 @@
 "use client";
 
 import React from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, RotateCcw, Trophy } from "lucide-react";
 import { BoardSlot } from "./BoardSlot";
 import { BoardCard } from "../../types/game";
+import { Button } from "../ui/Button";
 
 interface GameBoardProps {
   board: BoardCard[];
   currentConnectionId: string;
+  currentPlayerId?: string;
   status: string;
   totalPlayers?: number;
   cardsPerPlayer?: number;
   lockedList?: string[];
   selectedSlotId?: string | null;
+  isHost?: boolean;
+  onRestart?: () => void;
   onSelectSlot?: (slotId: string) => void;
   onRecallCard?: (slotId: string) => void;
   onFlipCard?: (slotId: string) => void;
@@ -21,11 +25,14 @@ interface GameBoardProps {
 export function GameBoard({
   board,
   currentConnectionId,
+  currentPlayerId,
   status,
   totalPlayers = 2,
   cardsPerPlayer = 2,
   lockedList = [],
   selectedSlotId,
+  isHost = false,
+  onRestart,
   onSelectSlot,
   onRecallCard,
   onFlipCard,
@@ -98,19 +105,38 @@ export function GameBoard({
         </div>
       </div>
 
+      {/* 遊戲結束顯眼狀態橫條 (支援房主直接重開) */}
+      {status === "finished" && (
+        <div className="relative z-20 w-full mb-2 p-2 rounded-xl bg-ukiyo-surface/95 border border-ukiyo-gold/40 shadow-lg flex items-center justify-between text-xs font-serif animate-fade-in">
+          <div className="flex items-center gap-1.5 text-ukiyo-gold font-bold">
+            <Trophy className="w-4 h-4 text-ukiyo-gold animate-bounce" />
+            <span>盤面檢視模式</span>
+          </div>
+          {isHost && onRestart && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={onRestart}
+              className="font-serif text-xs px-3 py-1 flex items-center gap-1"
+            >
+              <RotateCcw className="w-3.5 h-3.5" /> 房主重開下一局
+            </Button>
+          )}
+        </div>
+      )}
+
       {/* 頂部說明引導與計數器 */}
       <div className="relative z-10 w-full flex items-center justify-between px-2 py-1 text-xs text-ukiyo-mist font-serif border-b border-ukiyo-foam/10 pb-2">
-        <div className="flex items-center gap-1.5 font-bold text-ukiyo-foam">
+        <div className="flex items-center gap-1.5 font-bold text-ukiyo-foam text-[11px] sm:text-xs">
           <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" />
           <span>
             已落牌 {board.length} / {totalSlotsCount} 張 (點擊席位選位 ➔ 點擊手牌落牌)
           </span>
         </div>
 
-        {/* 右側多排順序指示 */}
-        <div className="hidden sm:flex items-center gap-1 text-[11px] text-ukiyo-gold font-mono">
-          <span>由上至下、由左至右 ➔ 由小到大</span>
-          <span className="text-[10px] font-mono opacity-60">(100)</span>
+        {/* 右側多排順序指示 (手機與桌機皆可見) */}
+        <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-ukiyo-gold font-mono whitespace-nowrap">
+          <span>由左至右 ➔ 由小到大</span>
         </div>
       </div>
 
@@ -132,9 +158,21 @@ export function GameBoard({
                   slotId={slotKey}
                   cards={slotCards}
                   status={status}
-                  isOwnerLocked={topCard ? lockedList.includes(topCard.playerId) : false}
-                  isCurrentPlayer={topCard ? topCard.playerId === currentConnectionId : false}
+                  isOwnerLocked={
+                    topCard
+                      ? lockedList.includes(topCard.playerId) ||
+                        Boolean((topCard as any).connectionId && lockedList.includes((topCard as any).connectionId))
+                      : false
+                  }
+                  isCurrentPlayer={
+                    topCard
+                      ? (currentPlayerId && topCard.playerId === currentPlayerId) ||
+                        topCard.playerId === currentConnectionId ||
+                        (topCard as any).connectionId === currentConnectionId
+                      : false
+                  }
                   currentConnectionId={currentConnectionId}
+                  currentPlayerId={currentPlayerId}
                   isSelected={selectedSlotId === slotKey}
                   isCorrectOrder={slotCorrectnessMap[slotKey]}
                   isFinishedReveal={isFinishedReveal}

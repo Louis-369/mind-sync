@@ -64,8 +64,8 @@ export function Card({
 
         {/* 卡牌正面 (100% 不透明天然和紙實體牌面) */}
         <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 washi-card-front text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/25 shadow-md overflow-hidden">
-          {/* 右上角 ↗ 斜對角小數字 */}
-          <div className="absolute top-1.5 right-2 flex flex-col items-center">
+          {/* 左上角 ↖ 斜對角小數字 */}
+          <div className="absolute top-1.5 left-2 flex flex-col items-center">
             <span
               className={clsx(
                 "font-mono text-[10px] md:text-xs font-black text-ukiyo-ink leading-none",
@@ -88,8 +88,8 @@ export function Card({
             </span>
           </div>
 
-          {/* 左下角 ↙ 斜對角小數字 (旋轉 180 度) */}
-          <div className="absolute bottom-1.5 left-2 flex flex-col items-center rotate-180">
+          {/* 右下角 ↘ 斜對角小數字 (旋轉 180 度) */}
+          <div className="absolute bottom-1.5 right-2 flex flex-col items-center rotate-180">
             <span
               className={clsx(
                 "font-mono text-[10px] md:text-xs font-black text-ukiyo-ink leading-none",

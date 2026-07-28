@@ -50,24 +50,51 @@ function RoomInner() {
     autoResetStaleRoom,
   } = useGameState();
 
-  const totalPlayers = others.length + 1;
+  // 計算線上所有獨立 playerId 的玩家數量 (防 Ghost WebSocket 重複計算導致誤判滿員)
+  const uniquePlayerIds = new Set<string>();
+  if (playerId) uniquePlayerIds.add(playerId);
+  others.forEach((o) => {
+    if (o.presence?.playerId) {
+      uniquePlayerIds.add(o.presence.playerId);
+    }
+  });
+
+  const totalPlayers = uniquePlayerIds.size;
   const maxPlayers = settings?.maxPlayers || 4;
   const isOverflow = totalPlayers > maxPlayers;
 
   // 處理卡牌放置事件 (若有選擇特定槽位則放入該槽位，否則自動遞補)
   const handlePlayCard = (cardValue: number) => {
-    placeCard(cardValue, playerName, selectedSlotId || undefined);
+    placeCard(cardValue, playerName, selectedSlotId || undefined, playerId);
     setSelectedSlotId(null);
   };
 
-  // 更新 Presence 與維護房主身分，並自動清除殘留無人的舊房間 (唯有未滿員時才執行，防止擠退已有玩家)
+  // 監聽離頁/重新整理事件 (當遊戲在進行中或鎖定狀態時提示玩家)
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (status === "playing" || status === "locked") {
+        e.preventDefault();
+        e.returnValue = "你即將離開或重新整理網頁，這將影響當前遊戲局數與其他玩家！";
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [status]);
+
+  // 更新 Presence 與維護房主身分，並自動清除殘留無人的舊房間 (唯有未滿員時才執行)
   useEffect(() => {
     try {
       if (isOverflow) return; // 滿員阻斷，不發送 Presence 避免干擾房內玩家
 
       if (playerId && playerName) {
-        // 檢查是否撞名
-        const isDuplicateName = others.some((o) => o.presence?.playerName === playerName);
+        // 檢查是否與其他人撞名 (排除自己)
+        const isDuplicateName = others.some(
+          (o) => o.presence?.playerId !== playerId && o.presence?.playerName === playerName
+        );
         let finalName = playerName;
         if (isDuplicateName) {
           finalName = `${playerName} #2`;
@@ -79,17 +106,19 @@ function RoomInner() {
           isReady: false,
         });
       }
-      claimHost();
-      autoResetStaleRoom();
+      claimHost(playerId);
+      autoResetStaleRoom(playerId);
     } catch (error) {
       console.error("更新玩家 Presence 失敗:", error);
     }
     return () => {};
-  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, others.length, isOverflow]);
+  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, others, isOverflow]);
 
-  const isHost = Boolean(self?.connectionId && String(self.connectionId) === hostId);
   const currentConnId = String(self?.connectionId);
-  const isLocked = lockedList.includes(currentConnId);
+  const isHost = Boolean(
+    (playerId && hostId === playerId) || (self?.connectionId && String(self.connectionId) === hostId)
+  );
+  const isLocked = lockedList.includes(currentConnId) || (playerId ? lockedList.includes(playerId) : false);
 
   // 1. 暱稱未填寫阻斷 (靠複製網址直連近來)
   if (!playerName) {
@@ -175,6 +204,7 @@ function RoomInner() {
       {/* 線上玩家清單 (極簡標籤) */}
       <PlayerList
         currentConnectionId={currentConnId}
+        currentPlayerId={playerId}
         hostId={hostId}
         lockedList={lockedList}
         others={others}
@@ -185,14 +215,17 @@ function RoomInner() {
       <GameBoard
         board={board}
         currentConnectionId={currentConnId}
+        currentPlayerId={playerId}
         status={status || "waiting"}
         totalPlayers={totalPlayers}
         cardsPerPlayer={settings?.cardsPerPlayer || 2}
         lockedList={lockedList}
         selectedSlotId={selectedSlotId}
+        isHost={isHost}
+        onRestart={resetGame}
         onSelectSlot={(slotId) => setSelectedSlotId(slotId)}
-        onRecallCard={recallCard}
-        onFlipCard={(slotId) => flipCard(slotId)}
+        onRecallCard={(targetKey) => recallCard(targetKey, playerId)}
+        onFlipCard={(targetKey) => flipCard(targetKey, playerId)}
       />
 
       {/* 底部玩家手牌與鎖定按鈕 */}
@@ -205,7 +238,7 @@ function RoomInner() {
           lockedCount={lockedList.length}
           totalPlayers={totalPlayers}
           hasBoardCollision={hasBoardCollision}
-          onToggleLock={() => toggleLock(playerName)}
+          onToggleLock={() => toggleLock(playerName, playerId)}
         />
       )}
 
@@ -218,7 +251,7 @@ function RoomInner() {
               : "靜候房主開始牌局..."}
           </p>
           {isHost && (
-            <Button variant="primary" size="lg" onClick={dealCards} className="font-serif tracking-widest">
+            <Button variant="primary" size="lg" onClick={() => dealCards(playerId)} className="font-serif tracking-widest">
               發牌開局
             </Button>
           )}

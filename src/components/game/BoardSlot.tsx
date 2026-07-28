@@ -12,6 +12,7 @@ interface BoardSlotProps {
   isOwnerLocked?: boolean;
   isCurrentPlayer?: boolean;
   currentConnectionId?: string;
+  currentPlayerId?: string;
   isFlipped?: boolean;
   isSelected?: boolean;
   isCorrectOrder?: boolean;
@@ -29,6 +30,7 @@ export function BoardSlot({
   isOwnerLocked = false,
   isCurrentPlayer = false,
   currentConnectionId,
+  currentPlayerId,
   isFlipped = false,
   isSelected = false,
   isCorrectOrder,
@@ -43,40 +45,27 @@ export function BoardSlot({
   const topCard = allCards[allCards.length - 1];
   const hasCollision = allCards.length > 1;
 
+  const isCardMine = (c: BoardCard) =>
+    (currentConnectionId && (c.playerId === currentConnectionId || (c as any).connectionId === currentConnectionId)) ||
+    (currentPlayerId && c.playerId === currentPlayerId);
+
   // 找尋當前玩家在這個槽位放置的未翻開卡牌
   const myUnflippedCard = allCards.find(
-    (c) =>
-      !c.flipped &&
-      ((currentConnectionId && c.playerId === currentConnectionId) ||
-        (c.playerName && isCurrentPlayer))
+    (c) => !c.flipped && (isCardMine(c) || (c.playerName && isCurrentPlayer))
   );
 
   // 整理參與碰撞的所有玩家名字
   const collisionNamesText = allCards
-    .map((c) =>
-      currentConnectionId && c.playerId === currentConnectionId
-        ? "你"
-        : c.playerName || "匿名"
-    )
+    .map((c) => (isCardMine(c) ? "你" : c.playerName || "匿名"))
     .join("、");
 
   const bottomPlayerNamesText = hasCollision
-    ? Array.from(
-        new Set(
-          allCards.map((c) =>
-            currentConnectionId && c.playerId === currentConnectionId
-              ? "你"
-              : c.playerName || "匿名"
-          )
-        )
-      ).join("、")
+    ? Array.from(new Set(allCards.map((c) => (isCardMine(c) ? "你" : c.playerName || "匿名")))).join("、")
     : isCurrentPlayer
     ? "你"
     : topCard?.playerName || "匿名";
 
-  const isAnyCardMine = allCards.some(
-    (c) => currentConnectionId && c.playerId === currentConnectionId
-  );
+  const isAnyCardMine = allCards.some((c) => isCardMine(c));
 
   if (allCards.length === 0) {
     const canSelect = status === "playing";
@@ -157,11 +146,11 @@ export function BoardSlot({
         </span>
       ) : null}
 
-      {/* 鎖定同意朱紅落款小印章「確」(僅在個人同意鎖定、遊戲進行中、且牌未翻開時顯示) */}
-      {isOwnerLocked && status === "playing" && !topCard?.flipped && (
+      {/* 鎖定同意朱紅落款小印章「確」(在個人同意鎖定且牌未翻開時醒目顯示) */}
+      {isOwnerLocked && (status === "playing" || status === "locked") && !topCard?.flipped && (
         <div
           title="已確認落牌"
-          className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded ukiyo-seal flex items-center justify-center text-[10px] shadow-md border border-ukiyo-cream/30 font-serif pointer-events-none"
+          className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded ukiyo-seal flex items-center justify-center text-[10px] shadow-md border border-ukiyo-cream/30 font-serif pointer-events-none animate-fade-in"
         >
           確
         </div>
@@ -186,7 +175,8 @@ export function BoardSlot({
       >
         {allCards.map((c, idx) => {
           const isMe =
-            (currentConnectionId && c.playerId === currentConnectionId) ||
+            (currentConnectionId && (c.playerId === currentConnectionId || (c as any).connectionId === currentConnectionId)) ||
+            (currentPlayerId && c.playerId === currentPlayerId) ||
             (c.playerId === topCard?.playerId && isCurrentPlayer);
           const isTopCard = idx === allCards.length - 1;
 
@@ -214,8 +204,8 @@ export function BoardSlot({
                 </div>
               )}
 
-              {/* 自己蓋著的牌：在右下角呈現無框晶亮金箔數字 (隨卡牌浮動且不超出圓角) */}
-              {isMe && !c.flipped && !isOwnerLocked && status === "playing" && (
+              {/* 自己蓋著的牌：在右下角呈現無框晶亮金箔數字 (自己始終可視預覽點數) */}
+              {isMe && !c.flipped && (status === "playing" || status === "locked") && (
                 <div className="absolute bottom-1.5 right-2 z-20 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] tracking-tight">
                   {c.cardValue}
                 </div>

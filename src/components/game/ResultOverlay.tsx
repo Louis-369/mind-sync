@@ -57,14 +57,27 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
 
   if (isCollapsed) {
     return (
-      <div className="fixed bottom-5 right-5 z-50 animate-fade-in pointer-events-auto">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in pointer-events-auto flex items-center gap-2 bg-ukiyo-surface/95 text-ukiyo-gold border border-ukiyo-gold/50 shadow-2xl px-3.5 py-2 rounded-2xl backdrop-blur-md max-w-[90vw]">
+        <span className="text-xs font-serif font-bold text-ukiyo-mist hidden xs:inline">
+          【{isWin ? "勝利" : "失敗"}】
+        </span>
         <button
           onClick={() => setIsCollapsed(false)}
-          className="flex items-center space-x-1.5 bg-ukiyo-surface/95 text-ukiyo-gold border border-ukiyo-gold/40 shadow-ukiyo-glow px-3 py-2 rounded-xl text-xs font-serif font-bold hover:bg-ukiyo-surface transition-all active:scale-95"
+          className="flex items-center gap-1 bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-gold/40 px-2.5 py-1.5 rounded-xl text-xs font-serif font-bold hover:bg-ukiyo-gold/10 transition-all active:scale-95"
         >
-          <Trophy className="w-4 h-4 text-ukiyo-gold" />
-          <span>顯示結算結果 ({isWin ? "勝" : "敗"})</span>
+          <Trophy className="w-3.5 h-3.5 text-ukiyo-gold" />
+          <span>開啟結算</span>
         </button>
+        {isHost && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={onRestart}
+            className="text-xs font-serif font-bold flex items-center gap-1 py-1.5 px-3"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> 房主重開
+          </Button>
+        )}
       </div>
     );
   }
