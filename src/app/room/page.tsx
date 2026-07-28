@@ -54,25 +54,36 @@ function RoomInner() {
     playerJoinOrder,
   } = useGameState();
 
-  // 計算線上所有獨立 playerId 的玩家數量 (防 Ghost WebSocket 重複計算導致誤判滿員)
+  // 1. 收集線上所有真實獨立玩家 UUID (雙重防護防 Ghost Socket)
   const uniquePlayerIds = new Set<string>();
   if (playerId) uniquePlayerIds.add(playerId);
   others.forEach((o) => {
-    if (o.presence?.playerId) {
-      uniquePlayerIds.add(o.presence.playerId);
+    const pId = o.presence?.playerId;
+    if (pId) {
+      uniquePlayerIds.add(pId);
     }
   });
 
-  const totalPlayers = uniquePlayerIds.size;
+  const totalUniqueOnlineCount = uniquePlayerIds.size;
+  const totalPlayers = totalUniqueOnlineCount;
   const maxPlayers = settings?.maxPlayers || 4;
-  
-  // 依據「當前真實線上 Presence」過濾歷史順序，徹底排除離線殘留 UUID
+
+  // 2. 建立線上純淨順位 (過濾歷史離線 ID)
   const onlineOrder = (playerJoinOrder || []).filter((id) => uniquePlayerIds.has(id));
   if (playerId && !onlineOrder.includes(playerId)) {
     onlineOrder.push(playerId);
   }
+
+  // 3. 計算自己在當前線上活躍人數中的排名 (0, 1, 2, 3...)
   const myOnlineRank = playerId ? onlineOrder.indexOf(playerId) : -1;
-  const isOverflow = myOnlineRank !== -1 ? myOnlineRank >= maxPlayers : totalPlayers > maxPlayers;
+
+  // 4. 滿員過載嚴密防護 (isOverflow)：
+  // 只有當自己在線上順位排名 >= maxPlayers (即屬於第 maxPlayers + 1 位連入的過載訪客) 且 線上獨特人數確實 > maxPlayers 時才阻斷！
+  // 範例：3 人房 (maxPlayers = 3)，第 3 位入座者排名為 2 (< 3)，isOverflow 強制為 false！
+  const isOverflow =
+    myOnlineRank !== -1
+      ? myOnlineRank >= maxPlayers && totalUniqueOnlineCount > maxPlayers
+      : totalUniqueOnlineCount > maxPlayers;
 
   // 處理卡牌放置事件 (若有選擇特定槽位則放入該槽位，否則自動遞補)
   const handlePlayCard = (cardValue: number) => {
