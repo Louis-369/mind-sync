@@ -56,18 +56,13 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
   // 當使用者點擊「檢視盤面」後 (showModal === false)，彈窗關閉且不保留「跳回彈窗」按鈕，僅於底部常規佈局流顯示重開/靜候按鈕
   if (!showModal) {
     return (
-      <div className="w-full my-3 flex items-center justify-center text-center animate-fade-in">
+      <div className="game-action-bar animate-fade-in">
         {isHost ? (
-          <Button
-            variant="primary"
-            size="md"
-            onClick={onRestart}
-            className="text-xs md:text-sm font-serif font-bold flex items-center justify-center gap-2 py-3 px-8 shadow-2xl tracking-widest text-center"
-          >
+          <Button variant="primary" size="md" onClick={onRestart} className="host-action-btn">
             <RotateCcw className="w-4 h-4 text-ukiyo-gold" /> 房主重新開局
           </Button>
         ) : (
-          <div className="bg-ukiyo-surface/95 text-ukiyo-mist border border-ukiyo-foam/20 shadow-xl px-6 py-3 rounded-2xl text-xs font-serif flex items-center justify-center gap-2 text-center">
+          <div className="guest-wait-badge">
             <span className="w-2 h-2 rounded-full bg-ukiyo-gold animate-ping" />
             <span>靜候房主重新開局...</span>
           </div>

@@ -115,3 +115,58 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #c9a96e;
 }
+
+@layer components {
+  /* 遊戲底部統一動作列容器 (100% 水平與垂直彈性置中，絕不壓底防跑版) */
+  .game-action-bar {
+    width: 100%;
+    max-width: 28rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* 房主重新開局按鈕專屬樣式 */
+  .host-action-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    font-family: var(--font-serif);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  }
+
+  /* 非房主靜候提示方塊專屬樣式 */
+  .guest-wait-badge {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    color: #94a3b8;
+    border-radius: 1rem;
+    background-color: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+  }
+}
