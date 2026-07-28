@@ -66,10 +66,13 @@ function RoomInner() {
   const totalPlayers = uniquePlayerIds.size;
   const maxPlayers = settings?.maxPlayers || 4;
   
-  // 依據進房歷史順序判斷：若自己已屬於前 maxPlayers 名的合法席位，不受後續第 5+ 位訪客擠退
-  const joinOrderList = playerJoinOrder || [];
-  const myJoinIndex = playerId ? joinOrderList.indexOf(playerId) : -1;
-  const isOverflow = myJoinIndex !== -1 ? myJoinIndex >= maxPlayers : totalPlayers > maxPlayers;
+  // 依據「當前真實線上 Presence」過濾歷史順序，徹底排除離線殘留 UUID
+  const onlineOrder = (playerJoinOrder || []).filter((id) => uniquePlayerIds.has(id));
+  if (playerId && !onlineOrder.includes(playerId)) {
+    onlineOrder.push(playerId);
+  }
+  const myOnlineRank = playerId ? onlineOrder.indexOf(playerId) : -1;
+  const isOverflow = myOnlineRank !== -1 ? myOnlineRank >= maxPlayers : totalPlayers > maxPlayers;
 
   // 處理卡牌放置事件 (若有選擇特定槽位則放入該槽位，否則自動遞補)
   const handlePlayCard = (cardValue: number) => {
