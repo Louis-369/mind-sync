@@ -51,6 +51,7 @@ function RoomInner() {
     claimHost,
     autoResetStaleRoom,
     syncOfflinePlayers,
+    playerJoinOrder,
   } = useGameState();
 
   // 計算線上所有獨立 playerId 的玩家數量 (防 Ghost WebSocket 重複計算導致誤判滿員)
@@ -64,7 +65,11 @@ function RoomInner() {
 
   const totalPlayers = uniquePlayerIds.size;
   const maxPlayers = settings?.maxPlayers || 4;
-  const isOverflow = totalPlayers > maxPlayers;
+  
+  // 依據進房歷史順序判斷：若自己已屬於前 maxPlayers 名的合法席位，不受後續第 5+ 位訪客擠退
+  const joinOrderList = playerJoinOrder || [];
+  const myJoinIndex = playerId ? joinOrderList.indexOf(playerId) : -1;
+  const isOverflow = myJoinIndex !== -1 ? myJoinIndex >= maxPlayers : totalPlayers > maxPlayers;
 
   // 處理卡牌放置事件 (若有選擇特定槽位則放入該槽位，否則自動遞補)
   const handlePlayCard = (cardValue: number) => {

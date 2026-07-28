@@ -34,6 +34,9 @@ declare global {
       
       // 已手動鎖定的玩家 ID 陣列
       lockedPlayers: LiveList<string>;
+
+      // 玩家進入房間的歷史時間順序 ID 陣列 (用於精準順位繼承房主與防擠退)
+      playerJoinOrder: LiveList<string>;
       
       // 各玩家當前手牌列表 (playerId -> LiveList<number>)
       hands: LiveMap<string, LiveList<number>>;

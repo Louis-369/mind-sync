@@ -345,29 +345,50 @@ export function useGameState() {
     });
   }, []);
 
-  // 自動聲明/維護房主身分 (無房主或原房主離線時自動遞補，使用穩定的 playerId)
+  const playerJoinOrder = useStorage((root) => root.playerJoinOrder);
+
+  // 自動聲明/維護房主身分 (無房主或原房主離線時，嚴格依據 playerJoinOrder 順序精準遞補)
   const claimHost = useMutation(({ storage }, currentMyPlayerId?: string) => {
     const currentHost = storage.get("hostId");
-    
-    // 收集線上所有獨立玩家的 playerId
-    const activePlayerIds: string[] = [];
-    const myPId = self?.presence?.playerId || currentMyPlayerId;
-    if (myPId) {
-      activePlayerIds.push(myPId);
+    let mutableJoinOrder = storage.get("playerJoinOrder");
+
+    // 若 LiveList 尚未初始化
+    if (!mutableJoinOrder) {
+      storage.set("playerJoinOrder", new LiveList([]));
+      mutableJoinOrder = storage.get("playerJoinOrder");
     }
 
+    const myPId = self?.presence?.playerId || currentMyPlayerId;
+    
+    // 1. 將自己與在線玩家寫入進房時間順序清單 (若尚未存在)
+    if (myPId && mutableJoinOrder.indexOf(myPId) === -1) {
+      mutableJoinOrder.push(myPId);
+    }
     others.forEach((o) => {
       const pId = o.presence?.playerId;
-      if (pId && !activePlayerIds.includes(pId)) {
-        activePlayerIds.push(pId);
+      if (pId && mutableJoinOrder.indexOf(pId) === -1) {
+        mutableJoinOrder.push(pId);
       }
     });
 
-    const isHostPresent = currentHost && activePlayerIds.includes(currentHost);
+    // 2. 收集目前線上的所有獨立 playerId
+    const activePlayerIds = new Set<string>();
+    if (myPId) activePlayerIds.add(myPId);
+    others.forEach((o) => {
+      if (o.presence?.playerId) activePlayerIds.add(o.presence.playerId);
+    });
 
-    // 若原房主離線或從未設定，將第一位線上玩家自動指定為房主
-    if (!isHostPresent && activePlayerIds.length > 0) {
-      storage.set("hostId", activePlayerIds[0]);
+    const isHostPresent = currentHost && activePlayerIds.has(currentHost);
+
+    // 3. 若原房主離線或未指定，依據 playerJoinOrder 尋找最先進房的線上玩家接任房主
+    if (!isHostPresent && activePlayerIds.size > 0) {
+      const orderArray = Array.from(mutableJoinOrder);
+      const firstActiveInOrder = orderArray.find((pId) => activePlayerIds.has(pId));
+      if (firstActiveInOrder) {
+        storage.set("hostId", firstActiveInOrder);
+      } else {
+        storage.set("hostId", Array.from(activePlayerIds)[0]);
+      }
     }
   }, [self, others]);
 
@@ -446,6 +467,7 @@ export function useGameState() {
     settings,
     board,
     lockedList,
+    playerJoinOrder: playerJoinOrder ? Array.from(playerJoinOrder) : [],
     status,
     result,
     hostId,

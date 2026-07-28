@@ -41,6 +41,7 @@ export function LiveblocksWrapper({ roomId, children, fallback }: LiveblocksWrap
           }),
           board: new LiveMap(),
           lockedPlayers: new LiveList([]),
+          playerJoinOrder: new LiveList([]),
           hands: new LiveMap(),
           status: "waiting",
           result: null,
