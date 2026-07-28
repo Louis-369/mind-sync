@@ -381,6 +381,48 @@ export function useGameState() {
     });
   }, []);
 
+  // 當玩家離線時，自動清理其 Storage 鎖定標籤與殘留手牌，並推進進度
+  const syncOfflinePlayers = useMutation(({ storage }, currentMyPlayerId?: string) => {
+    const activePlayerIds = new Set<string>();
+    const myPId = self?.presence?.playerId || currentMyPlayerId;
+    if (myPId) activePlayerIds.add(myPId);
+
+    others.forEach((o) => {
+      if (o.presence?.playerId) {
+        activePlayerIds.add(o.presence.playerId);
+      }
+    });
+
+    const mutableLocked = storage.get("lockedPlayers");
+    const mutableHands = storage.get("hands");
+
+    // 1. 刪除不在線上玩家的鎖定標籤
+    for (let i = mutableLocked.length - 1; i >= 0; i--) {
+      const lockedId = mutableLocked.get(i);
+      if (lockedId && !activePlayerIds.has(lockedId)) {
+        mutableLocked.delete(i);
+      }
+    }
+
+    // 2. 清理已離線玩家的殘留手牌 (防止離線手牌卡死發牌/鎖定)
+    if (storage.get("status") === "playing") {
+      Array.from(mutableHands.keys()).forEach((handKey) => {
+        if (!activePlayerIds.has(handKey)) {
+          mutableHands.delete(handKey);
+        }
+      });
+    }
+
+    // 3. 若所有線上剩餘玩家均已完成鎖定，自動推進 status 為 "locked"
+    if (
+      activePlayerIds.size > 0 &&
+      mutableLocked.length >= activePlayerIds.size &&
+      storage.get("status") === "playing"
+    ) {
+      storage.set("status", "locked");
+    }
+  }, [others, self]);
+
   // 重置遊戲回到大廳等待
   const resetGame = useMutation(({ storage }) => {
     const boardMap = storage.get("board");
@@ -426,5 +468,6 @@ export function useGameState() {
     resetGame,
     claimHost,
     autoResetStaleRoom,
+    syncOfflinePlayers,
   };
 }

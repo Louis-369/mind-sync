@@ -50,6 +50,7 @@ function RoomInner() {
     resetGame,
     claimHost,
     autoResetStaleRoom,
+    syncOfflinePlayers,
   } = useGameState();
 
   // 計算線上所有獨立 playerId 的玩家數量 (防 Ghost WebSocket 重複計算導致誤判滿員)
@@ -101,6 +102,7 @@ function RoomInner() {
           }
           claimHost(playerId);
           autoResetStaleRoom(playerId);
+          syncOfflinePlayers(playerId);
         } catch (error) {
           console.error("視窗恢復前景時狀態喚醒失敗:", error);
         }
@@ -111,7 +113,7 @@ function RoomInner() {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom]);
+  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, syncOfflinePlayers]);
 
   // 當 WebSocket 連線恢復為 connected 時自動刷新身分與狀態
   useEffect(() => {
@@ -125,11 +127,12 @@ function RoomInner() {
           });
         }
         claimHost(playerId);
+        syncOfflinePlayers(playerId);
       } catch (error) {
         console.error("連線恢復時狀態校準失敗:", error);
       }
     }
-  }, [connectionStatus, playerId, playerName, updateMyPresence, claimHost]);
+  }, [connectionStatus, playerId, playerName, updateMyPresence, claimHost, syncOfflinePlayers]);
 
   // 更新 Presence 與維護房主身分，並自動清除殘留無人的舊房間 (唯有未滿員時才執行)
   useEffect(() => {
@@ -154,11 +157,12 @@ function RoomInner() {
       }
       claimHost(playerId);
       autoResetStaleRoom(playerId);
+      syncOfflinePlayers(playerId);
     } catch (error) {
       console.error("更新玩家 Presence 失敗:", error);
     }
     return () => {};
-  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, others, isOverflow]);
+  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, syncOfflinePlayers, others, isOverflow]);
 
   const currentConnId = String(self?.connectionId);
   const isHost = Boolean(
@@ -281,7 +285,7 @@ function RoomInner() {
           playerName={playerName}
           onPlayCard={handlePlayCard}
           isLocked={isLocked}
-          lockedCount={lockedList.length}
+          lockedCount={lockedList.filter((id) => uniquePlayerIds.has(id)).length}
           totalPlayers={totalPlayers}
           hasBoardCollision={hasBoardCollision}
           onToggleLock={() => toggleLock(playerName, playerId)}
