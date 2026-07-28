@@ -38,14 +38,14 @@ export default function LobbyPage() {
         </div>
 
         <h1 className="text-4xl md:text-5xl font-serif font-black text-ukiyo-foam tracking-widest mb-1">
-          心秤
+          心天秤
         </h1>
         <p className="text-xs md:text-sm font-sans font-medium text-ukiyo-gold/80 tracking-[0.25em] uppercase mb-4">
           Kokoro Tenbin
         </p>
 
         <p className="text-xs md:text-sm text-ukiyo-mist mb-8 max-w-sm leading-relaxed font-serif">
-          透過言語構築，在心的天秤上取得平衡，最純粹的默契卡牌遊戲。
+          交流價值觀 ‧ 碰撞默契 ‧ 探索彼此的共鳴點
         </p>
 
         {/* 表單區域 (使用 div 避免使用 HTML form) */}
@@ -64,7 +64,7 @@ export default function LobbyPage() {
             className="w-full max-w-xs mt-4 group"
           >
             <span className="flex items-center justify-center gap-2 font-serif tracking-widest">
-              <Sparkles className="w-4 h-4 text-ukiyo-gold" /> 入座牌席
+              <Sparkles className="w-4 h-4 text-ukiyo-gold" /> 加入房間
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
           </Button>
@@ -73,24 +73,20 @@ export default function LobbyPage() {
         {/* 遊戲說明引導 */}
         <div className="mt-8 pt-6 border-t border-ukiyo-foam/10 w-full text-left">
           <h4 className="text-xs font-serif font-bold text-ukiyo-gold uppercase tracking-widest mb-3 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 默契法則
+            <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 玩法說明
           </h4>
-          <ul className="text-xs text-ukiyo-mist space-y-2 font-serif">
+          <ul className="text-xs text-ukiyo-mist space-y-2.5 font-serif">
             <li className="flex items-start gap-1.5">
-              <span className="text-ukiyo-gold font-bold shrink-0">☯️ 以心入座：</span>
-              <span>輸入相同 Emoji 暗號入座</span>
+              <span className="text-ukiyo-gold font-bold shrink-0">💬 設定主題與討論：</span>
+              <span>選定一個有趣主題（如：最難忘的事、買過最瞎的東西），自由分享彼此的價值觀。</span>
             </li>
             <li className="flex items-start gap-1.5">
-              <span className="text-ukiyo-gold font-bold shrink-0">🌊 默契落牌：</span>
-              <span>選位暗出手牌，由小至大流暢排列</span>
+              <span className="text-ukiyo-gold font-bold shrink-0">🎲 價值轉化出牌：</span>
+              <span>將你的衡量標準轉化為 1~100 的卡牌數字，憑藉默契將卡牌由小到大放入檯面。</span>
             </li>
             <li className="flex items-start gap-1.5">
-              <span className="text-ukiyo-gold font-bold shrink-0">⚡ 碰撞應變：</span>
-              <span>重疊撞牌時，及時收回調頻</span>
-            </li>
-            <li className="flex items-start gap-1.5">
-              <span className="text-ukiyo-gold font-bold shrink-0">🌸 心印結算：</span>
-              <span>手牌清空全員鎖定，翻牌印證默契</span>
+              <span className="text-ukiyo-gold font-bold shrink-0">🌸 揭牌驗證共鳴：</span>
+              <span>全員出牌鎖定後翻開卡牌！順序正確即代表大家的價值觀與默契完美達成！</span>
             </li>
           </ul>
         </div>

@@ -120,7 +120,10 @@ export function GameBoard({
         <div className="flex items-center gap-1.5 font-bold text-ukiyo-foam text-[11px] sm:text-xs">
           <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" />
           <span>
-            已落牌 {board.length} / {totalSlotsCount} 張 (點擊席位選位 ➔ 點擊手牌落牌)
+            已落牌 {board.length} / {totalSlotsCount} 張
+          </span>
+          <span className="text-[10px] text-ukiyo-mist font-normal hidden md:inline ml-1">
+            (💡 點選槽位可預指定位置，點擊已出的牌可收回)
           </span>
         </div>
 

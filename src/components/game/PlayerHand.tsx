@@ -65,15 +65,6 @@ export function PlayerHand({
           <span className="text-[11px] text-ukiyo-mist bg-ukiyo-surface/80 px-2 py-0.5 rounded-full border border-ukiyo-foam/10">
             {hand.length} 張手牌
           </span>
-          {!isLocked ? (
-            <span className="text-[10px] text-ukiyo-gold font-serif bg-ukiyo-gold/10 px-2 py-0.5 rounded-full border border-ukiyo-gold/30 flex items-center gap-1 shadow-sm">
-              💡 點擊盤面卡牌可收回
-            </span>
-          ) : (
-            <span className="text-[10px] text-ukiyo-gold font-serif bg-ukiyo-gold/10 px-2 py-0.5 rounded-full border border-ukiyo-gold/30 flex items-center gap-1 shadow-sm animate-pulse">
-              💡 全員鎖定，靜候答案揭曉
-            </span>
-          )}
         </div>
 
         {/* 鎖定按鈕 (手機端顯示) */}
@@ -88,7 +79,7 @@ export function PlayerHand({
             >
               {isLocked ? (
                 <span className="flex items-center gap-1 text-ukiyo-gold font-bold">
-                  <Lock className="w-3.5 h-3.5" /> 已鎖定 (點擊解開)
+                  <Lock className="w-3.5 h-3.5" /> 已鎖定 (點擊可解鎖)
                 </span>
               ) : (
                 <span className="flex items-center gap-1">
@@ -104,7 +95,7 @@ export function PlayerHand({
       <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 py-1 min-h-[90px]">
         {hand.length === 0 ? (
           <div className="text-xs text-ukiyo-mist font-serif py-2">
-            手牌已清空，全員鎖定靜候答案揭曉...
+            手牌已出完，點擊同意鎖定等待全員完成...
           </div>
         ) : (
           hand.map((cardValue) => (
