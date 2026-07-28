@@ -57,25 +57,22 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
 
   if (isCollapsed) {
     return (
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in pointer-events-auto flex items-center gap-2 bg-ukiyo-surface/95 text-ukiyo-gold border border-ukiyo-gold/50 shadow-2xl px-3.5 py-2 rounded-2xl backdrop-blur-md max-w-[90vw]">
-        <span className="text-xs font-serif font-bold text-ukiyo-mist hidden xs:inline">
-          【{isWin ? "勝利" : "失敗"}】
-        </span>
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in pointer-events-auto flex items-center justify-center gap-2.5 bg-ukiyo-surface/95 text-ukiyo-gold border border-ukiyo-gold/50 shadow-2xl px-4 py-2.5 rounded-2xl backdrop-blur-md max-w-[92vw] text-center">
         <button
           onClick={() => setIsCollapsed(false)}
-          className="flex items-center gap-1 bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-gold/40 px-2.5 py-1.5 rounded-xl text-xs font-serif font-bold hover:bg-ukiyo-gold/10 transition-all active:scale-95"
+          className="flex items-center justify-center gap-1.5 bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-gold/40 px-3 py-1.5 rounded-xl text-xs font-serif font-bold hover:bg-ukiyo-gold/10 transition-all active:scale-95 text-center"
         >
           <Trophy className="w-3.5 h-3.5 text-ukiyo-gold" />
-          <span>開啟結算</span>
+          <span>查看結算報表</span>
         </button>
         {isHost && (
           <Button
             variant="primary"
             size="sm"
             onClick={onRestart}
-            className="text-xs font-serif font-bold flex items-center gap-1 py-1.5 px-3"
+            className="text-xs font-serif font-bold flex items-center justify-center gap-1.5 py-1.5 px-3.5 text-center"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> 房主重開
+            <RotateCcw className="w-3.5 h-3.5" /> 房主重新開局
           </Button>
         )}
       </div>
@@ -106,7 +103,7 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
           </p>
 
           {/* 操作按鈕組：重新開局與顯眼的查看盤面 */}
-          <div className="flex flex-col gap-2.5 w-full max-w-xs">
+          <div className="flex flex-col items-center justify-center gap-2.5 w-full max-w-xs mx-auto">
             {isHost ? (
               <Button
                 variant={isWin ? "primary" : "danger"}
