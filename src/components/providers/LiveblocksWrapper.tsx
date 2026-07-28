@@ -15,7 +15,7 @@ export function LiveblocksWrapper({ roomId, children, fallback }: LiveblocksWrap
   const apiKey = process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY || DEFAULT_PUBLIC_KEY;
 
   return (
-    <LiveblocksProvider publicApiKey={apiKey}>
+    <LiveblocksProvider authEndpoint="/api/liveblocks-auth" publicApiKey={apiKey}>
       <RoomProvider
         id={roomId}
         initialPresence={{
