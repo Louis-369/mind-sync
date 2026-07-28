@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, RefreshCw } from "lucide-react";
+import { useStatus } from "@liveblocks/react";
 import { useRoomId } from "../../hooks/useRoomId";
 import { usePlayerId } from "../../hooks/usePlayerId";
 import { useGameState } from "../../hooks/useGameState";
@@ -18,6 +19,7 @@ import { Button } from "../../components/ui/Button";
 function RoomInner() {
   const router = useRouter();
   const roomId = useRoomId();
+  const connectionStatus = useStatus();
   const { playerId, playerName, setPlayerName } = usePlayerId();
   const [isHostModalOpen, setIsHostModalOpen] = React.useState<boolean>(false);
   const [inputNameTemp, setInputNameTemp] = React.useState<string>("");
@@ -84,6 +86,50 @@ function RoomInner() {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [status]);
+
+  // 監聽手機端視窗切換 (visibilitychange) 與 Liveblocks 重連狀態，自動喚醒同步狀態
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        try {
+          if (playerId && playerName) {
+            updateMyPresence({
+              playerId,
+              playerName,
+              isReady: false,
+            });
+          }
+          claimHost(playerId);
+          autoResetStaleRoom(playerId);
+        } catch (error) {
+          console.error("視窗恢復前景時狀態喚醒失敗:", error);
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom]);
+
+  // 當 WebSocket 連線恢復為 connected 時自動刷新身分與狀態
+  useEffect(() => {
+    if (connectionStatus === "connected") {
+      try {
+        if (playerId && playerName) {
+          updateMyPresence({
+            playerId,
+            playerName,
+            isReady: false,
+          });
+        }
+        claimHost(playerId);
+      } catch (error) {
+        console.error("連線恢復時狀態校準失敗:", error);
+      }
+    }
+  }, [connectionStatus, playerId, playerName, updateMyPresence, claimHost]);
 
   // 更新 Presence 與維護房主身分，並自動清除殘留無人的舊房間 (唯有未滿員時才執行)
   useEffect(() => {

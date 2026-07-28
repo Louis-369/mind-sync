@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@liveblocks/client": "^2.16.0",
-    "@liveblocks/node": "^3.23.0",
+    "@liveblocks/node": "^2.24.4",
     "@liveblocks/react": "^2.16.0",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",

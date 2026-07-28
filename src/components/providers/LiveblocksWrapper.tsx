@@ -13,9 +13,16 @@ interface LiveblocksWrapperProps {
 
 export function LiveblocksWrapper({ roomId, children, fallback }: LiveblocksWrapperProps) {
   const apiKey = process.env.NEXT_PUBLIC_LIVEBLOCKS_PUBLIC_KEY || DEFAULT_PUBLIC_KEY;
+  const hasSecretKey = Boolean(
+    process.env.LIVEBLOCKS_SECRET_KEY && process.env.LIVEBLOCKS_SECRET_KEY.startsWith("sk_")
+  );
+
+  const providerProps = hasSecretKey
+    ? { authEndpoint: "/api/liveblocks-auth" }
+    : { publicApiKey: apiKey };
 
   return (
-    <LiveblocksProvider authEndpoint="/api/liveblocks-auth" publicApiKey={apiKey}>
+    <LiveblocksProvider {...(providerProps as any)}>
       <RoomProvider
         id={roomId}
         initialPresence={{
