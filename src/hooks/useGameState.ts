@@ -185,6 +185,13 @@ export function useGameState() {
         playerHand.clear();
         currentArr.forEach((val) => playerHand.push(val));
       }
+
+      // 自動解除鎖定標籤 (若該玩家先前已同意鎖定，收回卡牌後自動恢復未鎖定狀態)
+      const mutableLocked = storage.get("lockedPlayers");
+      const lockIndexPId = mutableLocked.indexOf(myPId);
+      const lockIndexConnId = mutableLocked.indexOf(connId);
+      if (lockIndexPId !== -1) mutableLocked.delete(lockIndexPId);
+      if (lockIndexConnId !== -1) mutableLocked.delete(lockIndexConnId);
     }
   }, [self]);
 
@@ -428,8 +435,10 @@ export function useGameState() {
     }
   }, [self, others]);
 
-  // 更新遊戲設定
+  // 更新遊戲設定 (雙重防護：嚴格限制只能在大廳等待 status === "waiting" 時修改設定)
   const updateSettings = useMutation(({ storage }, newSettings: Partial<GameSettings>) => {
+    if (storage.get("status") !== "waiting") return;
+
     const mutableSettings = storage.get("settings");
     Object.entries(newSettings).forEach(([key, val]) => {
       if (val !== undefined) {
