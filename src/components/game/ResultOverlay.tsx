@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
 import { RotateCcw, Eye } from "lucide-react";
 import { Button } from "../ui/Button";
@@ -13,8 +14,13 @@ interface ResultOverlayProps {
 
 export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [mounted, setMounted] = useState<boolean>(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const activeResultRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (result) {
@@ -53,10 +59,10 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
 
   const isWin = result === "win";
 
-  // 當使用者點擊「檢視盤面」後 (showModal === false)，彈窗關閉且不保留「跳回彈窗」按鈕，僅於底部常規佈局流顯示重開/靜候按鈕
+  // 當使用者點擊「檢視盤面」後 (showModal === false)，彈窗關閉，於底部常規佈局顯示重開/靜候按鈕
   if (!showModal) {
     return (
-      <div className="game-action-bar animate-fade-in">
+      <div className="game-action-bar animate-fade-in relative z-20">
         {isHost ? (
           <Button variant="primary" size="md" onClick={onRestart} className="host-action-btn">
             <RotateCcw className="w-4 h-4 text-ukiyo-gold" /> 房主重新開局
@@ -71,9 +77,11 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
     );
   }
 
-  // 遊戲剛結束時自動跳出的勝負結算彈窗 Modal
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ukiyo-bg/85 backdrop-blur-md animate-fade-in pointer-events-auto">
+  if (!mounted) return null;
+
+  // 遊戲結束勝負結算 Modal (使用 createPortal 置於最高層級 z-[200]，避免任何 CSS 層疊破圖)
+  const modalJSX = (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-ukiyo-bg/90 backdrop-blur-md animate-fade-in pointer-events-auto">
       <div className="glass-panel rounded-3xl p-6 text-center border border-ukiyo-foam/20 shadow-2xl relative overflow-hidden flex flex-col items-center w-full max-w-md my-auto">
         <div className="flex flex-col items-center w-full pt-2">
           {/* 勝負印章 */}
@@ -102,7 +110,7 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
                 variant={isWin ? "primary" : "danger"}
                 size="md"
                 onClick={onRestart}
-                className="w-full flex items-center justify-center gap-2 font-serif tracking-widest"
+                className="w-full flex items-center justify-center gap-2 font-serif tracking-widest cursor-pointer"
               >
                 <RotateCcw className="w-4 h-4" /> 房主重新開局
               </Button>
@@ -112,12 +120,12 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
               </div>
             )}
 
-            {/* 檢視盤面按鈕 (點擊後關閉彈窗，絕不保留跳回彈窗的重複按鈕) */}
+            {/* 檢視盤面按鈕 */}
             <Button
               variant="secondary"
               size="md"
               onClick={() => setShowModal(false)}
-              className="w-full flex items-center justify-center gap-2 font-serif tracking-widest text-ukiyo-gold border-ukiyo-gold/40 hover:bg-ukiyo-gold/10"
+              className="w-full flex items-center justify-center gap-2 font-serif tracking-widest text-ukiyo-gold border-ukiyo-gold/40 hover:bg-ukiyo-gold/10 cursor-pointer"
             >
               <Eye className="w-4 h-4 text-ukiyo-gold" /> 檢視盤面
             </Button>
@@ -126,4 +134,6 @@ export function ResultOverlay({ result, isHost, onRestart }: ResultOverlayProps)
       </div>
     </div>
   );
+
+  return createPortal(modalJSX, document.body);
 }

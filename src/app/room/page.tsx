@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Clock, RefreshCw, AlertCircle } from "lucide-react";
 import { useStatus } from "@liveblocks/react";
@@ -25,6 +26,11 @@ function RoomInner() {
   const [isHostModalOpen, setIsHostModalOpen] = React.useState<boolean>(false);
   const [inputNameTemp, setInputNameTemp] = React.useState<string>("");
   const [selectedSlotId, setSelectedSlotId] = React.useState<string | null>(null);
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 5 分鐘閒置與 30 秒預警機制 (既省 20人 CCU 額度，又保證遊戲體驗)
   const { isWarning, isIdle, remainingSeconds, resetTimer } = useIdleDisconnect(
@@ -108,7 +114,7 @@ function RoomInner() {
     };
   }, [status]);
 
-  // 監聽手機端視窗切換與 Liveblocks 重連狀態 (切 App 恢復時快速恢復，不重置盤面)
+  // 監聽手機端視窗切換與 Liveblocks 重連狀態
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
@@ -183,7 +189,7 @@ function RoomInner() {
 
   const currentConnId = String(self?.connectionId);
 
-  // 首位進房玩家即刻聲明為房主 (修復第1位進房看不到設定按鈕的瑕疵)
+  // 首位進房玩家即刻聲明為房主
   const isHost = Boolean(
     (playerId && hostId === playerId) ||
     (self?.connectionId && String(self.connectionId) === hostId) ||
@@ -194,14 +200,14 @@ function RoomInner() {
 
   const isLocked = lockedList.includes(currentConnId) || (playerId ? lockedList.includes(playerId) : false);
 
-  // 1. 暱稱未填寫阻斷
+  // 1. 暱稱未填寫阻斷 (分享連結直連進房時之暱稱輸入視窗)
   if (!playerName) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-        <div className="glass-panel p-6 rounded-3xl max-w-sm w-full border border-ukiyo-foam/20 flex flex-col items-center space-y-4">
+        <div className="glass-panel p-6 rounded-3xl max-w-sm w-full border border-ukiyo-foam/20 flex flex-col items-center space-y-4 shadow-2xl relative z-30">
           <h2 className="text-xl font-serif font-bold text-ukiyo-gold">請輸入稱號</h2>
-          <p className="text-xs text-ukiyo-mist font-serif">
-            你正在進入暗號房間 <span className="text-ukiyo-foam font-mono font-bold">{roomId}</span>
+          <p className="text-xs text-ukiyo-mist font-serif leading-relaxed">
+            您正透過分享連結入座暗號房間 <span className="text-ukiyo-foam font-mono font-bold">{roomId}</span>
           </p>
           <input
             type="text"
@@ -216,7 +222,7 @@ function RoomInner() {
             size="md"
             disabled={!inputNameTemp.trim()}
             onClick={() => setPlayerName(inputNameTemp.trim())}
-            className="w-full font-serif"
+            className="w-full font-serif font-bold tracking-widest"
           >
             入座牌席
           </Button>
@@ -229,7 +235,7 @@ function RoomInner() {
   if (isOverflow) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-        <div className="glass-panel p-8 rounded-3xl max-w-md border border-ukiyo-vermillion/40">
+        <div className="glass-panel p-8 rounded-3xl max-w-md border border-ukiyo-vermillion/40 shadow-2xl relative z-30">
           <h2 className="text-2xl font-serif font-bold text-ukiyo-vermillion mb-2">席位已滿</h2>
           <p className="text-xs md:text-sm text-ukiyo-mist mb-6 font-serif">
             此暗號房間已達人數上限 ({maxPlayers} 人)，為維護牌席秩序，請選擇其他暗號房間。
@@ -242,11 +248,11 @@ function RoomInner() {
     );
   }
 
-  // 3. 閒置斷線提示彈窗 (閒置 5 分鐘自動暫停連線，節省 20 人 CCU)
+  // 3. 閒置斷線提示彈窗
   if (isIdle) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-ukiyo-bg/95">
-        <div className="glass-panel p-8 rounded-3xl max-w-md border border-ukiyo-gold/40 flex flex-col items-center space-y-4 shadow-2xl">
+        <div className="glass-panel p-8 rounded-3xl max-w-md border border-ukiyo-gold/40 flex flex-col items-center space-y-4 shadow-2xl relative z-30">
           <div className="w-14 h-14 rounded-full bg-ukiyo-gold/20 border border-ukiyo-gold/40 flex items-center justify-center text-ukiyo-gold">
             <Clock className="w-7 h-7" />
           </div>
@@ -269,25 +275,27 @@ function RoomInner() {
     );
   }
 
+  // 30 秒閒置預警浮動提示列 (使用 createPortal 與 z-[250]，徹底隔離父層 Stacking Context)
+  const warningBannerJSX = mounted && isWarning ? (
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[250] w-[92%] max-w-md glass-panel border border-ukiyo-gold/60 p-4 rounded-2xl shadow-2xl flex items-center justify-between animate-fade-in">
+      <div className="flex items-center gap-3">
+        <AlertCircle className="w-5 h-5 text-ukiyo-gold shrink-0" />
+        <div className="text-left">
+          <h4 className="text-xs font-serif font-bold text-ukiyo-gold">閒置提示</h4>
+          <p className="text-[11px] font-serif text-ukiyo-foam">
+            即將暫停連線 (剩餘 <span className="font-mono text-ukiyo-gold font-bold text-sm">{remainingSeconds}</span> 秒)
+          </p>
+        </div>
+      </div>
+      <Button variant="primary" size="sm" onClick={resetTimer} className="font-serif text-xs px-3">
+        繼續遊玩
+      </Button>
+    </div>
+  ) : null;
+
   return (
     <main className="min-h-screen p-2.5 md:p-5 max-w-4xl mx-auto flex flex-col justify-between relative">
-      {/* 30 秒閒置預警靜態提示條 */}
-      {isWarning && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md glass-panel border border-ukiyo-gold/60 p-4 rounded-2xl shadow-2xl flex items-center justify-between animate-fade-in">
-          <div className="flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-ukiyo-gold shrink-0" />
-            <div className="text-left">
-              <h4 className="text-xs font-serif font-bold text-ukiyo-gold">閒置提示</h4>
-              <p className="text-[11px] font-serif text-ukiyo-foam">
-                即將暫停連線 (剩餘 <span className="font-mono text-ukiyo-gold font-bold text-sm">{remainingSeconds}</span> 秒)
-              </p>
-            </div>
-          </div>
-          <Button variant="primary" size="sm" onClick={resetTimer} className="font-serif text-xs px-3">
-            繼續遊玩
-          </Button>
-        </div>
-      )}
+      {mounted && warningBannerJSX && createPortal(warningBannerJSX, document.body)}
 
       {/* 頂部 Header */}
       <div className="flex items-center justify-between mb-2">
