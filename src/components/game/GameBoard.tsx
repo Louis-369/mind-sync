@@ -44,9 +44,8 @@ export function GameBoard({
     status
   );
 
-  // 席位佈局分行演算法：6 席以下優先呈現為彈性單行橫排 (Single Flow Row)
-  const isSingleRowLayout = totalSlotsCount <= 6;
-  const maxPerRow = isSingleRowLayout ? totalSlotsCount : 4;
+  // 每列嚴格固定 4 個席位 (4-column grid layout)，確保手機端全卡牌一目瞭然，免除橫向滾動看牌
+  const maxPerRow = 4;
 
   const slotRows: number[][] = [];
   for (let i = 0; i < totalSlotsCount; i += maxPerRow) {
@@ -108,50 +107,59 @@ export function GameBoard({
         </div>
       </div>
 
-      {/* 盤面槽位 (席位精準動態排版：6 席以下彈性橫向並排，絕無多餘空間浪費) */}
+      {/* 盤面槽位 (席位精準動態排版：每列固定 4 個席位，手機屏一次全覽免橫滾) */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-full gap-2 sm:gap-3 md:gap-4 min-h-[140px] my-auto">
         {slotRows.map((rowSlotIndexes, rowIndex) => (
-          <div
-            key={`row-${rowIndex}`}
-            className="flex items-center justify-center gap-1.5 sm:gap-3 md:gap-4 w-full flex-nowrap overflow-x-auto py-1"
-          >
-            {rowSlotIndexes.map((idx) => {
-              const slotKey = `slot-${idx}`;
-              const slotCards = slotsMap[slotKey] || [];
-              const topCard = slotCards[slotCards.length - 1];
+          <React.Fragment key={`row-frag-${rowIndex}`}>
+            {rowIndex > 0 && (
+              <div className="w-full flex items-center justify-center my-0.5 pointer-events-none">
+                <span className="text-[10px] font-serif text-ukiyo-gold/70 bg-ukiyo-surface/60 px-2.5 py-0.5 rounded-full border border-ukiyo-gold/20 flex items-center gap-1">
+                  <span>第 {rowIndex + 1} 列 (由左至右遞增)</span>
+                  <ArrowRight className="w-3 h-3 text-ukiyo-gold" />
+                </span>
+              </div>
+            )}
+            <div
+              className="flex items-center justify-center gap-1.5 sm:gap-3 md:gap-4 w-full flex-wrap py-1"
+            >
+              {rowSlotIndexes.map((idx) => {
+                const slotKey = `slot-${idx}`;
+                const slotCards = slotsMap[slotKey] || [];
+                const topCard = slotCards[slotCards.length - 1];
 
-              return (
-                <BoardSlot
-                  key={slotKey}
-                  slotId={slotKey}
-                  cards={slotCards}
-                  status={status}
-                  lockedList={lockedList}
-                  isOwnerLocked={
-                    topCard
-                      ? lockedList.includes(topCard.playerId) ||
-                        Boolean((topCard as any).connectionId && lockedList.includes((topCard as any).connectionId))
-                      : false
-                  }
-                  isCurrentPlayer={
-                    topCard
-                      ? (currentPlayerId && topCard.playerId === currentPlayerId) ||
-                        topCard.playerId === currentConnectionId ||
-                        (topCard as any).connectionId === currentConnectionId
-                      : false
-                  }
-                  currentConnectionId={currentConnectionId}
-                  currentPlayerId={currentPlayerId}
-                  isSelected={selectedSlotId === slotKey}
-                  isCorrectOrder={slotCorrectnessMap[slotKey]}
-                  isFinishedReveal={isFinishedReveal}
-                  onSelectSlot={onSelectSlot}
-                  onRecall={onRecallCard}
-                  onFlip={onFlipCard}
-                />
-              );
-            })}
-          </div>
+                return (
+                  <BoardSlot
+                    key={slotKey}
+                    slotId={slotKey}
+                    cards={slotCards}
+                    status={status}
+                    lockedList={lockedList}
+                    isOwnerLocked={
+                      topCard
+                        ? lockedList.includes(topCard.playerId) ||
+                          Boolean((topCard as any).connectionId && lockedList.includes((topCard as any).connectionId))
+                        : false
+                    }
+                    isCurrentPlayer={
+                      topCard
+                        ? (currentPlayerId && topCard.playerId === currentPlayerId) ||
+                          topCard.playerId === currentConnectionId ||
+                          (topCard as any).connectionId === currentConnectionId
+                        : false
+                    }
+                    currentConnectionId={currentConnectionId}
+                    currentPlayerId={currentPlayerId}
+                    isSelected={selectedSlotId === slotKey}
+                    isCorrectOrder={slotCorrectnessMap[slotKey]}
+                    isFinishedReveal={isFinishedReveal}
+                    onSelectSlot={onSelectSlot}
+                    onRecall={onRecallCard}
+                    onFlip={onFlipCard}
+                  />
+                );
+              })}
+            </div>
+          </React.Fragment>
         ))}
       </div>
     </div>
