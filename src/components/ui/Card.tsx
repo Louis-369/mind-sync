@@ -40,7 +40,7 @@ export function Card({
         )}
       >
         {/* 卡牌背面 (浮世繪海浪質感極簡純圖騰) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden ukiyo-card-back rounded-xl p-1 flex flex-col items-center justify-center border border-ukiyo-foam/20 overflow-hidden relative">
+        <div className="absolute inset-0 w-full h-full backface-hidden ukiyo-card-back rounded-xl p-1 flex flex-col items-center justify-center border border-ukiyo-foam/20 overflow-hidden">
           {/* 右上角 ↗ 日式朱紅「確」落款印章 (個別玩家點擊鎖定時顯示，全場鎖定後自動消失) */}
           {showSeal && (
             <div className="absolute top-1.5 right-1.5 z-20 w-4 h-4 md:w-5 md:h-5 rounded ukiyo-seal flex items-center justify-center text-[9px] md:text-[10px] font-serif leading-none shadow-sm opacity-90 pointer-events-none animate-fade-in">
@@ -57,7 +57,7 @@ export function Card({
         </div>
 
         {/* 卡牌正面 (100% 不透明天然和紙實體牌面) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 washi-card-front text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/25 shadow-md overflow-hidden relative">
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 washi-card-front text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/25 shadow-md overflow-hidden">
           {/* 左上角 ↖ 斜對角小數字 */}
           <div className="absolute top-1.5 left-2 flex flex-col items-center">
             <span
