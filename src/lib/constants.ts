@@ -14,9 +14,6 @@ export const EMOJI_GROUPS = {
 export const DEFAULT_SETTINGS: GameSettings = {
   maxPlayers: 4,
   cardsPerPlayer: 2,
-  healthSystem: true,
-  shuriken: true,
-  levelMode: true,
   showCollisionName: true,
 };
 

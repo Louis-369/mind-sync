@@ -2,11 +2,12 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft, Clock, RefreshCw } from "lucide-react";
 import { useStatus } from "@liveblocks/react";
 import { useRoomId } from "../../hooks/useRoomId";
 import { usePlayerId } from "../../hooks/usePlayerId";
 import { useGameState } from "../../hooks/useGameState";
+import { useIdleDisconnect } from "../../hooks/useIdleDisconnect";
 import { LiveblocksWrapper } from "../../components/providers/LiveblocksWrapper";
 import { GameStatus } from "../../components/game/GameStatus";
 import { PlayerList } from "../../components/game/PlayerList";
@@ -25,6 +26,9 @@ function RoomInner() {
   const [inputNameTemp, setInputNameTemp] = React.useState<string>("");
   const [selectedSlotId, setSelectedSlotId] = React.useState<string | null>(null);
 
+  // 5 分鐘閒置自動暫停機制 (防佔用 20人 CCU 額度)
+  const { isIdle, resetTimer } = useIdleDisconnect(5 * 60 * 1000);
+
   const {
     settings,
     board,
@@ -32,9 +36,6 @@ function RoomInner() {
     status,
     result,
     hostId,
-    lives,
-    shurikens,
-    currentLevel,
     myHand,
     hasBoardCollision,
     self,
@@ -45,16 +46,15 @@ function RoomInner() {
     recallCard,
     toggleLock,
     flipCard,
-    useShuriken,
     updateSettings,
     resetGame,
     claimHost,
     autoResetStaleRoom,
     syncOfflinePlayers,
     playerJoinOrder,
-  } = useGameState();
+  } = useGameState(roomId);
 
-  // 1. 收集線上所有真實獨立玩家 UUID (雙重防護防 Ghost Socket)
+  // 1. 收集線上所有真實獨立玩家 UUID
   const uniquePlayerIds = new Set<string>();
   if (playerId) uniquePlayerIds.add(playerId);
   others.forEach((o) => {
@@ -68,30 +68,28 @@ function RoomInner() {
   const totalPlayers = totalUniqueOnlineCount;
   const maxPlayers = settings?.maxPlayers || 4;
 
-  // 2. 建立線上純淨順位 (過濾歷史離線 ID)
+  // 2. 建立線上純淨順位
   const onlineOrder = (playerJoinOrder || []).filter((id) => uniquePlayerIds.has(id));
   if (playerId && !onlineOrder.includes(playerId)) {
     onlineOrder.push(playerId);
   }
 
-  // 3. 計算自己在當前線上活躍人數中的排名 (0, 1, 2, 3...)
+  // 3. 計算自己在當前線上活躍人數中的排名
   const myOnlineRank = playerId ? onlineOrder.indexOf(playerId) : -1;
 
-  // 4. 滿員過載嚴密防護 (isOverflow)：
-  // 只有當自己在線上順位排名 >= maxPlayers (即屬於第 maxPlayers + 1 位連入的過載訪客) 且 線上獨特人數確實 > maxPlayers 時才阻斷！
-  // 範例：3 人房 (maxPlayers = 3)，第 3 位入座者排名為 2 (< 3)，isOverflow 強制為 false！
+  // 4. 滿員過載嚴密防護 (isOverflow)
   const isOverflow =
     myOnlineRank !== -1
       ? myOnlineRank >= maxPlayers && totalUniqueOnlineCount > maxPlayers
       : totalUniqueOnlineCount > maxPlayers;
 
-  // 處理卡牌放置事件 (若有選擇特定槽位則放入該槽位，否則自動遞補)
+  // 處理卡牌放置事件
   const handlePlayCard = (cardValue: number) => {
     placeCard(cardValue, playerName, selectedSlotId || undefined, playerId);
     setSelectedSlotId(null);
   };
 
-  // 監聽離頁/重新整理事件 (當遊戲在進行中或鎖定狀態時提示玩家)
+  // 監聽離頁/重新整理事件
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (status === "playing" || status === "locked") {
@@ -107,7 +105,7 @@ function RoomInner() {
     };
   }, [status]);
 
-  // 監聽手機端視窗切換 (visibilitychange) 與 Liveblocks 重連狀態，自動喚醒同步狀態
+  // 監聽手機端視窗切換與 Liveblocks 重連狀態
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
@@ -153,13 +151,12 @@ function RoomInner() {
     }
   }, [connectionStatus, playerId, playerName, updateMyPresence, claimHost, syncOfflinePlayers]);
 
-  // 更新 Presence 與維護房主身分，並自動清除殘留無人的舊房間 (唯有未滿員時才執行)
+  // 更新 Presence 與維護房主身分
   useEffect(() => {
     try {
-      if (isOverflow) return; // 滿員阻斷，不發送 Presence 避免干擾房內玩家
+      if (isOverflow || isIdle) return;
 
       if (playerId && playerName) {
-        // 檢查是否與其他人撞名 (排除自己)
         const isDuplicateName = others.some(
           (o) => o.presence?.playerId !== playerId && o.presence?.playerName === playerName
         );
@@ -181,7 +178,7 @@ function RoomInner() {
       console.error("更新玩家 Presence 失敗:", error);
     }
     return () => {};
-  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, syncOfflinePlayers, others, isOverflow]);
+  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, syncOfflinePlayers, others, isOverflow, isIdle]);
 
   const currentConnId = String(self?.connectionId);
   const isHost = Boolean(
@@ -189,7 +186,7 @@ function RoomInner() {
   );
   const isLocked = lockedList.includes(currentConnId) || (playerId ? lockedList.includes(playerId) : false);
 
-  // 1. 暱稱未填寫阻斷 (靠複製網址直連近來)
+  // 1. 暱稱未填寫阻斷
   if (!playerName) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
@@ -220,7 +217,7 @@ function RoomInner() {
     );
   }
 
-  // 2. 滿員阻斷檢測 (防擠退)
+  // 2. 滿員阻斷檢測
   if (isOverflow) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
@@ -237,9 +234,36 @@ function RoomInner() {
     );
   }
 
+  // 3. 閒置斷線提示彈窗 (閒置 5 分鐘自動暫停連線，節省 20 人 CCU)
+  if (isIdle) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-ukiyo-bg/95">
+        <div className="glass-panel p-8 rounded-3xl max-w-md border border-ukiyo-gold/40 flex flex-col items-center space-y-4 shadow-2xl">
+          <div className="w-14 h-14 rounded-full bg-ukiyo-gold/20 border border-ukiyo-gold/40 flex items-center justify-center text-ukiyo-gold">
+            <Clock className="w-7 h-7" />
+          </div>
+          <h2 className="text-2xl font-serif font-bold text-ukiyo-foam">連線已暫停</h2>
+          <p className="text-xs md:text-sm text-ukiyo-mist font-serif leading-relaxed">
+            您已閒置超過 5 分鐘。為節省連線席位資源，系統已暫停連線。
+          </p>
+          <Button
+            variant="primary"
+            onClick={() => {
+              resetTimer();
+              window.location.reload();
+            }}
+            className="gap-2 font-serif tracking-widest mt-2"
+          >
+            <RefreshCw className="w-4 h-4" /> 重新連線入座
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main className="min-h-screen p-2.5 md:p-5 max-w-4xl mx-auto flex flex-col justify-between">
-      {/* 頂部極簡單行 Header */}
+      {/* 頂部 Header */}
       <div className="flex items-center justify-between mb-2">
         <Button variant="ghost" size="sm" onClick={() => router.push("/")} className="gap-1 text-xs font-serif">
           <ArrowLeft className="w-3.5 h-3.5" /> 離開席位
@@ -256,21 +280,16 @@ function RoomInner() {
         </div>
       </div>
 
-      {/* 頂部狀態與房間資訊列 (包含房主 ⚙ 按鈕) */}
+      {/* 頂部狀態與房間資訊列 */}
       <GameStatus
         roomId={roomId}
-        lives={lives ?? 3}
-        shurikens={shurikens ?? 1}
-        currentLevel={currentLevel ?? 1}
         connectedCount={totalPlayers}
         maxPlayers={maxPlayers}
         isHost={isHost}
         onOpenHostPanel={() => setIsHostModalOpen(true)}
-        onUseShuriken={useShuriken}
-        canUseShuriken={(shurikens ?? 0) > 0 && status === "playing"}
       />
 
-      {/* 線上玩家清單 (極簡標籤) */}
+      {/* 線上玩家清單 */}
       <PlayerList
         currentConnectionId={currentConnId}
         currentPlayerId={playerId}
@@ -280,7 +299,7 @@ function RoomInner() {
         selfPresence={self?.presence}
       />
 
-      {/* 中央極簡禪意盤面 (傳入容量與鎖定清單) */}
+      {/* 中央盤面 */}
       <GameBoard
         board={board}
         currentConnectionId={currentConnId}
@@ -311,7 +330,7 @@ function RoomInner() {
         />
       )}
 
-      {/* 大廳等待提示與房主開局按鈕 (當 status === "waiting") */}
+      {/* 大廳等待提示與房主開局按鈕 */}
       {status === "waiting" && (
         <div className="w-full glass-panel rounded-2xl p-4 my-2 text-center flex flex-col items-center">
           <p className="text-xs text-ukiyo-mist font-serif mb-3">

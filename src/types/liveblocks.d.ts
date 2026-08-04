@@ -16,9 +16,6 @@ declare global {
       settings: LiveObject<{
         maxPlayers: number;
         cardsPerPlayer: number;
-        healthSystem: boolean;
-        shuriken: boolean;
-        levelMode: boolean;
         showCollisionName: boolean;
       }>;
       
@@ -38,8 +35,11 @@ declare global {
       // 玩家進入房間的歷史時間順序 ID 陣列 (用於精準順位繼承房主與防擠退)
       playerJoinOrder: LiveList<string>;
       
-      // 各玩家當前手牌列表 (playerId -> LiveList<number>)
-      hands: LiveMap<string, LiveList<number>>;
+      // 各玩家當前剩餘手牌張數 (playerId -> number) (防透視作弊與節省頻寬)
+      handCounts: LiveMap<string, number>;
+
+      // 最新發牌時間戳記 (用於本機確定性洗牌與手牌發放)
+      dealTimestamp: number;
       
       // 遊戲主狀態
       status: "waiting" | "playing" | "locked" | "finished";
@@ -49,15 +49,6 @@ declare global {
       
       // 房主 ID
       hostId: string;
-      
-      // 當前生命值
-      lives: number;
-      
-      // 手裏劍剩餘次數
-      shurikens: number;
-      
-      // 當前關卡
-      currentLevel: number;
     };
   }
 }

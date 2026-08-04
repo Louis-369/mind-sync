@@ -2,9 +2,6 @@
 export interface GameSettings {
   maxPlayers: number;           // 人數上限 (2-4人)
   cardsPerPlayer: number;       // 每人發牌數 (1-10張)
-  healthSystem: boolean;        // 生命值系統
-  shuriken: boolean;            // 手裏劍功能
-  levelMode: boolean;           // 關卡晉級模式
   showCollisionName: boolean;   // 顯示碰撞撞牌玩家名稱
 }
 

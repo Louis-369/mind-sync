@@ -5,15 +5,10 @@ import { Users, Copy, Check, Settings } from "lucide-react";
 
 interface GameStatusProps {
   roomId: string;
-  lives?: number;
-  shurikens?: number;
-  currentLevel?: number;
   connectedCount: number;
   maxPlayers: number;
   isHost?: boolean;
   onOpenHostPanel?: () => void;
-  onUseShuriken?: () => void;
-  canUseShuriken?: boolean;
 }
 
 export function GameStatus({
