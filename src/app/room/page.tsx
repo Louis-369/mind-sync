@@ -273,11 +273,7 @@ function RoomInner() {
           心天秤
         </h1>
 
-        <div className="w-16 text-right">
-          <span className="text-[10px] bg-ukiyo-surface/80 text-ukiyo-gold px-2 py-0.5 rounded border border-ukiyo-foam/10 font-mono">
-            LIVE
-          </span>
-        </div>
+        <div className="w-16 text-right" />
       </div>
 
       {/* 頂部狀態與房間資訊列 */}

@@ -52,7 +52,7 @@
 
 ### ⛩️ 盤面席位 (`BoardSlot.tsx`)
 - 每行上限 strictly 4 個席位 (`grid-cols-4`)，符合手持裝置與桌面寬度。
-- 空位顯示金箔虛線邊框 (`border-dashed border-ukiyo-foam/25`) 與編號標籤 (`#1`, `#2`...)。
+- 空位顯示金箔虛線邊框 (`border-dashed border-ukiyo-foam/25`)，席位標籤統一採用極簡日式漢字 (`壹`, `貳`, `參`, `肆`...)，全面移除冗餘之 `#1`, `#2` 阿拉伯數字疊加，維護畫面純淨感。
 
 ### 🔘 通用按鈕 (`Button.tsx`)
 - **Primary**：金箔底色 + 深藍文字，配有 hover 放大與光影效果。

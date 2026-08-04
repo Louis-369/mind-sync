@@ -80,10 +80,7 @@ export function BoardSlot({
             : "border-ukiyo-foam/25 bg-ukiyo-surface/30 text-ukiyo-mist/50 hover:border-ukiyo-gold/60 hover:text-ukiyo-gold"
         }`}
       >
-        <div className="absolute top-1.5 left-2 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">
-          #{slotIndex}
-        </div>
-        <div className="absolute top-1.5 right-2 pointer-events-none text-[10px] font-serif font-bold text-ukiyo-gold/40">
+        <div className="absolute top-1.5 left-2 pointer-events-none text-[11px] font-serif font-bold text-ukiyo-gold/80">
           {kanjiLabel}
         </div>
         <span className="text-[11px] font-serif font-bold">
@@ -165,7 +162,6 @@ export function BoardSlot({
             (currentConnectionId && (c.playerId === currentConnectionId || (c as any).connectionId === currentConnectionId)) ||
             (currentPlayerId && c.playerId === currentPlayerId) ||
             (c.playerId === topCard?.playerId && isCurrentPlayer);
-          const isTopCard = idx === allCards.length - 1;
 
           return (
             <div
@@ -184,13 +180,6 @@ export function BoardSlot({
                 showSeal={(isOwnerLocked || status === "locked") && !c.flipped}
                 onClick={() => handleCardClick(c)}
               />
-
-              {/* 席位編號標籤 */}
-              {isTopCard && !c.flipped && (
-                <div className="absolute top-1.5 left-2 z-20 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] tracking-tight">
-                  #{slotIndex}
-                </div>
-              )}
 
               {/* 自己蓋著的牌：在右下角呈現無框晶亮金箔數字 */}
               {isMe && !c.flipped && (status === "playing" || status === "locked") && (
