@@ -177,7 +177,7 @@ export function BoardSlot({
                 flipped={c.flipped || isFlipped}
                 isOwner={isMe}
                 playerName={c.playerName}
-                showSeal={(isOwnerLocked || status === "locked") && !c.flipped}
+                showSeal={status === "playing" && isOwnerLocked && !(c.flipped || isFlipped)}
                 onClick={() => handleCardClick(c)}
               />
 
