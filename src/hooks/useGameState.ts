@@ -249,12 +249,17 @@ export function useGameState(roomId?: string) {
         const currentCount = mutableHandCounts.get(myId) ?? 0;
         mutableHandCounts.set(myId, currentCount + 1);
 
-        // 解除鎖定
+        // 解除鎖定 (徹底清除所有鎖定紀錄)
         const mutableLocked = storage.get("lockedPlayers");
-        const lockIndexPId = mutableLocked.indexOf(myId);
-        const lockIndexConnId = mutableLocked.indexOf(connId);
-        if (lockIndexPId !== -1) mutableLocked.delete(lockIndexPId);
-        if (lockIndexConnId !== -1) mutableLocked.delete(lockIndexConnId);
+        let idx = -1;
+        while ((idx = mutableLocked.indexOf(myId)) !== -1) {
+          mutableLocked.delete(idx);
+        }
+        if (connId && connId !== myId) {
+          while ((idx = mutableLocked.indexOf(connId)) !== -1) {
+            mutableLocked.delete(idx);
+          }
+        }
       }
     },
     [self]
@@ -288,13 +293,20 @@ export function useGameState(roomId?: string) {
       }
 
       const mutableLocked = storage.get("lockedPlayers");
-      const lockIndexPId = mutableLocked.indexOf(myId);
-      const lockIndexConnId = mutableLocked.indexOf(connId);
+      const isAlreadyLocked =
+        mutableLocked.indexOf(myId) !== -1 || (connId && mutableLocked.indexOf(connId) !== -1);
 
-      if (lockIndexPId !== -1) {
-        mutableLocked.delete(lockIndexPId);
-      } else if (lockIndexConnId !== -1) {
-        mutableLocked.delete(lockIndexConnId);
+      if (isAlreadyLocked) {
+        // 確實清除該玩家在 lockedPlayers 中的所有紀錄
+        let idx = -1;
+        while ((idx = mutableLocked.indexOf(myId)) !== -1) {
+          mutableLocked.delete(idx);
+        }
+        if (connId && connId !== myId) {
+          while ((idx = mutableLocked.indexOf(connId)) !== -1) {
+            mutableLocked.delete(idx);
+          }
+        }
       } else {
         mutableLocked.push(myId);
         if (connId && connId !== myId) {

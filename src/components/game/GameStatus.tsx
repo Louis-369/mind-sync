@@ -48,7 +48,7 @@ export function GameStatus({
   };
 
   return (
-    <div className="w-full glass-panel rounded-2xl px-3 md:px-4 py-2.5 mb-2 flex items-center justify-between gap-2 border-ukiyo-foam/15 shadow-lg">
+    <div className="w-full glass-panel rounded-2xl px-3 md:px-4 py-1.5 md:py-2 mb-1.5 flex items-center justify-between gap-2 border-ukiyo-foam/15 shadow-md">
       {/* 左側：房間代碼、一鍵複製與個人稱號 */}
       <div className="flex items-center space-x-2">
         <div className="flex items-center space-x-1.5 bg-ukiyo-surface/80 px-2.5 py-1 rounded-lg border border-ukiyo-foam/15">

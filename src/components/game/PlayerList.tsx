@@ -47,7 +47,7 @@ export function PlayerList({
   const allPlayers = Array.from(playersMap.values());
 
   return (
-    <div className="w-full glass-card rounded-xl p-2.5 border border-ukiyo-foam/10 mb-2">
+    <div className="w-full glass-card rounded-xl p-1.5 md:p-2 border border-ukiyo-foam/10 mb-1.5">
       <h3 className="text-[11px] font-serif tracking-widest text-ukiyo-mist font-bold mb-1.5 flex items-center gap-1">
         <User className="w-3.5 h-3.5 text-ukiyo-gold" /> 同席同伴 ({allPlayers.length})
       </h3>

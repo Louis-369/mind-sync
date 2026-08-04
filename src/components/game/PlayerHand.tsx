@@ -50,7 +50,7 @@ export function PlayerHand({
   return (
     <div
       className={clsx(
-        "w-full glass-panel rounded-2xl p-3 md:p-4 mt-2 flex flex-col md:flex-row items-center justify-between gap-3 transition-all duration-300 shadow-xl border",
+        "w-full glass-panel rounded-2xl p-2.5 md:p-4 my-1.5 flex flex-col md:flex-row items-center justify-between gap-2.5 transition-all duration-300 shadow-xl border",
         isLocked
           ? "border-ukiyo-gold/60 bg-ukiyo-surface/90"
           : "border-ukiyo-foam/15"
