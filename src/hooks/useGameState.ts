@@ -314,28 +314,32 @@ export function useGameState(roomId?: string) {
         }
       }
 
-      // 統計線上獨立玩家人數與全場張數
-      const activePIds = new Set<string>();
-      if (myId) activePIds.add(myId);
-      others.forEach((o) => {
-        if (o.presence?.playerId) activePIds.add(o.presence.playerId);
-      });
-
       const lockedArray = Array.from(mutableLocked);
       const lockedPlayerSet = new Set(lockedArray);
-      const activeLockedCount = Array.from(activePIds).filter(
-        (pId) => lockedPlayerSet.has(pId) || (connId && lockedPlayerSet.has(connId))
-      ).length;
 
-      const totalPlayersInGame = storage.get("playerSlots")?.size || activePIds.size;
+      // 精準判定線上「每一位玩家」個自的鎖定狀態
+      const isSelfLocked = lockedPlayerSet.has(myId) || (connId && lockedPlayerSet.has(connId));
+
+      const otherLockStates = others.map((o) => {
+        const oPId = o.presence?.playerId;
+        const oConnId = String(o.connectionId);
+        return Boolean(
+          (oPId && lockedPlayerSet.has(oPId)) ||
+          (oConnId && lockedPlayerSet.has(oConnId))
+        );
+      });
+
+      const isAllPlayersLocked = Boolean(isSelfLocked) && (otherLockStates.length === 0 || otherLockStates.every(Boolean));
+
+      const totalPlayersInGame = Math.max(2, storage.get("playerSlots")?.size || (others.length + 1));
       const expectedTotalCards = totalPlayersInGame * cardsPerPlayer;
       const placedCardsCount = currentBoard.length;
 
-      // 100% 穩定進入 locked 狀態：檯面張數符合且全場活躍玩家皆已鎖定
+      // 100% 穩定判定全場鎖定：必須「所有玩家」均已獨立鎖定，且盤面張數放滿方可觸發翻牌鎖定！
       if (
-        activePIds.size >= 1 &&
+        totalPlayersInGame >= 2 &&
         placedCardsCount >= expectedTotalCards &&
-        activeLockedCount >= activePIds.size
+        isAllPlayersLocked
       ) {
         storage.set("status", "locked");
       }
