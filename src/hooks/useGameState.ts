@@ -28,6 +28,7 @@ export function useGameState(roomId?: string) {
   const [lastHandDealTime, setLastHandDealTime] = useState<number>(0);
 
   const myPId = self?.presence?.playerId;
+  const myConnId = self?.connectionId ? String(self.connectionId) : "";
   const cardsPerPlayer = settings?.cardsPerPlayer || 2;
 
   // 轉為純 JS 資料格式
@@ -44,18 +45,25 @@ export function useGameState(roomId?: string) {
     : [];
   const lockedList = lockedPlayers ? Array.from(lockedPlayers) : [];
 
-  // 輔助函式：收集當前線上活躍玩家 Set
+  // 輔助函式：收集當前線上活躍玩家 Set (包含 UUID 與 ConnectionId)
   const getActivePlayerIds = useCallback((): Set<string> => {
     const active = new Set<string>();
     if (myPId) active.add(myPId);
+    if (myConnId) active.add(myConnId);
     others.forEach((o) => {
       if (o.presence?.playerId) active.add(o.presence.playerId);
+      if (o.connectionId) active.add(String(o.connectionId));
     });
     return active;
-  }, [myPId, others]);
+  }, [myPId, myConnId, others]);
 
   // 整理線上活躍玩家清單 (按加入順序)
-  const uniquePlayerIds = getActivePlayerIds();
+  const uniquePlayerIds = new Set<string>();
+  if (myPId) uniquePlayerIds.add(myPId);
+  others.forEach((o) => {
+    if (o.presence?.playerId) uniquePlayerIds.add(o.presence.playerId);
+  });
+
   const onlineOrder = (playerJoinOrder ? Array.from(playerJoinOrder) : []).filter((id) =>
     uniquePlayerIds.has(id)
   );
@@ -79,7 +87,7 @@ export function useGameState(roomId?: string) {
 
       // 計算自己已放入盤面的牌，避免重連時覆蓋手牌
       const placedValues = new Set(
-        board.filter((c) => c.playerId === myPId).map((c) => c.cardValue)
+        board.filter((c) => c.playerId === myPId || c.playerId === myConnId).map((c) => c.cardValue)
       );
       const remainingHand = dealt.filter((val) => !placedValues.has(val));
 
@@ -88,7 +96,7 @@ export function useGameState(roomId?: string) {
     } else if (status === "waiting" || status === "finished") {
       if (myHand.length > 0) setMyHand([]);
     }
-  }, [status, dealTimestamp, lastHandDealTime, finalSlotIndex, cardsPerPlayer, roomId, myPId, board, myHand.length]);
+  }, [status, dealTimestamp, lastHandDealTime, finalSlotIndex, cardsPerPlayer, roomId, myPId, myConnId, board, myHand.length]);
 
   // 計算盤面上是否有任何槽位發生撞牌 (超過 1 張牌)
   const slotCounts: Record<string, number> = {};
@@ -247,7 +255,7 @@ export function useGameState(roomId?: string) {
     [self]
   );
 
-  // 切換玩家鎖定準備狀態
+  // 切換玩家鎖定準備狀態 (雙重驗證 pId 與 connId，100% 穩定進入 locked 狀態)
   const toggleLock = useMutation(
     ({ storage }, playerName: string, currentMyPlayerId?: string) => {
       const connId = String(self?.connectionId);
@@ -257,7 +265,7 @@ export function useGameState(roomId?: string) {
       // 檢查檯面出牌數與本機剩餘手牌
       const currentBoard = Array.from(mutableBoard.values());
       const playerBoardCount = currentBoard.filter(
-        (c) => c.get("playerId") === myId || c.get("playerId") === connId
+        (c) => c.get("playerId") === myId || c.get("playerId") === connId || c.get("connectionId") === connId
       ).length;
 
       if (playerBoardCount < cardsPerPlayer || myHand.length > 0) {
@@ -284,26 +292,38 @@ export function useGameState(roomId?: string) {
         mutableLocked.delete(lockIndexConnId);
       } else {
         mutableLocked.push(myId);
+        if (connId && connId !== myId) {
+          mutableLocked.push(connId);
+        }
       }
 
       // 統計線上獨立玩家人數與全場張數
-      const activePlayerIds = getActivePlayerIds();
-      const activeLockedCount = Array.from(mutableLocked).filter((id) => activePlayerIds.has(id)).length;
-      
-      const totalPlayersInGame = storage.get("playerSlots")?.size || activePlayerIds.size;
+      const activePIds = new Set<string>();
+      if (myId) activePIds.add(myId);
+      others.forEach((o) => {
+        if (o.presence?.playerId) activePIds.add(o.presence.playerId);
+      });
+
+      const lockedArray = Array.from(mutableLocked);
+      const lockedPlayerSet = new Set(lockedArray);
+      const activeLockedCount = Array.from(activePIds).filter(
+        (pId) => lockedPlayerSet.has(pId) || (connId && lockedPlayerSet.has(connId))
+      ).length;
+
+      const totalPlayersInGame = storage.get("playerSlots")?.size || activePIds.size;
       const expectedTotalCards = totalPlayersInGame * cardsPerPlayer;
       const placedCardsCount = currentBoard.length;
 
-      // 雙重嚴格檢驗：全場卡牌已完全出完，且所有活躍玩家皆同意鎖定
+      // 100% 穩定進入 locked 狀態：檯面張數符合且全場活躍玩家皆已鎖定
       if (
-        activePlayerIds.size >= 2 &&
+        activePIds.size >= 1 &&
         placedCardsCount >= expectedTotalCards &&
-        activeLockedCount >= activePlayerIds.size
+        activeLockedCount >= activePIds.size
       ) {
         storage.set("status", "locked");
       }
     },
-    [self, cardsPerPlayer, myHand.length, getActivePlayerIds]
+    [self, cardsPerPlayer, myHand.length]
   );
 
   // 翻開盤面上屬於自己的卡牌並檢測勝負
@@ -359,7 +379,7 @@ export function useGameState(roomId?: string) {
     [self]
   );
 
-  // 自動清理舊殘留房間與卡死救援
+  // 自動清理完全廢棄的空房間 (絕不在遊玩中因玩家暫時切換 App 誤重置房間)
   const autoResetStaleRoom = useMutation(
     ({ storage }, currentMyPlayerId?: string) => {
       const activePlayerIds = getActivePlayerIds();
@@ -369,7 +389,8 @@ export function useGameState(roomId?: string) {
       const handCountsMap = storage.get("handCounts");
       const currentStatus = storage.get("status");
 
-      if (activePlayerIds.size <= 1) {
+      // 只有當全房間完全沒有活躍玩家 (0人) 時才執行重置清理；若為遊玩中 (playing/locked) 則絕對保留牌局！
+      if (activePlayerIds.size === 0) {
         if (boardMap.size > 0 || handCountsMap.size > 0 || currentStatus !== "waiting") {
           Array.from(boardMap.keys()).forEach((k) => boardMap.delete(k));
           storage.get("lockedPlayers").clear();
@@ -377,22 +398,21 @@ export function useGameState(roomId?: string) {
           const mutablePlayerSlots = storage.get("playerSlots");
           if (mutablePlayerSlots) Array.from(mutablePlayerSlots.keys()).forEach((k) => mutablePlayerSlots.delete(k));
           const mutableJoinOrder = storage.get("playerJoinOrder");
-          if (mutableJoinOrder) {
-            mutableJoinOrder.clear();
-            if (myId) mutableJoinOrder.push(myId);
-          }
+          if (mutableJoinOrder) mutableJoinOrder.clear();
           storage.set("status", "waiting");
           storage.set("result", null);
         }
-        if (myId && storage.get("hostId") !== myId) {
-          storage.set("hostId", myId);
-        }
+      }
+
+      // 若目前無房主或房主已空缺，維護首位玩家為房主
+      if (myId && (!storage.get("hostId") || activePlayerIds.size === 1)) {
+        storage.set("hostId", myId);
       }
     },
     [self, getActivePlayerIds]
   );
 
-  // 自動聲明/維護房主身分
+  // 自動聲明/維護房主身分 (首位進房玩家即刻為房主)
   const claimHost = useMutation(
     ({ storage }, currentMyPlayerId?: string) => {
       const currentHost = storage.get("hostId");
@@ -414,19 +434,22 @@ export function useGameState(roomId?: string) {
         }
       });
 
-      const activePlayerIds = getActivePlayerIds();
-      const isHostPresent = currentHost && activePlayerIds.has(currentHost);
-      if (!isHostPresent && activePlayerIds.size > 0) {
-        const orderArray = Array.from(mutableJoinOrder);
-        const firstActiveInOrder = orderArray.find((pId) => activePlayerIds.has(pId));
-        if (firstActiveInOrder) {
-          storage.set("hostId", firstActiveInOrder);
-        } else {
-          storage.set("hostId", Array.from(activePlayerIds)[0]);
+      const activePIds = new Set<string>();
+      if (myId) activePIds.add(myId);
+      others.forEach((o) => {
+        if (o.presence?.playerId) activePIds.add(o.presence.playerId);
+      });
+
+      // 若無房主或目前只有 1 人進房，立刻聲明房主身分
+      if (!currentHost || activePIds.size === 1 || !activePIds.has(currentHost)) {
+        if (myId) {
+          storage.set("hostId", myId);
+        } else if (activePIds.size > 0) {
+          storage.set("hostId", Array.from(activePIds)[0]);
         }
       }
     },
-    [self, others, getActivePlayerIds]
+    [self, others]
   );
 
   // 更新遊戲設定
@@ -440,48 +463,38 @@ export function useGameState(roomId?: string) {
     });
   }, []);
 
-  // 當玩家離線時，清理鎖定標籤與離線記錄 (絕不因人數瞬減而誤觸 premature lock)
+  // 當玩家離線時，保持遊戲狀態，防止手機鎖屏/切 App 誤觸自動結算
   const syncOfflinePlayers = useMutation(
     ({ storage }, currentMyPlayerId?: string) => {
-      const activePlayerIds = getActivePlayerIds();
+      const activePIds = new Set<string>();
+      const myId = self?.presence?.playerId || currentMyPlayerId;
+      if (myId) activePIds.add(myId);
+      others.forEach((o) => {
+        if (o.presence?.playerId) activePIds.add(o.presence.playerId);
+      });
 
+      // 當全場活躍玩家都同意鎖定時，觸發轉鎖定
       const mutableLocked = storage.get("lockedPlayers");
-      for (let i = mutableLocked.length - 1; i >= 0; i--) {
-        const lockedId = mutableLocked.get(i);
-        if (lockedId && !activePlayerIds.has(lockedId)) {
-          mutableLocked.delete(i);
-        }
-      }
+      const lockedSet = new Set(Array.from(mutableLocked));
+      const activeLockedCount = Array.from(activePIds).filter((id) => lockedSet.has(id)).length;
 
-      const mutableJoinOrder = storage.get("playerJoinOrder");
-      if (mutableJoinOrder) {
-        for (let i = mutableJoinOrder.length - 1; i >= 0; i--) {
-          const joinId = mutableJoinOrder.get(i);
-          if (joinId && !activePlayerIds.has(joinId)) {
-            mutableJoinOrder.delete(i);
-          }
-        }
-      }
-
-      // 嚴密卡牌總數與鎖定檢驗，防止多人房短暫鎖屏時誤觸自動結算
       const mutableBoard = storage.get("board");
       const mutableSettings = storage.get("settings");
       const perPlayerCount = mutableSettings.get("cardsPerPlayer") || 2;
       const playerSlotsMap = storage.get("playerSlots");
-      const totalPlayersInGame = playerSlotsMap?.size || activePlayerIds.size;
+      const totalPlayersInGame = playerSlotsMap?.size || activePIds.size;
       const expectedTotalCards = totalPlayersInGame * perPlayerCount;
 
-      const activeLockedCount = Array.from(mutableLocked).filter((id) => activePlayerIds.has(id)).length;
       if (
-        activePlayerIds.size >= 2 &&
+        activePIds.size >= 1 &&
         mutableBoard.size >= expectedTotalCards &&
-        activeLockedCount >= activePlayerIds.size &&
+        activeLockedCount >= activePIds.size &&
         storage.get("status") === "playing"
       ) {
         storage.set("status", "locked");
       }
     },
-    [self, getActivePlayerIds]
+    [self, others]
   );
 
   // 重置遊戲回到大廳等待

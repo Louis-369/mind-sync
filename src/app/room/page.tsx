@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Clock, RefreshCw } from "lucide-react";
+import { ArrowLeft, Clock, RefreshCw, AlertCircle } from "lucide-react";
 import { useStatus } from "@liveblocks/react";
 import { useRoomId } from "../../hooks/useRoomId";
 import { usePlayerId } from "../../hooks/usePlayerId";
@@ -26,8 +26,11 @@ function RoomInner() {
   const [inputNameTemp, setInputNameTemp] = React.useState<string>("");
   const [selectedSlotId, setSelectedSlotId] = React.useState<string | null>(null);
 
-  // 5 分鐘閒置自動暫停機制 (防佔用 20人 CCU 額度)
-  const { isIdle, resetTimer } = useIdleDisconnect(5 * 60 * 1000);
+  // 5 分鐘閒置與 30 秒預警機制 (既省 20人 CCU 額度，又保證遊戲體驗)
+  const { isWarning, isIdle, remainingSeconds, resetTimer } = useIdleDisconnect(
+    4.5 * 60 * 1000,
+    5 * 60 * 1000
+  );
 
   const {
     settings,
@@ -105,7 +108,7 @@ function RoomInner() {
     };
   }, [status]);
 
-  // 監聽手機端視窗切換與 Liveblocks 重連狀態
+  // 監聽手機端視窗切換與 Liveblocks 重連狀態 (切 App 恢復時快速恢復，不重置盤面)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
@@ -118,7 +121,6 @@ function RoomInner() {
             });
           }
           claimHost(playerId);
-          autoResetStaleRoom(playerId);
           syncOfflinePlayers(playerId);
         } catch (error) {
           console.error("視窗恢復前景時狀態喚醒失敗:", error);
@@ -130,7 +132,7 @@ function RoomInner() {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, syncOfflinePlayers]);
+  }, [playerId, playerName, updateMyPresence, claimHost, syncOfflinePlayers]);
 
   // 當 WebSocket 連線恢復為 connected 時自動刷新身分與狀態
   useEffect(() => {
@@ -172,18 +174,24 @@ function RoomInner() {
         });
       }
       claimHost(playerId);
-      autoResetStaleRoom(playerId);
       syncOfflinePlayers(playerId);
     } catch (error) {
       console.error("更新玩家 Presence 失敗:", error);
     }
     return () => {};
-  }, [playerId, playerName, updateMyPresence, claimHost, autoResetStaleRoom, syncOfflinePlayers, others, isOverflow, isIdle]);
+  }, [playerId, playerName, updateMyPresence, claimHost, syncOfflinePlayers, others, isOverflow, isIdle]);
 
   const currentConnId = String(self?.connectionId);
+
+  // 首位進房玩家即刻聲明為房主 (修復第1位進房看不到設定按鈕的瑕疵)
   const isHost = Boolean(
-    (playerId && hostId === playerId) || (self?.connectionId && String(self.connectionId) === hostId)
+    (playerId && hostId === playerId) ||
+    (self?.connectionId && String(self.connectionId) === hostId) ||
+    (!hostId && myOnlineRank === 0) ||
+    (onlineOrder[0] === playerId) ||
+    (totalUniqueOnlineCount === 1)
   );
+
   const isLocked = lockedList.includes(currentConnId) || (playerId ? lockedList.includes(playerId) : false);
 
   // 1. 暱稱未填寫阻斷
@@ -262,7 +270,25 @@ function RoomInner() {
   }
 
   return (
-    <main className="min-h-screen p-2.5 md:p-5 max-w-4xl mx-auto flex flex-col justify-between">
+    <main className="min-h-screen p-2.5 md:p-5 max-w-4xl mx-auto flex flex-col justify-between relative">
+      {/* 30 秒閒置預警浮動提示彈窗 */}
+      {isWarning && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md glass-panel border border-ukiyo-gold p-4 rounded-2xl shadow-2xl flex items-center justify-between animate-bounce">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-6 h-6 text-ukiyo-gold shrink-0 animate-pulse" />
+            <div className="text-left">
+              <h4 className="text-xs font-serif font-bold text-ukiyo-gold">閒置提示 Warning</h4>
+              <p className="text-[11px] font-serif text-ukiyo-foam">
+                即將暫停連線 (剩餘 <span className="font-mono text-ukiyo-gold font-bold text-sm">{remainingSeconds}</span> 秒)
+              </p>
+            </div>
+          </div>
+          <Button variant="primary" size="sm" onClick={resetTimer} className="font-serif text-xs px-3">
+            繼續遊玩
+          </Button>
+        </div>
+      )}
+
       {/* 頂部 Header */}
       <div className="flex items-center justify-between mb-2">
         <Button variant="ghost" size="sm" onClick={() => router.push("/")} className="gap-1 text-xs font-serif">
