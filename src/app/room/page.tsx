@@ -189,13 +189,11 @@ function RoomInner() {
 
   const currentConnId = String(self?.connectionId);
 
-  // 首位進房玩家即刻聲明為房主
+  // 嚴密單一房主判定：唯有自己的 ID / 連線 ID 與 Liveblocks 唯一 hostId 匹配時才為房主
   const isHost = Boolean(
     (playerId && hostId === playerId) ||
     (self?.connectionId && String(self.connectionId) === hostId) ||
-    (!hostId && myOnlineRank === 0) ||
-    (onlineOrder[0] === playerId) ||
-    (totalUniqueOnlineCount === 1)
+    (!hostId && myOnlineRank === 0)
   );
 
   const isLocked = lockedList.includes(currentConnId) || (playerId ? lockedList.includes(playerId) : false);

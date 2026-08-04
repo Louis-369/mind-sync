@@ -484,12 +484,14 @@ export function useGameState(roomId?: string) {
 
       const activePIds = collectActivePlayerIds(myId, others);
 
-      // 若無房主或目前只有 1 人進房，立刻聲明房主身分
-      if (!currentHost || activePIds.size === 1 || !activePIds.has(currentHost)) {
-        if (myId) {
+      // 嚴密房主聲明與繼承：只有當完全無房主，或者現任房主已完全離線時，才進行房主繼承！
+      if (!currentHost || !activePIds.has(currentHost)) {
+        const joinOrderList = Array.from(mutableJoinOrder);
+        const firstActiveInOrder = joinOrderList.find((id) => activePIds.has(id));
+        if (firstActiveInOrder) {
+          storage.set("hostId", firstActiveInOrder);
+        } else if (myId) {
           storage.set("hostId", myId);
-        } else if (activePIds.size > 0) {
-          storage.set("hostId", Array.from(activePIds)[0]);
         }
       }
     },
