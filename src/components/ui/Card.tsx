@@ -9,7 +9,6 @@ interface CardProps {
   isOwner?: boolean;
   playerName?: string;
   showSeal?: boolean;
-  showPreviewText?: boolean;
   onClick?: () => void;
 }
 
@@ -103,13 +102,6 @@ export function Card({
           </div>
         </div>
       </div>
-
-      {/* 擁有者視角預覽點數 */}
-      {isOwner && !flipped && (
-        <div className="absolute bottom-1 right-1 z-20 bg-ukiyo-bg/90 border border-ukiyo-gold/60 text-ukiyo-gold font-mono font-bold text-[10px] sm:text-xs px-1.5 py-0.5 rounded shadow">
-          {value}
-        </div>
-      )}
     </div>
   );
 }

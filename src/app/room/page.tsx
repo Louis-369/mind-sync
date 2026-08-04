@@ -294,7 +294,7 @@ function RoomInner() {
   ) : null;
 
   return (
-    <main className="min-h-screen pt-3 md:pt-5 pb-3 px-2.5 md:px-5 max-w-4xl mx-auto flex flex-col justify-between relative">
+    <main className="w-full max-w-4xl mx-auto flex flex-col justify-between relative py-2 px-2.5 md:px-5">
       {mounted && warningBannerJSX && createPortal(warningBannerJSX, document.body)}
 
       {/* 頂部 Header */}
