@@ -123,19 +123,19 @@ export function BoardSlot({
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
-      className="relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-ukiyo-foam/20 touch-manipulation"
+      className="relative group flex flex-col items-center pt-3.5 p-1 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-ukiyo-foam/20 touch-manipulation"
     >
       {/* 標籤權重化渲染 */}
       {isFinishedReveal && isCorrectOrder === false ? (
-        <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
+        <span className="absolute top-0 z-30 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
           ✕ 錯誤
         </span>
       ) : hasCollision ? (
-        <div className="absolute -top-3.5 z-50 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
+        <div className="absolute top-0 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
           {collisionNamesText}
         </div>
       ) : status === "locked" && myUnflippedCard && !topCard?.flipped ? (
-        <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold pointer-events-none whitespace-nowrap animate-pulse">
+        <span className="absolute top-0 z-30 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold pointer-events-none whitespace-nowrap animate-pulse">
           點擊翻牌
         </span>
       ) : null}
