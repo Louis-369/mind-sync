@@ -88,40 +88,29 @@ export function GameBoard({
         </div>
       </div>
 
-      {/* 醒目 [ 最小卡牌 ──▶ ──▶ 最大卡牌 ] 順序流向引導橫條 */}
-      <div className="relative z-10 w-full max-w-2xl flex items-center justify-between px-3 py-1.5 my-2 rounded-xl bg-ukiyo-surface/80 border border-ukiyo-gold/30 shadow-sm text-xs font-serif">
-        <div className="flex items-center gap-1.5 text-ukiyo-gold font-bold text-[11px] sm:text-xs shrink-0">
-          <span>［ 🌸 最小卡牌 ］</span>
+      {/* 極簡典雅 [ 最小卡牌 ➔ 由左至右 ‧ 由上至下遞增 ➔ 最大卡牌 ] 順序流向引導橫條 */}
+      <div className="relative z-10 w-full max-w-xl flex items-center justify-between px-4 py-1.5 my-1.5 rounded-xl bg-ukiyo-surface/80 border border-ukiyo-gold/30 shadow-sm text-xs font-serif">
+        <span className="text-ukiyo-gold font-bold text-[11px] sm:text-xs">
+          最小卡牌
+        </span>
+
+        <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-ukiyo-foam/90 font-serif tracking-wider">
+          <span>由左至右 ‧ 由上至下遞增</span>
+          <ArrowRight className="w-3 h-3 text-ukiyo-gold shrink-0" />
         </div>
 
-        <div className="flex-1 flex items-center justify-center mx-2 overflow-hidden">
-          <div className="w-full border-t border-dashed border-ukiyo-gold/40 relative flex items-center justify-center">
-            <span className="bg-ukiyo-surface px-2 text-[10px] sm:text-[11px] font-serif text-ukiyo-foam/90 tracking-wider flex items-center gap-1">
-              由左至右 數值遞增 <ArrowRight className="w-3 h-3 text-ukiyo-gold" />
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-1.5 text-ukiyo-gold font-bold text-[11px] sm:text-xs shrink-0">
-          <span>［ 最大卡牌 🌸 ］</span>
-        </div>
+        <span className="text-ukiyo-gold font-bold text-[11px] sm:text-xs">
+          最大卡牌
+        </span>
       </div>
 
       {/* 盤面槽位 (席位精準動態排版：每列固定 4 個席位，手機屏一次全覽免橫滾) */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-full gap-2 sm:gap-3 md:gap-4 min-h-[140px] my-auto">
         {slotRows.map((rowSlotIndexes, rowIndex) => (
-          <React.Fragment key={`row-frag-${rowIndex}`}>
-            {rowIndex > 0 && (
-              <div className="w-full flex items-center justify-center my-0.5 pointer-events-none">
-                <span className="text-[10px] font-serif text-ukiyo-gold/70 bg-ukiyo-surface/60 px-2.5 py-0.5 rounded-full border border-ukiyo-gold/20 flex items-center gap-1">
-                  <span>第 {rowIndex + 1} 列 (由左至右遞增)</span>
-                  <ArrowRight className="w-3 h-3 text-ukiyo-gold" />
-                </span>
-              </div>
-            )}
-            <div
-              className="flex items-center justify-center gap-1.5 sm:gap-3 md:gap-4 w-full flex-wrap py-1"
-            >
+          <div
+            key={`row-${rowIndex}`}
+            className="flex items-center justify-center gap-1.5 sm:gap-3 md:gap-4 w-full flex-wrap py-1"
+          >
               {rowSlotIndexes.map((idx) => {
                 const slotKey = `slot-${idx}`;
                 const slotCards = slotsMap[slotKey] || [];
@@ -159,8 +148,7 @@ export function GameBoard({
                 );
               })}
             </div>
-          </React.Fragment>
-        ))}
+          ))}
       </div>
     </div>
   );
