@@ -40,16 +40,16 @@ export function Card({
     <div
       onClick={onClick}
       className={clsx(
-        "perspective-1000 cursor-pointer group relative inline-block transition-transform duration-300 hover:-translate-y-2",
+        "perspective-1000 cursor-pointer group relative inline-block transition-all duration-300 hover:-translate-y-2.5 hover:shadow-[0_12px_24px_rgba(201,169,110,0.3)]",
         sizeClasses[size],
         className
       )}
     >
       <div
         className={clsx(
-          "w-full h-full duration-500 transform-style-3d relative rounded-xl shadow-ukiyo-soft border transition-transform",
+          "w-full h-full duration-500 transform-style-3d relative rounded-xl border transition-transform shadow-xl",
           flipped ? "rotate-y-180" : "",
-          isOwner ? "border-ukiyo-foam/50" : "border-ukiyo-wave/30"
+          isOwner ? "border-ukiyo-gold/60" : "border-ukiyo-wave/40"
         )}
       >
         {/* 卡牌背面 (浮世繪海浪質感極簡純圖騰) */}
@@ -63,7 +63,7 @@ export function Card({
         </div>
 
         {/* 卡牌正面 (100% 不透明天然和紙實體牌面) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 washi-card-front text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/25 shadow-md overflow-hidden">
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 washi-card-front text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-ink/25 shadow-md overflow-hidden relative">
           {/* 左上角 ↖ 斜對角小數字 */}
           <div className="absolute top-1.5 left-2 flex flex-col items-center">
             <span
@@ -76,11 +76,16 @@ export function Card({
             </span>
           </div>
 
+          {/* 右上角 ↗ 日式朱紅「確」落款印章 */}
+          <div className="absolute top-1.5 right-1.5 w-4 h-4 md:w-5 md:h-5 rounded ukiyo-seal flex items-center justify-center text-[9px] md:text-[10px] font-serif leading-none shadow-sm opacity-90 pointer-events-none">
+            確
+          </div>
+
           {/* 中央大數字 */}
           <div className="flex flex-col items-center justify-center">
             <span
               className={clsx(
-                "font-mono text-xl md:text-3xl font-black text-ukiyo-ink tracking-tight leading-none",
+                "font-mono text-xl md:text-3xl font-black text-ukiyo-ink tracking-tight leading-none drop-shadow-sm",
                 showUnderline && "border-b md:border-b-2 border-ukiyo-ink/80 pb-0.5"
               )}
             >
@@ -104,4 +109,3 @@ export function Card({
     </div>
   );
 }
-

@@ -28,19 +28,25 @@ export default function LobbyPage() {
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-ukiyo-wave/25 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-80 h-80 bg-ukiyo-gold/10 rounded-full blur-[120px] pointer-events-none" />
 
+      {/* 浮世繪風格底部波浪紋裝飾 */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 opacity-15 pointer-events-none bg-repeat-x bg-bottom" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 C150,90 350,-40 500,45 C650,130 900,10 1200,60 L1200,120 L0,120 Z' fill='%23c9a96e'%3E%3C/path%3E%3C/svg%3E")`,
+        backgroundSize: '800px 120px'
+      }} />
+
       {/* 主面板容器 */}
       <div className="glass-panel w-full max-w-lg rounded-3xl p-6 md:p-10 border border-ukiyo-foam/20 shadow-2xl relative z-10 flex flex-col items-center text-center">
         {/* 日式硃砂圓圖騰 */}
-        <div className="w-14 h-14 rounded-full ukiyo-seal flex items-center justify-center text-2xl font-serif mb-4 shadow-lg animate-wave-float">
+        <div className="w-14 h-14 rounded-full ukiyo-seal flex items-center justify-center text-2xl font-serif mb-4 shadow-lg animate-wave-float border border-ukiyo-foam/30">
           <span className="animate-tenbin-sway leading-none select-none">
             心
           </span>
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-serif font-black text-ukiyo-foam tracking-widest mb-1">
+        <h1 className="text-4xl md:text-5xl font-serif font-black text-ukiyo-foam tracking-widest mb-1 drop-shadow-md">
           心天秤
         </h1>
-        <p className="text-xs md:text-sm font-sans font-medium text-ukiyo-gold/80 tracking-[0.25em] uppercase mb-4">
+        <p className="text-xs md:text-sm font-sans font-medium text-ukiyo-gold/90 tracking-[0.25em] uppercase mb-4">
           Kokoro Tenbin
         </p>
 
@@ -48,7 +54,7 @@ export default function LobbyPage() {
           交流價值觀 ‧ 碰撞默契 ‧ 探索彼此的共鳴點
         </p>
 
-        {/* 表單區域 (使用 div 避免使用 HTML form) */}
+        {/* 表單區域 */}
         <div className="w-full space-y-6 flex flex-col items-center">
           {/* 暱稱輸入 */}
           <NameInput name={playerName} onChange={setPlayerName} />

@@ -67,6 +67,9 @@ export function BoardSlot({
 
   const isAnyCardMine = allCards.some((c) => isCardMine(c));
 
+  const KANJI_NUMS = ["壹", "貳", "參", "肆", "伍", "陸", "柒", "捌", "玖", "拾"];
+  const kanjiLabel = KANJI_NUMS[(slotIndex - 1) % KANJI_NUMS.length] || String(slotIndex);
+
   if (allCards.length === 0) {
     const canSelect = status === "playing";
     return (
@@ -76,12 +79,15 @@ export function BoardSlot({
           canSelect ? "cursor-pointer hover:scale-105" : "cursor-default opacity-60"
         } ${
           isSelected
-            ? "border-ukiyo-gold bg-ukiyo-gold/20 text-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+            ? "border-ukiyo-gold bg-ukiyo-gold/20 text-ukiyo-gold shadow-[0_0_20px_rgba(201,169,110,0.5)]"
             : "border-ukiyo-foam/25 bg-ukiyo-surface/30 text-ukiyo-mist/50 hover:border-ukiyo-gold/60 hover:text-ukiyo-gold"
         }`}
       >
         <div className="absolute top-1.5 left-2 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">
           #{slotIndex}
+        </div>
+        <div className="absolute top-1.5 right-2 pointer-events-none text-[10px] font-serif font-bold text-ukiyo-gold/40">
+          {kanjiLabel}
         </div>
         <span className="text-[11px] font-serif font-bold">
           {isSelected ? "已選定" : "空席位"}

@@ -8,9 +8,9 @@
     background-color: #0d1b2a;
     background-image: 
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.085 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E"),
-      radial-gradient(circle at 50% 10%, rgba(45, 90, 123, 0.45) 0%, transparent 60%),
-      radial-gradient(circle at 20% 80%, rgba(27, 40, 56, 0.85) 0%, transparent 50%),
-      radial-gradient(circle at 80% 90%, rgba(13, 27, 42, 0.95) 0%, transparent 60%);
+      radial-gradient(circle at 50% 10%, rgba(45, 90, 123, 0.5) 0%, transparent 65%),
+      radial-gradient(circle at 20% 80%, rgba(27, 40, 56, 0.9) 0%, transparent 55%),
+      radial-gradient(circle at 80% 90%, rgba(13, 27, 42, 0.98) 0%, transparent 65%);
     background-attachment: fixed;
   }
 }
@@ -21,7 +21,7 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(232, 220, 200, 0.2);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(232, 220, 200, 0.15);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E");
 }
 
@@ -36,12 +36,13 @@
   background-image: 
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.20 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E"),
     linear-gradient(135deg, #fbf7eb 0%, #f2e7cd 50%, #e2cba4 100%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 0 0 1px rgba(201, 169, 110, 0.4);
 }
 
 .glass-card {
-  background: rgba(27, 40, 56, 0.7);
+  background: rgba(27, 40, 56, 0.75);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(232, 220, 200, 0.15);
+  border: 1px solid rgba(232, 220, 200, 0.18);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.065 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E");
 }
 
@@ -66,10 +67,12 @@
   background-color: #1b2838;
   background-image: 
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E"),
-    radial-gradient(circle at 50% 50%, #2d5a7b 10%, transparent 11%), 
-    radial-gradient(circle at 0% 100%, #2d5a7b 10%, transparent 11%), 
-    radial-gradient(circle at 100% 100%, #2d5a7b 10%, transparent 11%);
+    radial-gradient(circle at 50% 50%, #2d5a7b 12%, transparent 13%), 
+    radial-gradient(circle at 0% 100%, #2d5a7b 12%, transparent 13%), 
+    radial-gradient(circle at 100% 100%, #2d5a7b 12%, transparent 13%);
   background-size: auto, 16px 16px, 16px 16px, 16px 16px;
+  border: 1px solid rgba(201, 169, 110, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 /* 朱紅日式印章標籤 */
@@ -77,9 +80,15 @@
   background: #c73e1d;
   color: #f5f0e3;
   border-radius: 4px;
-  font-family: 'Noto Serif JP', serif;
+  font-family: 'Noto Serif JP', 'Songti TC', serif;
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(199, 62, 29, 0.4);
+  box-shadow: 0 2px 8px rgba(199, 62, 29, 0.5), inset 0 0 0 1px rgba(245, 240, 227, 0.3);
+}
+
+/* 金箔光彩邊框與陰影 */
+.gold-foil-border {
+  border: 1px solid #c9a96e;
+  box-shadow: 0 0 15px rgba(201, 169, 110, 0.25);
 }
 
 /* 3D 卡片翻轉效果 */
