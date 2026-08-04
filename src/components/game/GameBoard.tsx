@@ -129,7 +129,6 @@ export function GameBoard({
       {/* 醒目 [ 最小卡牌 ──▶ ──▶ 最大卡牌 ] 順序流向引導橫條 */}
       <div className="relative z-10 w-full max-w-2xl flex items-center justify-between px-3 py-1.5 my-2 rounded-xl bg-ukiyo-surface/80 border border-ukiyo-gold/30 shadow-sm text-xs font-serif">
         <div className="flex items-center gap-1.5 text-ukiyo-gold font-bold text-[11px] sm:text-xs shrink-0">
-          <span className="w-2 h-2 rounded-full bg-ukiyo-gold animate-ping" />
           <span>［ 🌸 最小卡牌 ］</span>
         </div>
 

@@ -271,13 +271,13 @@ function RoomInner() {
 
   return (
     <main className="min-h-screen p-2.5 md:p-5 max-w-4xl mx-auto flex flex-col justify-between relative">
-      {/* 30 秒閒置預警浮動提示彈窗 */}
+      {/* 30 秒閒置預警靜態提示條 */}
       {isWarning && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md glass-panel border border-ukiyo-gold p-4 rounded-2xl shadow-2xl flex items-center justify-between animate-bounce">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md glass-panel border border-ukiyo-gold/60 p-4 rounded-2xl shadow-2xl flex items-center justify-between animate-fade-in">
           <div className="flex items-center gap-3">
-            <AlertCircle className="w-6 h-6 text-ukiyo-gold shrink-0 animate-pulse" />
+            <AlertCircle className="w-5 h-5 text-ukiyo-gold shrink-0" />
             <div className="text-left">
-              <h4 className="text-xs font-serif font-bold text-ukiyo-gold">閒置提示 Warning</h4>
+              <h4 className="text-xs font-serif font-bold text-ukiyo-gold">閒置提示</h4>
               <p className="text-[11px] font-serif text-ukiyo-foam">
                 即將暫停連線 (剩餘 <span className="font-mono text-ukiyo-gold font-bold text-sm">{remainingSeconds}</span> 秒)
               </p>
