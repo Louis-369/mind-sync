@@ -357,12 +357,24 @@ function RoomInner() {
         <div className="w-full glass-panel rounded-2xl p-4 my-2 text-center flex flex-col items-center">
           <p className="text-xs text-ukiyo-mist font-serif mb-3">
             {isHost
-              ? "全員入座後，請點擊下方按鈕開始發牌。"
+              ? totalPlayers >= 2
+                ? "全員入座後，請點擊下方按鈕開始發牌。"
+                : "靜候至少 2 位玩家入座方可開局..."
               : "靜候房主開始牌局..."}
           </p>
           {isHost && (
-            <Button variant="primary" size="lg" onClick={() => dealCards(playerId)} className="font-serif tracking-widest">
-              發牌開局
+            <Button
+              variant="primary"
+              size="lg"
+              disabled={totalPlayers < 2}
+              onClick={() => {
+                if (totalPlayers >= 2) dealCards(playerId);
+              }}
+              className={`font-serif tracking-widest ${
+                totalPlayers < 2 ? "opacity-50 cursor-not-allowed border-ukiyo-foam/20" : ""
+              }`}
+            >
+              {totalPlayers < 2 ? "等待玩家入座 (至少 2 人)" : "發牌開局"}
             </Button>
           )}
         </div>

@@ -136,6 +136,11 @@ export function useGameState(roomId?: string) {
       if (o.presence?.playerId) activePIds.add(o.presence.playerId);
     });
 
+    // 至少需有 2 位玩家方可開局發牌
+    if (activePIds.size < 2) {
+      return;
+    }
+
     let slotIdx = 0;
     activePIds.forEach((pId) => {
       mutablePlayerSlots.set(pId, slotIdx);
