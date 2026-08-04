@@ -36,3 +36,18 @@ export function generateSeededDeck(seedStr: string): number[] {
 export function buildRoomId(emoji1: string, emoji2: string, emoji3: string): string {
   return `${emoji1}-${emoji2}-${emoji3}`;
 }
+
+/**
+ * 依據種子與玩家席位重建本機場牌手牌 (過濾已下放盤面之卡牌)
+ */
+export function reconstructPlayerHand(
+  seedStr: string,
+  slotIndex: number,
+  cardsPerPlayer: number,
+  placedValues: Set<number> = new Set()
+): number[] {
+  const deck = generateSeededDeck(seedStr);
+  const startIdx = Math.max(0, slotIndex) * cardsPerPlayer;
+  const dealt = deck.slice(startIdx, startIdx + cardsPerPlayer).sort((a, b) => a - b);
+  return dealt.filter((val) => !placedValues.has(val));
+}

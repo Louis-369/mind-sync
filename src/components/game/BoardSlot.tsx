@@ -127,7 +127,7 @@ export function BoardSlot({
     >
       {/* 標籤權重化渲染 */}
       {isFinishedReveal && isCorrectOrder === false ? (
-        <span className="absolute top-0 z-30 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
+        <span className="absolute top-0 z-30 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-ukiyo-bg border border-ukiyo-vermillion text-ukiyo-vermillion font-bold pointer-events-none whitespace-nowrap animate-bounce">
           ✕ 錯誤
         </span>
       ) : hasCollision ? (

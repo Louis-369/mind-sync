@@ -3,8 +3,38 @@
 import { useStorage, useMutation, useOthers, useSelf, useMyPresence } from "@liveblocks/react";
 import { LiveList, LiveObject } from "@liveblocks/client";
 import { useState, useEffect, useCallback } from "react";
-import { generateSeededDeck } from "../lib/gameLogic";
+import { generateSeededDeck, reconstructPlayerHand } from "../lib/gameLogic";
 import { GameSettings, BoardCard } from "../types/game";
+
+/**
+ * 輔助函式：收集當前線上活躍玩家 ID 集合 (過濾非空 playerId)
+ */
+function collectActivePlayerIds(myId: string | undefined, others: readonly any[]): Set<string> {
+  const active = new Set<string>();
+  if (myId) active.add(myId);
+  others.forEach((o) => {
+    if (o.presence?.playerId) active.add(o.presence.playerId);
+  });
+  return active;
+}
+
+/**
+ * 輔助函式：從 Storage lockedPlayers 徹底清除指定玩家的所有鎖定紀錄 (pId 及 connId)
+ */
+function purgeLockedPlayer(mutableLocked: any, pId?: string, connId?: string) {
+  if (!mutableLocked) return;
+  let idx = -1;
+  if (pId) {
+    while ((idx = mutableLocked.indexOf(pId)) !== -1) {
+      mutableLocked.delete(idx);
+    }
+  }
+  if (connId && connId !== pId) {
+    while ((idx = mutableLocked.indexOf(connId)) !== -1) {
+      mutableLocked.delete(idx);
+    }
+  }
+}
 
 export function useGameState(roomId?: string) {
   const [myPresence, updateMyPresence] = useMyPresence();
@@ -58,11 +88,7 @@ export function useGameState(roomId?: string) {
   }, [myPId, myConnId, others]);
 
   // 整理線上活躍玩家清單 (按加入順序)
-  const uniquePlayerIds = new Set<string>();
-  if (myPId) uniquePlayerIds.add(myPId);
-  others.forEach((o) => {
-    if (o.presence?.playerId) uniquePlayerIds.add(o.presence.playerId);
-  });
+  const uniquePlayerIds = collectActivePlayerIds(myPId, others);
 
   const onlineOrder = (playerJoinOrder ? Array.from(playerJoinOrder) : []).filter((id) =>
     uniquePlayerIds.has(id)
@@ -81,15 +107,14 @@ export function useGameState(roomId?: string) {
     if (status === "playing" && dealTimestamp && dealTimestamp !== lastHandDealTime) {
       const seedKey = roomId ? `room_${roomId}` : "default_room";
       const seed = `${seedKey}_${dealTimestamp}`;
-      const deck = generateSeededDeck(seed);
-      const startIdx = finalSlotIndex * cardsPerPlayer;
-      const dealt = deck.slice(startIdx, startIdx + cardsPerPlayer).sort((a, b) => a - b);
 
       // 計算自己已放入盤面的牌，避免重連時覆蓋手牌
       const placedValues = new Set(
         board.filter((c) => c.playerId === myPId || c.playerId === myConnId).map((c) => c.cardValue)
       );
-      const remainingHand = dealt.filter((val) => !placedValues.has(val));
+
+      // 使用 gameLogic.ts 中的 reconstructPlayerHand 模組計算手牌
+      const remainingHand = reconstructPlayerHand(seed, finalSlotIndex, cardsPerPlayer, placedValues);
 
       setMyHand(remainingHand);
       setLastHandDealTime(dealTimestamp);
@@ -130,11 +155,7 @@ export function useGameState(roomId?: string) {
     }
 
     // 收集獨立 playerId，顯式配分席位 (0, 1, 2...) 與初始化手牌張數
-    const activePIds = new Set<string>();
-    if (myId) activePIds.add(myId);
-    others.forEach((o) => {
-      if (o.presence?.playerId) activePIds.add(o.presence.playerId);
-    });
+    const activePIds = collectActivePlayerIds(myId, others);
 
     // 至少需有 2 位玩家方可開局發牌
     if (activePIds.size < 2) {
@@ -251,15 +272,7 @@ export function useGameState(roomId?: string) {
 
         // 解除鎖定 (徹底清除所有鎖定紀錄)
         const mutableLocked = storage.get("lockedPlayers");
-        let idx = -1;
-        while ((idx = mutableLocked.indexOf(myId)) !== -1) {
-          mutableLocked.delete(idx);
-        }
-        if (connId && connId !== myId) {
-          while ((idx = mutableLocked.indexOf(connId)) !== -1) {
-            mutableLocked.delete(idx);
-          }
-        }
+        purgeLockedPlayer(mutableLocked, myId, connId);
       }
     },
     [self]
@@ -298,15 +311,7 @@ export function useGameState(roomId?: string) {
 
       if (isAlreadyLocked) {
         // 確實清除該玩家在 lockedPlayers 中的所有紀錄
-        let idx = -1;
-        while ((idx = mutableLocked.indexOf(myId)) !== -1) {
-          mutableLocked.delete(idx);
-        }
-        if (connId && connId !== myId) {
-          while ((idx = mutableLocked.indexOf(connId)) !== -1) {
-            mutableLocked.delete(idx);
-          }
-        }
+        purgeLockedPlayer(mutableLocked, myId, connId);
       } else {
         mutableLocked.push(myId);
         if (connId && connId !== myId) {
@@ -455,11 +460,7 @@ export function useGameState(roomId?: string) {
         }
       });
 
-      const activePIds = new Set<string>();
-      if (myId) activePIds.add(myId);
-      others.forEach((o) => {
-        if (o.presence?.playerId) activePIds.add(o.presence.playerId);
-      });
+      const activePIds = collectActivePlayerIds(myId, others);
 
       // 若無房主或目前只有 1 人進房，立刻聲明房主身分
       if (!currentHost || activePIds.size === 1 || !activePIds.has(currentHost)) {
@@ -487,8 +488,8 @@ export function useGameState(roomId?: string) {
   // 當玩家離線時，保持遊戲狀態，防止手機鎖屏/切 App 誤觸自動結算
   const syncOfflinePlayers = useMutation(
     ({ storage }, currentMyPlayerId?: string) => {
-      const activePIds = new Set<string>();
       const myId = self?.presence?.playerId || currentMyPlayerId;
+      const activePIds = collectActivePlayerIds(myId, others);
       if (myId) activePIds.add(myId);
       others.forEach((o) => {
         if (o.presence?.playerId) activePIds.add(o.presence.playerId);

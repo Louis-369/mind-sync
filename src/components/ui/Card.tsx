@@ -41,13 +41,6 @@ export function Card({
       >
         {/* 卡牌背面 (浮世繪海浪質感極簡純圖騰) */}
         <div className="absolute inset-0 w-full h-full backface-hidden ukiyo-card-back rounded-xl p-1 flex flex-col items-center justify-center border border-ukiyo-foam/20 overflow-hidden">
-          {/* 右上角 ↗ 日式朱紅「確」落款印章 (個別玩家點擊鎖定時顯示，全場鎖定後自動消失) */}
-          {showSeal && (
-            <div className="absolute top-1.5 right-1.5 z-20 w-4 h-4 md:w-5 md:h-5 rounded ukiyo-seal flex items-center justify-center text-[9px] md:text-[10px] font-serif leading-none shadow-sm opacity-90 pointer-events-none animate-fade-in">
-              確
-            </div>
-          )}
-
           <div className="w-full h-full rounded-lg border border-ukiyo-foam/15 flex items-center justify-center">
             {/* 朱紅日式心印 */}
             <div className="w-7 h-7 md:w-9 md:h-9 rounded-full ukiyo-seal flex items-center justify-center text-xs font-serif shadow-md">

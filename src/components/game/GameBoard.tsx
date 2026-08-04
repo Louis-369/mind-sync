@@ -4,6 +4,7 @@ import React from "react";
 import { Sparkles, Trophy, ArrowRight } from "lucide-react";
 import { BoardSlot } from "./BoardSlot";
 import { BoardCard } from "../../types/game";
+import { useBoardState } from "../../hooks/useBoardState";
 
 interface GameBoardProps {
   board: BoardCard[];
@@ -36,50 +37,12 @@ export function GameBoard({
   onRecallCard,
   onFlipCard,
 }: GameBoardProps) {
-  // 動態精準計算本局所需席位總數 (2人4張=4席；3人6張=6席；不渲染無用虛包)
-  const totalSlotsCount = Math.min(12, Math.max(2, totalPlayers * cardsPerPlayer));
-
-  // 根據 slotId 或是放置順序將卡牌歸類至各槽位
-  const slotsMap: Record<string, BoardCard[]> = {};
-  for (let i = 0; i < totalSlotsCount; i++) {
-    slotsMap[`slot-${i}`] = [];
-  }
-
-  // 將已經放置在盤面上的卡牌配對至槽位 (按放置時間順序排序)
-  const sortedBoard = [...board].sort((a, b) => a.placedAt - b.placedAt);
-  sortedBoard.forEach((item, idx) => {
-    const targetKey = item.slotId && slotsMap[item.slotId] ? item.slotId : `slot-${idx % totalSlotsCount}`;
-    if (slotsMap[targetKey]) {
-      slotsMap[targetKey].push(item);
-    } else {
-      slotsMap[`slot-${idx % totalSlotsCount}`].push(item);
-    }
-  });
-
-  // 即時計算所有已翻開卡牌各席位卡牌順序正確性
-  const slotCorrectnessMap: Record<string, boolean> = {};
-  const flippedSlots: { slotKey: string; slotIdx: number; val: number }[] = [];
-
-  for (let i = 0; i < totalSlotsCount; i++) {
-    const key = `slot-${i}`;
-    const cards = slotsMap[key] || [];
-    const topCard = cards[cards.length - 1];
-    if (topCard && topCard.flipped) {
-      flippedSlots.push({ slotKey: key, slotIdx: i, val: topCard.cardValue });
-    }
-  }
-
-  if (flippedSlots.length > 0) {
-    const sortedCards = [...flippedSlots].sort((a, b) => a.val - b.val);
-    flippedSlots.forEach((slot, idx) => {
-      const expectedVal = sortedCards[idx].val;
-      slotCorrectnessMap[slot.slotKey] = slot.val === expectedVal;
-    });
-  }
-
-  // 檢查全場卡牌是否已全部翻開
-  const isAllCardsFlipped = board.length > 0 && board.every((c) => c.flipped);
-  const isFinishedReveal = status === "finished" || isAllCardsFlipped;
+  const { totalSlotsCount, slotsMap, slotCorrectnessMap, isFinishedReveal } = useBoardState(
+    board,
+    totalPlayers,
+    cardsPerPlayer,
+    status
+  );
 
   // 席位佈局分行演算法：6 席以下優先呈現為彈性單行橫排 (Single Flow Row)
   const isSingleRowLayout = totalSlotsCount <= 6;
