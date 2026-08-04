@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, HelpCircle } from "lucide-react";
 import { NameInput } from "../components/lobby/NameInput";
 import { EmojiPicker } from "../components/lobby/EmojiPicker";
+import { TutorialModal } from "../components/lobby/TutorialModal";
 import { Button } from "../components/ui/Button";
 import { usePlayerId } from "../hooks/usePlayerId";
 
@@ -12,6 +13,7 @@ export default function LobbyPage() {
   const router = useRouter();
   const { playerName, setPlayerName } = usePlayerId();
   const [selectedRoomId, setSelectedRoomId] = useState<string>("🐶-🚀-🍎");
+  const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
 
   const handleEnterRoom = () => {
     try {
@@ -50,9 +52,18 @@ export default function LobbyPage() {
           Kokoro Tenbin
         </p>
 
-        <p className="text-xs md:text-sm text-ukiyo-mist mb-8 max-w-sm leading-relaxed font-serif">
+        <p className="text-xs md:text-sm text-ukiyo-mist mb-6 max-w-sm leading-relaxed font-serif">
           交流價值觀 ‧ 碰撞默契 ‧ 探索彼此的共鳴點
         </p>
+
+        {/* 遊戲教學按鈕 */}
+        <button
+          onClick={() => setIsTutorialOpen(true)}
+          className="mb-6 px-3.5 py-1.5 rounded-full bg-ukiyo-surface/80 border border-ukiyo-gold/40 text-ukiyo-gold text-xs font-serif font-bold hover:bg-ukiyo-gold/15 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
+        >
+          <HelpCircle className="w-3.5 h-3.5 text-ukiyo-gold" />
+          <span>🌸 玩法教學與詳細規則</span>
+        </button>
 
         {/* 表單區域 */}
         <div className="w-full space-y-6 flex flex-col items-center">
@@ -76,27 +87,26 @@ export default function LobbyPage() {
           </Button>
         </div>
 
-        {/* 遊戲說明引導 */}
+        {/* 遊戲說明引導摘要 */}
         <div className="mt-8 pt-6 border-t border-ukiyo-foam/10 w-full text-left">
           <h4 className="text-xs font-serif font-bold text-ukiyo-gold uppercase tracking-widest mb-3 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 玩法說明
+            <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 玩法概要
           </h4>
           <ul className="text-xs text-ukiyo-mist space-y-2.5 font-serif">
             <li className="flex items-start gap-1.5">
               <span className="text-ukiyo-gold font-bold shrink-0">💬 設定主題與討論：</span>
-              <span>選定一個有趣主題（如：最難忘的事、買過最瞎的東西），自由分享彼此的價值觀。</span>
+              <span>選定一個有趣主題，自由分享彼此的價值觀。</span>
             </li>
             <li className="flex items-start gap-1.5">
               <span className="text-ukiyo-gold font-bold shrink-0">🎲 價值轉化出牌：</span>
-              <span>將你的衡量標準轉化為 1~100 的卡牌數字，憑藉默契將卡牌由小到大放入檯面。</span>
-            </li>
-            <li className="flex items-start gap-1.5">
-              <span className="text-ukiyo-gold font-bold shrink-0">🌸 揭牌驗證共鳴：</span>
-              <span>全員出牌鎖定後翻開卡牌！順序正確即代表大家的價值觀與默契完美達成！</span>
+              <span>將標準轉化為 1~100 卡牌數字，憑默契由小到大放入檯面。</span>
             </li>
           </ul>
         </div>
       </div>
+
+      {/* 互動式詳細規則教學彈窗 */}
+      <TutorialModal isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
     </main>
   );
 }

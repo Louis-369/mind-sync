@@ -307,8 +307,10 @@ function RoomInner() {
         roomId={roomId}
         connectedCount={totalPlayers}
         maxPlayers={maxPlayers}
+        playerName={playerName}
         isHost={isHost}
         onOpenHostPanel={() => setIsHostModalOpen(true)}
+        onChangePlayerName={setPlayerName}
       />
 
       {/* 線上玩家清單 */}
