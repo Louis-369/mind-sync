@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 /**
  * 監聽使用者操作，若超過 timeoutMs 無任何互動則觸發閒置狀態 (isIdle = true)
@@ -8,18 +8,25 @@ import { useEffect, useState, useCallback } from "react";
  */
 export function useIdleDisconnect(timeoutMs: number = 5 * 60 * 1000) {
   const [isIdle, setIsIdle] = useState<boolean>(false);
+  const isIdleRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    isIdleRef.current = isIdle;
+  }, [isIdle]);
 
   const resetTimer = useCallback(() => {
+    isIdleRef.current = false;
     setIsIdle(false);
   }, []);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: ReturnType<typeof setTimeout>;
 
     const handleUserActivity = () => {
-      if (isIdle) return; // 已處於閒置斷線狀態，需手動點擊按鈕恢復
+      if (isIdleRef.current) return;
       clearTimeout(timer);
       timer = setTimeout(() => {
+        isIdleRef.current = true;
         setIsIdle(true);
       }, timeoutMs);
     };
@@ -29,6 +36,7 @@ export function useIdleDisconnect(timeoutMs: number = 5 * 60 * 1000) {
 
     // 啟動初始計時器
     timer = setTimeout(() => {
+      isIdleRef.current = true;
       setIsIdle(true);
     }, timeoutMs);
 
@@ -36,7 +44,7 @@ export function useIdleDisconnect(timeoutMs: number = 5 * 60 * 1000) {
       clearTimeout(timer);
       events.forEach((evt) => window.removeEventListener(evt, handleUserActivity));
     };
-  }, [timeoutMs, isIdle]);
+  }, [timeoutMs]);
 
   return { isIdle, resetTimer };
 }

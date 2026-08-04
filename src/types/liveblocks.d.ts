@@ -35,6 +35,9 @@ declare global {
       // 玩家進入房間的歷史時間順序 ID 陣列 (用於精準順位繼承房主與防擠退)
       playerJoinOrder: LiveList<string>;
       
+      // 開局時顯式分配的玩家席位 mapping (playerId -> slotIndex 0, 1, 2...)
+      playerSlots: LiveMap<string, number>;
+
       // 各玩家當前剩餘手牌張數 (playerId -> number) (防透視作弊與節省頻寬)
       handCounts: LiveMap<string, number>;
 

@@ -1,4 +1,9 @@
-// 種子偽隨機數產生器 (Mulberry32)
+/**
+ * 種子偽隨機數產生器 (Mulberry32 PRNG 搭配 FNV-1a 雜湊)
+ * 2166136261: FNV-1a 初始雜湊偏置值 (Offset Basis)
+ * 16777619: FNV-1a 質數常數 (Prime Multiplier)
+ * 0x6d2b79f5: Mulberry32 亂數狀態加法常數
+ */
 function seededRandom(seedStr: string) {
   let h = 2166136261 >>> 0;
   for (let i = 0; i < seedStr.length; i++) {
@@ -12,7 +17,9 @@ function seededRandom(seedStr: string) {
   };
 }
 
-// 根據種子生成全場一致洗牌後的 1-100 卡牌陣列
+/**
+ * 根據種子生成全場一致洗牌後的 1-100 卡牌陣列 (Fisher-Yates 洗牌演算法)
+ */
 export function generateSeededDeck(seedStr: string): number[] {
   const rng = seededRandom(seedStr);
   const deck = Array.from({ length: 100 }, (_, i) => i + 1);
@@ -23,17 +30,9 @@ export function generateSeededDeck(seedStr: string): number[] {
   return deck;
 }
 
-// 生成隨機洗牌後的 1-100 卡牌陣列 (備用)
-export function generateShuffledDeck(): number[] {
-  const deck = Array.from({ length: 100 }, (_, i) => i + 1);
-  for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [deck[i], deck[j]] = [deck[j], deck[i]];
-  }
-  return deck;
-}
-
-// 格式化 Emoji 房間 ID (例如: "🐶-🚀-🍎")
+/**
+ * 格式化 Emoji 房間 ID (例如: "🐶-🚀-🍎")
+ */
 export function buildRoomId(emoji1: string, emoji2: string, emoji3: string): string {
   return `${emoji1}-${emoji2}-${emoji3}`;
 }
