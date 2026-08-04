@@ -126,6 +126,7 @@ export function GameBoard({
                   slotId={slotKey}
                   cards={slotCards}
                   status={status}
+                  lockedList={lockedList}
                   isOwnerLocked={
                     topCard
                       ? lockedList.includes(topCard.playerId) ||

@@ -31,6 +31,13 @@ export function Card({
         "w-14 h-20 sm:w-16 sm:h-24 md:w-20 md:h-28"
       )}
     >
+      {/* 右上角 ↗ 日式朱紅「確」落款印章 (個別玩家點擊鎖定時顯示，全場鎖定後自動消失) */}
+      {showSeal && (
+        <div className="absolute top-1.5 right-1.5 z-30 w-4 h-4 md:w-5 md:h-5 rounded ukiyo-seal flex items-center justify-center text-[9px] md:text-[10px] font-serif leading-none shadow-md opacity-95 pointer-events-none animate-fade-in">
+          確
+        </div>
+      )}
+
       {/* 卡牌 3D 翻轉主體 */}
       <div
         className={clsx(
@@ -62,13 +69,6 @@ export function Card({
               {value}
             </span>
           </div>
-
-          {/* 右上角 ↗ 日式朱紅「確」落款印章 (個別玩家點擊鎖定時顯示，全場鎖定後自動消失) */}
-          {showSeal && (
-            <div className="absolute top-1.5 right-1.5 z-20 w-4 h-4 md:w-5 md:h-5 rounded ukiyo-seal flex items-center justify-center text-[9px] md:text-[10px] font-serif leading-none shadow-sm opacity-90 pointer-events-none animate-fade-in">
-              確
-            </div>
-          )}
 
           {/* 中央大數字 */}
           <div className="flex flex-col items-center justify-center my-auto">

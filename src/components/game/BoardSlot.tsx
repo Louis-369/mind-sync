@@ -9,6 +9,7 @@ interface BoardSlotProps {
   cards?: BoardCard[];
   card?: BoardCard;
   status?: string;
+  lockedList?: string[];
   isOwnerLocked?: boolean;
   isCurrentPlayer?: boolean;
   currentConnectionId?: string;
@@ -27,6 +28,7 @@ export function BoardSlot({
   cards = [],
   card,
   status = "playing",
+  lockedList = [],
   isOwnerLocked = false,
   isCurrentPlayer = false,
   currentConnectionId,
@@ -163,6 +165,11 @@ export function BoardSlot({
             (currentPlayerId && c.playerId === currentPlayerId) ||
             (c.playerId === topCard?.playerId && isCurrentPlayer);
 
+          const isCardLocked =
+            (c.playerId && lockedList.includes(c.playerId)) ||
+            ((c as any).connectionId && lockedList.includes((c as any).connectionId)) ||
+            (isOwnerLocked && (isMe || idx === allCards.length - 1));
+
           return (
             <div
               key={`${c.placedAt}-${idx}`}
@@ -177,7 +184,7 @@ export function BoardSlot({
                 flipped={c.flipped || isFlipped}
                 isOwner={isMe}
                 playerName={c.playerName}
-                showSeal={status === "playing" && isOwnerLocked && !(c.flipped || isFlipped)}
+                showSeal={status === "playing" && Boolean(isCardLocked) && !(c.flipped || isFlipped)}
                 onClick={() => handleCardClick(c)}
               />
 
