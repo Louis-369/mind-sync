@@ -46,7 +46,7 @@
 ## 🧩 4. 核心元件設計規範 (Component Specs)
 
 ### 🎴 卡牌元件 (`Card.tsx`)
-- **正面 (Flipped)**：和紙背景 (`bg-ukiyo-foam`)，墨黑大字 (`text-ukiyo-ink`)，右上角佐以朱紅落款印章「確」。
+- **正面 (Flipped)**：和紙背景 (`bg-ukiyo-foam`)，墨黑大字 (`text-ukiyo-ink`)；右上角朱紅落款印章「確」**僅於同意鎖定/蓋牌鎖定 (`showSeal={true}`) 時顯現**，一般手牌與未鎖定階段隱藏。
 - **背面 (Unflipped)**：深海面板 (`bg-ukiyo-surface`)，金箔花紋邊框 (`border-ukiyo-gold/40`)，展現神祕感。
 - **碰撞狀態 (Collision)**：發出朱紅呼吸脈衝微光 (`border-ukiyo-vermillion animate-pulse shadow-[0_0_15px_#c73e1d]`)。
 

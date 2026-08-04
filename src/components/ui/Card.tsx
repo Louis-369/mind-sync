@@ -8,6 +8,7 @@ interface CardProps {
   flipped?: boolean;
   isOwner?: boolean;
   playerName?: string;
+  showSeal?: boolean;
   onClick?: () => void;
   size?: "sm" | "md" | "lg";
   className?: string;
@@ -24,6 +25,7 @@ export function Card({
   flipped = false,
   isOwner = false,
   playerName,
+  showSeal = false,
   onClick,
   size = "md",
   className,
@@ -76,10 +78,12 @@ export function Card({
             </span>
           </div>
 
-          {/* 右上角 ↗ 日式朱紅「確」落款印章 */}
-          <div className="absolute top-1.5 right-1.5 w-4 h-4 md:w-5 md:h-5 rounded ukiyo-seal flex items-center justify-center text-[9px] md:text-[10px] font-serif leading-none shadow-sm opacity-90 pointer-events-none">
-            確
-          </div>
+          {/* 右上角 ↗ 日式朱紅「確」落款印章 (僅在 showSeal / 蓋牌鎖定成立時顯示) */}
+          {showSeal && (
+            <div className="absolute top-1.5 right-1.5 w-4 h-4 md:w-5 md:h-5 rounded ukiyo-seal flex items-center justify-center text-[9px] md:text-[10px] font-serif leading-none shadow-sm opacity-90 pointer-events-none animate-fade-in">
+              確
+            </div>
+          )}
 
           {/* 中央大數字 */}
           <div className="flex flex-col items-center justify-center">

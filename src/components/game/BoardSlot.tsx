@@ -40,7 +40,6 @@ export function BoardSlot({
   onFlip,
 }: BoardSlotProps) {
   const slotIndex = parseInt(slotId.replace("slot-", ""), 10) + 1;
-  // 相容單卡與多卡模式
   const allCards = cards.length > 0 ? cards : card ? [card] : [];
   const topCard = allCards[allCards.length - 1];
   const hasCollision = allCards.length > 1;
@@ -49,12 +48,10 @@ export function BoardSlot({
     (currentConnectionId && (c.playerId === currentConnectionId || (c as any).connectionId === currentConnectionId)) ||
     (currentPlayerId && c.playerId === currentPlayerId);
 
-  // 找尋當前玩家在這個槽位放置的未翻開卡牌
   const myUnflippedCard = allCards.find(
     (c) => !c.flipped && (isCardMine(c) || (c.playerName && isCurrentPlayer))
   );
 
-  // 整理參與碰撞的所有玩家名字
   const collisionNamesText = allCards
     .map((c) => (isCardMine(c) ? "你" : c.playerName || "匿名"))
     .join("、");
@@ -99,11 +96,9 @@ export function BoardSlot({
     );
   }
 
-  // 智慧點擊處理常式 (支援手機觸控與桌機點擊，優先處理個人卡牌收回/翻牌)
   const handleCardClick = (clickedCard?: BoardCard, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
 
-    // 優先認定點擊屬於自己的卡牌
     const targetCard =
       clickedCard &&
       ((currentConnectionId && clickedCard.playerId === currentConnectionId) ||
@@ -113,31 +108,27 @@ export function BoardSlot({
 
     if (targetCard && !targetCard.flipped) {
       if (status === "playing" && !isOwnerLocked && onRecall) {
-        // 未同意鎖定前：點擊收回手牌
         onRecall(targetCard.uniqueKey || slotId);
         return;
       } else if (status === "locked" && onFlip) {
-        // 全員鎖定後：點擊翻開卡牌
         onFlip(targetCard.uniqueKey || slotId);
         return;
       }
     }
 
-    // 若該槽位沒有自己的未翻開卡牌，則點擊進行選位 (僅遊戲進行中允許選位)
     if (status === "playing" && onSelectSlot) {
       onSelectSlot(slotId);
     }
   };
 
   const isHighlightSelected = status === "playing" && isSelected;
-  const isCardFlipped = topCard?.flipped === true;
 
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
       className="relative group flex flex-col items-center p-1 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-ukiyo-foam/20 touch-manipulation"
     >
-      {/* 標籤權重化渲染 (全場翻開結算後：錯誤時顯示 ✕ 錯誤；碰撞時顯示碰撞名字；鎖定階段顯示點擊翻牌) */}
+      {/* 標籤權重化渲染 */}
       {isFinishedReveal && isCorrectOrder === false ? (
         <span className="absolute -top-3.5 z-50 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-red-950 border border-ukiyo-vermillion text-red-400 font-bold pointer-events-none whitespace-nowrap animate-bounce">
           ✕ 錯誤
@@ -152,17 +143,7 @@ export function BoardSlot({
         </span>
       ) : null}
 
-      {/* 鎖定同意朱紅落款小印章「確」(在個人同意鎖定且牌未翻開時醒目顯示) */}
-      {isOwnerLocked && (status === "playing" || status === "locked") && !topCard?.flipped && (
-        <div
-          title="已確認落牌"
-          className="absolute -top-1.5 -right-1.5 z-20 w-5 h-5 rounded ukiyo-seal flex items-center justify-center text-[10px] shadow-md border border-ukiyo-cream/30 font-serif pointer-events-none animate-fade-in"
-        >
-          確
-        </div>
-      )}
-
-      {/* 卡牌實體區域 (紅/綠/金高亮微光：全場卡牌皆翻開後才展示微光特效) */}
+      {/* 卡牌實體區域 */}
       <div
         className={`relative flex items-center justify-center p-1 rounded-2xl transition-all border ${
           isFinishedReveal && isCorrectOrder === true
@@ -200,17 +181,18 @@ export function BoardSlot({
                 flipped={c.flipped || isFlipped}
                 isOwner={isMe}
                 playerName={c.playerName}
+                showSeal={(isOwnerLocked || status === "locked") && !c.flipped}
                 onClick={() => handleCardClick(c)}
               />
 
-              {/* 席位編號標籤 (#1, #2, #3... 緊貼卡牌內部左上角，隨卡牌浮動且無凸出外框) */}
+              {/* 席位編號標籤 */}
               {isTopCard && !c.flipped && (
                 <div className="absolute top-1.5 left-2 z-20 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] tracking-tight">
                   #{slotIndex}
                 </div>
               )}
 
-              {/* 自己蓋著的牌：在右下角呈現無框晶亮金箔數字 (自己始終可視預覽點數) */}
+              {/* 自己蓋著的牌：在右下角呈現無框晶亮金箔數字 */}
               {isMe && !c.flipped && (status === "playing" || status === "locked") && (
                 <div className="absolute bottom-1.5 right-2 z-20 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] tracking-tight">
                   {c.cardValue}
@@ -221,7 +203,7 @@ export function BoardSlot({
         })}
       </div>
 
-      {/* 出牌者標籤 (獨立在微光外框下方) */}
+      {/* 出牌者標籤 */}
       <div className="mt-1 flex items-center space-x-1 z-10">
         <span
           className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[130px] transition-colors ${

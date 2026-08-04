@@ -104,6 +104,7 @@ export function PlayerHand({
               value={cardValue}
               flipped={true} // 自己看得到數值
               isOwner={true}
+              showSeal={isLocked}
               onClick={() => {
                 if (!disabled) onPlayCard(cardValue);
               }}
