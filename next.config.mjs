@@ -1,13 +1,13 @@
 /** @type {import('next').NextConfig} */
-const isProd = process.env.NODE_ENV === 'production';
+const isGithubActions = process.env.GITHUB_ACTIONS === 'true';
 
-// GitHub Pages 倉庫名稱
+// GitHub Pages 倉庫名稱 (僅在 GitHub Actions 部署時套用)
 const repoName = 'mind-sync';
 
 const nextConfig = {
   output: 'export',
-  basePath: isProd ? `/${repoName}` : '',
-  assetPrefix: isProd ? `/${repoName}/` : '',
+  basePath: isGithubActions ? `/${repoName}` : '',
+  assetPrefix: isGithubActions ? `/${repoName}/` : '',
   images: {
     unoptimized: true,
   },
