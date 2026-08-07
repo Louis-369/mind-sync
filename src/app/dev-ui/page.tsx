@@ -12,6 +12,7 @@ import { BoardCard } from "../../types/game";
 
 export default function DevUiPlaygroundPage() {
   // Playground Mock States
+  const [japaneseTheme, setJapaneseTheme] = useState<"ukiyo" | "urushi" | "matsuba">("ukiyo");
   const [status, setStatus] = useState<"waiting" | "playing" | "locked" | "finished">("playing");
   const [isHost, setIsHost] = useState<boolean>(true);
   const [isHostModalOpen, setIsHostModalOpen] = useState<boolean>(false);
@@ -57,17 +58,35 @@ export default function DevUiPlaygroundPage() {
     }
   };
 
+  const themeClass =
+    japaneseTheme === "urushi"
+      ? "theme-urushi"
+      : japaneseTheme === "matsuba"
+      ? "theme-matsuba"
+      : "theme-ukiyo";
+
   return (
-    <div className="w-full min-h-screen bg-ukiyo-bg text-ukiyo-foam py-6 px-4 flex flex-col items-center">
+    <div className={`w-full min-h-screen bg-ukiyo-bg text-ukiyo-foam py-6 px-4 flex flex-col items-center transition-colors duration-500 ${themeClass}`}>
       {/* Dev Controller Bar */}
       <div className="w-full max-w-4xl bg-ukiyo-surface/90 border border-ukiyo-gold/40 p-4 rounded-2xl mb-6 shadow-xl flex flex-wrap items-center justify-between gap-3 text-xs font-serif z-50">
         <div className="flex items-center gap-2 font-bold text-ukiyo-gold">
-          <span>🧪 Dev UI Playground</span>
+          <span>🧪 Nippon Colors 日系主題 Playground</span>
           <span className="text-[10px] bg-ukiyo-gold/20 px-2 py-0.5 rounded-full text-ukiyo-gold">Mock Mode</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <label className="text-ukiyo-mist">狀態:</label>
+          <label className="text-ukiyo-mist font-bold">日系色調:</label>
+          <select
+            value={japaneseTheme}
+            onChange={(e) => setJapaneseTheme(e.target.value as any)}
+            className="bg-ukiyo-bg border border-ukiyo-gold/40 rounded px-2 py-1 text-ukiyo-gold font-bold focus:outline-none"
+          >
+            <option value="ukiyo">🌊 浮世繪・濃藍金箔 (Ocean Navy)</option>
+            <option value="urushi">漆 黑漆・金箔墨繪 (Urushi Black)</option>
+            <option value="matsuba">🌲 松葉・靜寂竹林 (Matsuba Pine)</option>
+          </select>
+
+          <label className="text-ukiyo-mist ml-2">狀態:</label>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as any)}
