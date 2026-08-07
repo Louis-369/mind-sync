@@ -48,15 +48,15 @@ export function GameStatus({
   };
 
   return (
-    <div className="w-full glass-panel rounded-2xl px-3 md:px-4 py-1.5 md:py-2 mb-1.5 flex items-center justify-between gap-2 border-ukiyo-foam/15 shadow-md">
+    <div className="w-full glass-panel rounded-2xl px-3 md:px-4 py-2 my-1.5 flex items-center justify-between gap-2 border-ukiyo-gold/30 shadow-xl relative z-20">
       {/* 左側：房間代碼、一鍵複製與個人稱號 */}
       <div className="flex items-center space-x-2">
-        <div className="flex items-center space-x-1.5 bg-ukiyo-surface/80 px-2.5 py-1 rounded-lg border border-ukiyo-foam/15">
-          <span className="text-sm md:text-base font-bold text-ukiyo-gold font-mono">{roomId}</span>
+        <div className="flex items-center space-x-1.5 bg-ukiyo-bg/80 px-3 py-1 rounded-xl border border-ukiyo-gold/40 shadow-inner">
+          <span className="text-sm md:text-base font-bold text-ukiyo-gold font-mono tracking-wider">{roomId}</span>
           <button
             onClick={handleCopyLink}
             title="複製邀請連結"
-            className="text-ukiyo-mist hover:text-ukiyo-foam transition-colors p-0.5 cursor-pointer"
+            className="text-ukiyo-mist hover:text-ukiyo-foam transition-colors p-1 cursor-pointer touch-manipulation active:scale-95"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           </button>
@@ -70,9 +70,9 @@ export function GameStatus({
               setIsEditModalOpen(true);
             }}
             title="修改個人稱號"
-            className="hidden sm:flex items-center gap-1 text-xs text-ukiyo-foam/90 bg-ukiyo-surface/60 hover:bg-ukiyo-surface px-2.5 py-1 rounded-lg border border-ukiyo-foam/10 transition-all cursor-pointer font-serif"
+            className="hidden sm:flex items-center gap-1.5 text-xs text-ukiyo-foam/90 bg-ukiyo-surface/80 hover:bg-ukiyo-surface px-3 py-1.5 rounded-xl border border-ukiyo-foam/15 transition-all cursor-pointer font-serif touch-manipulation active:scale-95"
           >
-            <span className="font-bold truncate max-w-[90px]">{playerName}</span>
+            <span className="font-bold truncate max-w-[100px] text-ukiyo-gold">{playerName}</span>
             <Edit3 className="w-3 h-3 text-ukiyo-gold" />
           </button>
         )}
@@ -88,14 +88,14 @@ export function GameStatus({
               setIsEditModalOpen(true);
             }}
             title="修改個人稱號"
-            className="sm:hidden p-1.5 rounded-lg bg-ukiyo-surface/80 hover:bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-foam/10 transition-colors"
+            className="sm:hidden p-1.5 rounded-xl bg-ukiyo-surface/80 hover:bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-foam/15 transition-colors touch-manipulation active:scale-95"
           >
             <Edit3 className="w-3.5 h-3.5" />
           </button>
         )}
 
         {/* 人數 */}
-        <div className="flex items-center space-x-1 text-ukiyo-foam bg-ukiyo-surface/80 px-2.5 py-1 rounded-full border border-ukiyo-foam/10">
+        <div className="flex items-center space-x-1.5 text-ukiyo-foam bg-ukiyo-bg/80 px-3 py-1 rounded-full border border-ukiyo-foam/15 shadow-inner">
           <Users className="w-3.5 h-3.5 text-ukiyo-gold" />
           <span className="font-sans text-xs font-semibold">{`${connectedCount}/${maxPlayers}`} 人席</span>
         </div>
@@ -105,7 +105,7 @@ export function GameStatus({
           <button
             onClick={onOpenHostPanel}
             title="房主設定"
-            className="p-1.5 rounded-lg bg-ukiyo-surface hover:bg-ukiyo-wave text-ukiyo-foam border border-ukiyo-gold/40 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl bg-ukiyo-surface hover:bg-ukiyo-wave text-ukiyo-foam border border-ukiyo-gold/40 transition-colors cursor-pointer touch-manipulation active:scale-95 shadow-md"
           >
             <Settings className="w-4 h-4 text-ukiyo-gold" />
           </button>
