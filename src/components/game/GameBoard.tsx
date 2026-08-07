@@ -57,7 +57,7 @@ export function GameBoard({
   }
 
   return (
-    <div className="w-full flex-1 min-h-[240px] sm:min-h-[280px] md:min-h-[360px] bg-gradient-to-b from-ukiyo-surface/90 via-ukiyo-bg/95 to-ukiyo-surface/90 rounded-3xl p-2 md:p-5 border border-ukiyo-foam/20 shadow-2xl relative flex flex-col items-center justify-between my-1.5 washi-texture">
+    <div className="w-full flex-1 min-h-[260px] sm:min-h-[300px] md:min-h-[360px] bg-gradient-to-b from-ukiyo-surface/95 via-ukiyo-bg/95 to-ukiyo-surface/95 rounded-2xl md:rounded-3xl p-2.5 md:p-5 border border-ukiyo-gold/30 shadow-2xl relative flex flex-col items-center justify-between my-2 washi-texture overflow-hidden">
       {/* 背景水墨波浪浮水印 */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
         <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border-8 border-ukiyo-foam flex items-center justify-center">
@@ -89,17 +89,17 @@ export function GameBoard({
       </div>
 
       {/* 極簡典雅 [ 最小卡牌 ➔ 由左至右 ‧ 由上至下遞增 ➔ 最大卡牌 ] 順序流向引導橫條 */}
-      <div className="relative z-10 w-full max-w-xl flex items-center justify-between px-4 py-1.5 my-1.5 rounded-xl bg-ukiyo-surface/80 border border-ukiyo-gold/30 shadow-sm text-xs font-serif">
-        <span className="text-ukiyo-gold font-bold text-[11px] sm:text-xs">
+      <div className="relative z-10 w-full max-w-xl flex items-center justify-between px-3 py-1.5 my-1.5 rounded-xl bg-ukiyo-bg/80 border border-ukiyo-gold/30 shadow-sm text-xs font-serif">
+        <span className="text-ukiyo-gold font-bold text-[10px] sm:text-xs">
           最小卡牌
         </span>
 
-        <div className="flex items-center gap-1 text-[10px] sm:text-[11px] text-ukiyo-foam/90 font-serif tracking-wider">
+        <div className="flex items-center gap-1 text-[9px] sm:text-[11px] text-ukiyo-foam/90 font-serif tracking-wider">
           <span>由左至右 ‧ 由上至下遞增</span>
           <ArrowRight className="w-3 h-3 text-ukiyo-gold shrink-0" />
         </div>
 
-        <span className="text-ukiyo-gold font-bold text-[11px] sm:text-xs">
+        <span className="text-ukiyo-gold font-bold text-[10px] sm:text-xs">
           最大卡牌
         </span>
       </div>
