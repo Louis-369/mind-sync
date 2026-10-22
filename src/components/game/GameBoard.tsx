@@ -73,7 +73,7 @@ export function GameBoard({
         <div className="relative z-20 w-full mb-2 p-2 rounded-lg bg-slate-800 border border-[#f59e0b]/50 flex items-center justify-between text-xs text-[#f59e0b] animate-fade-in font-bold">
           <div className="flex items-center gap-1.5">
             <Trophy className="w-4 h-4 text-[#f59e0b] animate-bounce" />
-            <span>盤面檢視模式（點數與順序已全數揭曉）</span>
+            <span>本局已結束（全部數字已翻開）</span>
           </div>
         </div>
       )}
@@ -83,7 +83,7 @@ export function GameBoard({
         <div className="flex items-center gap-1.5 font-bold text-white text-[11px] sm:text-xs">
           <Sparkles className="w-3.5 h-3.5 text-[#f59e0b]" />
           <span>
-            已落牌 {board.length} / {totalSlotsCount} 張 (共 {totalSlotsCount} 席)
+            已出牌 {board.length} / {totalSlotsCount} 張
           </span>
         </div>
 
@@ -95,22 +95,22 @@ export function GameBoard({
               className="flex items-center gap-1 text-[11px] text-[#f59e0b] bg-slate-800 hover:bg-slate-700 px-2.5 py-0.5 rounded border border-[#f59e0b]/40 transition-all cursor-pointer active:scale-95 font-medium"
             >
               <Eye className="w-3 h-3 text-[#f59e0b]" />
-              <span>展開主題：《{topic?.title || "經典心流"}》</span>
+              <span>顯示題目：《{topic?.title || "數字排序"}》</span>
             </button>
           )}
           <div className="text-[11px] text-slate-400 hidden md:block">
-            點選空席位落牌，點擊已出卡牌可收回
+            點空位出牌，點已出的牌可收回
           </div>
         </div>
       </div>
 
-      {/* 本局價值主題橫幅 */}
+      {/* 本局主題橫幅 */}
       {showTopicSetting && !isTopicCollapsed && (
         <div className="relative z-10 w-full max-w-xl topic-scroll-banner p-3 my-1.5 text-center flex flex-col items-center animate-fade-in">
           <div className="flex items-center justify-between w-full mb-1">
             <div className="flex items-center gap-1.5 text-xs text-[#f59e0b] font-bold">
               <span className="w-2 h-2 rounded-full bg-[#f59e0b] animate-pulse" />
-              <span>本局主題</span>
+              <span>本局題目</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -120,38 +120,38 @@ export function GameBoard({
                   className="flex items-center gap-1 text-[11px] text-[#f59e0b] bg-[#f59e0b]/15 hover:bg-[#f59e0b]/25 px-2.5 py-0.5 rounded border border-[#f59e0b]/40 transition-all cursor-pointer active:scale-95"
                 >
                   <Dices className="w-3 h-3" />
-                  <span>抽籤換題</span>
+                  <span>隨機換題</span>
                 </button>
               )}
 
               <button
                 onClick={() => setIsTopicCollapsed(true)}
-                title="隱藏主題以獲取更大牌桌視野"
+                title="隱藏題目讓畫面更寬敞"
                 className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded border border-slate-700 transition-all cursor-pointer active:scale-95"
               >
                 <EyeOff className="w-3 h-3" />
-                <span>隱藏主題</span>
+                <span>隱藏題目</span>
               </button>
             </div>
           </div>
 
           <h3 className="text-base sm:text-lg font-bold text-white tracking-wide my-1">
-            {topic?.title || "純數字心流默契"}
+            {topic?.title || "純數字默契挑戰"}
           </h3>
 
           {/* 兩端極限標尺 */}
           <div className="flex items-center justify-between w-full mt-1.5 pt-1.5 border-t border-slate-800 text-xs">
             <span className="text-[#f59e0b] font-bold truncate max-w-[45%] text-left">
-              1 ‧ {topic?.minLabel || "極小值"}
+              1（{topic?.minLabel || "最小"}）
             </span>
 
             <div className="flex items-center gap-1 text-[10px] text-slate-400 shrink-0 px-1 font-mono">
-              <span>默契遞增</span>
+              <span>由小到大</span>
               <ArrowRight className="w-2.5 h-2.5 text-[#f59e0b]" />
             </div>
 
             <span className="text-[#f59e0b] font-bold truncate max-w-[45%] text-right">
-              {topic?.maxLabel || "極大值"} ‧ 100
+              100（{topic?.maxLabel || "最大"}）
             </span>
           </div>
         </div>

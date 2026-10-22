@@ -245,15 +245,15 @@ function RoomInner() {
       <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#090b0e]">
         <AsciiWaveCanvas active={true} />
         <div className="bg-[#12161f] p-6 max-w-sm w-full border border-slate-700 rounded-2xl flex flex-col items-center space-y-4 shadow-2xl relative z-30">
-          <h2 className="text-lg font-bold text-white">歡迎進入茶室</h2>
+          <h2 className="text-lg font-bold text-white">加入遊戲房間</h2>
           <p className="text-xs text-slate-300 leading-relaxed">
-            透過邀請連結進入房間 <span className="font-bold text-[#f59e0b]">{roomId}</span>，請先輸入您的稱號：
+            準備進入房間 <span className="font-bold text-[#f59e0b]">{roomId}</span>，請先輸入你的暱稱：
           </p>
           <input
             type="text"
             value={inputNameTemp}
             onChange={(e) => setInputNameTemp(e.target.value)}
-            placeholder="例如：風之浪人"
+            placeholder="請輸入暱稱..."
             maxLength={14}
             className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white focus:outline-none focus:border-[#f59e0b]"
           />
@@ -264,7 +264,7 @@ function RoomInner() {
             onClick={() => setPlayerName(inputNameTemp.trim())}
             className="w-full font-bold"
           >
-            確認入座
+            進入房間
           </Button>
         </div>
       </div>
@@ -424,7 +424,7 @@ function RoomInner() {
               onClick={() => flipAllCards(playerId)}
               className="text-xs whitespace-nowrap"
             >
-              房主一鍵全揭
+              房主一鍵全翻
             </Button>
           )}
         </div>
@@ -438,8 +438,8 @@ function RoomInner() {
               ? "正在連線同步房間狀態..."
               : isHost
               ? totalPlayers >= 2
-                ? "全員已就緒！點擊下方按鈕即可發牌開局。"
-                : "等待至少 2 位玩家加入房間即可開局（可開新分頁測試）..."
+                ? "全員已就緒！點擊下方按鈕即可開始發牌。"
+                : "等待至少 2 位玩家加入房間即可開始（可開新分頁測試）..."
               : "等待房主開始發牌..."}
           </p>
           {isHost && (
@@ -456,7 +456,7 @@ function RoomInner() {
             >
               <span className="flex items-center gap-1.5 text-black">
                 <Sparkles className="w-4 h-4 text-black" />
-                {totalPlayers < 2 ? "等待同伴入座 (至少 2 人)" : "發牌開局"}
+                {totalPlayers < 2 ? "等待其他玩家加入 (至少 2 人)" : "開始發牌"}
               </span>
             </Button>
           )}

@@ -33,14 +33,14 @@ export function PlayerHand({
   const isLockDisabled = (disabled || hasBoardCollision || hasUnplayedCards) && !isLocked;
 
   const getLockStatusText = () => {
-    if (hasBoardCollision) return "⚡ 席位重疊，請先讓席";
-    if (hasUnplayedCards) return `請先落盡手牌 (尚餘 ${hand.length} 張)`;
-    return `全體同意進度: ${lockedCount}/${totalPlayers} 人`;
+    if (hasBoardCollision) return "⚡ 有人撞牌！請先收回重放";
+    if (hasUnplayedCards) return `請先出完手牌 (還剩 ${hand.length} 張)`;
+    return `已準備鎖定: ${lockedCount}/${totalPlayers} 人`;
   };
 
   const getLockActionLabel = () => {
-    if (isLocked) return `已鎖定 (點擊撤回)`;
-    if (hasBoardCollision) return "席位重疊無法鎖定";
+    if (isLocked) return `已鎖定 (點擊取消)`;
+    if (hasBoardCollision) return "有人撞牌無法鎖定";
     if (hasUnplayedCards) return "請先出完手牌";
     return `確認鎖定 (${lockedCount}/${totalPlayers})`;
   };
@@ -82,7 +82,7 @@ export function PlayerHand({
         {hand.length === 0 ? (
           <div className="text-xs text-white py-3 px-6 bg-[#12161f] border border-slate-700 rounded-xl text-center animate-fade-in shadow-lg flex items-center gap-2">
             <span className="text-[#f59e0b] font-bold">✨ 手牌已完全出完！</span>
-            <span className="text-slate-300">請點擊下方按鈕確認鎖定，等待全員揭牌。</span>
+            <span className="text-slate-300">請點擊下方「確認鎖定」，等待大家一起翻牌。</span>
           </div>
         ) : (
           hand.map((cardValue, idx) => {

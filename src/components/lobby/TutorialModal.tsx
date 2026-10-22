@@ -15,45 +15,45 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
 
   const steps = [
     {
-      title: "① 展卷抽題 ‧ 禁言數字",
+      title: "① 看題目，用形容詞聊手牌",
       icon: <Sparkles className="w-8 h-8 text-[#f59e0b]" />,
       subtitle: "不能直接說出數字，只能用情境描述你的感受",
       content: (
         <div className="space-y-3 text-left">
           <div className="p-3.5 bg-slate-900 rounded-xl border border-slate-700 text-xs text-slate-200 space-y-2 leading-relaxed">
-            <p className="font-bold text-[#f59e0b]">核心玩法規則：</p>
+            <p className="font-bold text-[#f59e0b]">基本規則：</p>
             <p>
-              每局會有一道情境題（例如：「收到最想翻白眼的交換禮物」）。每位玩家會拿到 1~100 的數字手牌，請用言語形容你手中數字對應的事物，但<span className="text-white font-bold">絕對不能直接說出數字</span>！
+              每局會有一道題目（例如：「收到最想翻白眼的交換禮物」）。每個人會拿到 1~100 的數字牌，請用言語形容你手中數字的大小程度，但<span className="text-white font-bold">絕對不能直接說出數字</span>！
             </p>
           </div>
         </div>
       ),
     },
     {
-      title: "② 暗出心證 ‧ 由小至大落席",
+      title: "② 憑默契，由小到大出牌",
       icon: <Layers className="w-8 h-8 text-[#f59e0b]" />,
-      subtitle: "憑藉彼此的描述與默契，由第 1 席往後依序排好",
+      subtitle: "聽大家的描述，從第 1 格往後由小到大排好",
       content: (
         <div className="space-y-3 text-left">
           <div className="p-3.5 bg-slate-900 rounded-xl border border-slate-700 text-xs text-slate-200 space-y-2 leading-relaxed">
-            <p className="font-bold text-[#f59e0b]">自由搶位與讓席：</p>
+            <p className="font-bold text-[#f59e0b]">怎麼出牌與收牌：</p>
             <p>
-              點擊盤面的槽位（<span className="text-white font-bold">第 1 席、第 2 席...</span>）再點擊手牌即可出牌。目標是讓全場卡牌由左至右、由上至下**由小到大排列**。如果跟隊友撞在同一格，可以隨時點擊卡牌收回重放！
+              點擊場上的格子（<span className="text-white font-bold">第 1 格、第 2 格...</span>）再點擊手牌就能出牌。目標是讓全場的牌**由小到大排好**。如果跟別人撞在同一格，點一下場上的牌就能收回重放！
             </p>
           </div>
         </div>
       ),
     },
     {
-      title: "③ 翻牌共鳴 ‧ 心天秤平衡",
+      title: "③ 翻開檢查，順序全對就贏！",
       icon: <Eye className="w-8 h-8 text-[#f59e0b]" />,
-      subtitle: "全員確認鎖定後揭曉，完全遞增即獲勝！",
+      subtitle: "所有人確認鎖定後翻牌，數字由小到大即過關",
       content: (
         <div className="space-y-3 text-left">
           <div className="p-3.5 bg-slate-900 rounded-xl border border-slate-700 text-xs text-slate-200 space-y-2 leading-relaxed">
-            <p className="font-bold text-[#f59e0b]">勝利條件：</p>
+            <p className="font-bold text-[#f59e0b]">怎麼贏：</p>
             <p>
-              所有人出完手牌並點擊「確認鎖定」後，即可從全場最有把握的席位開始翻牌。只要翻開後所有數字<span className="text-emerald-400 font-bold">符合由小到大遞增</span>，即達成心天秤完美平衡！
+              大家把牌出完並按下「確認鎖定」後，就可以開始翻牌。只要翻開後所有數字<span className="text-emerald-400 font-bold">從第 1 格到最後一格都是由小到大</span>，全員就挑戰成功！
             </p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="30 秒上手指南">
+    <Modal isOpen={isOpen} onClose={onClose} title="30 秒玩法說明">
       <div className="space-y-4 text-center">
         <div className="flex justify-center my-1">{steps[currentStep].icon}</div>
 
@@ -123,7 +123,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
           >
             {currentStep === steps.length - 1 ? (
               <span className="flex items-center gap-1 text-black">
-                <CheckCircle2 className="w-3.5 h-3.5 text-black" /> 準備好了！
+                <CheckCircle2 className="w-3.5 h-3.5 text-black" /> 懂了，開始玩！
               </span>
             ) : (
               <span className="flex items-center gap-1 text-black">

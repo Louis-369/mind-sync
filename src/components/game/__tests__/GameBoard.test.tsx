@@ -14,7 +14,7 @@ describe('GameBoard Component', () => {
         cardsPerPlayer={2}
       />
     );
-    expect(screen.getByText(/已落牌 0 \/ 4 張/)).toBeInTheDocument();
+    expect(screen.getByText(/已出牌 0 \/ 4 張/)).toBeInTheDocument();
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument();
   });

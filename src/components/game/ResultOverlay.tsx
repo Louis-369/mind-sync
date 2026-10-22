@@ -101,33 +101,33 @@ export function ResultOverlay({
 
   const syncRate = Math.round((correctPairs / totalPairs) * 100);
 
-  let stampLabel = "共鳴";
-  let resultTitle = "心天秤完美平衡！";
-  let detailRoast = "所有卡牌由小到大精準歸位，彼此的默契宛如一體。";
+  let stampLabel = "過關";
+  let resultTitle = "挑戰成功！順序完全正確！";
+  let detailRoast = "所有數字牌都由小到大完美排好，你們的默契太強了！";
 
   if (isWin) {
     if (closestPair && closestPair.diff <= 3) {
-      stampLabel = "神合";
-      resultTitle = "極限心靈神合！";
-      detailRoast = `神仙級默契！${closestPair.a.playerName} 的【${closestPair.a.cardValue}】與 ${closestPair.b.playerName} 的【${closestPair.b.cardValue}】僅差 ${closestPair.diff} 點，依然完美咬合！`;
+      stampLabel = "神默契";
+      resultTitle = "神級默契！挑戰大成功！";
+      detailRoast = `太扯了！${closestPair.a.playerName} 的【${closestPair.a.cardValue}】跟 ${closestPair.b.playerName} 的【${closestPair.b.cardValue}】只差 ${closestPair.diff} 點，居然還排對順序！`;
     } else {
-      stampLabel = "共鳴";
-      resultTitle = "心天秤圓滿平衡！";
-      detailRoast = `全員在主題《${topic?.title || "經典心流"}》下的價值觀驚人一致，成功全數過關！`;
+      stampLabel = "過關";
+      resultTitle = "挑戰成功！順序完全正確！";
+      detailRoast = `大家在題目《${topic?.title || "數字排序"}》的想法超一致，順利過關！`;
     }
   } else {
-    stampLabel = "失衡";
-    resultTitle = "價值觀出現交錯失衡";
+    stampLabel = "失敗";
+    resultTitle = "挑戰失敗！有牌順序排錯了";
     if (firstError) {
-      detailRoast = `在【第 ${firstError.slotIdx} 席】發生順序交錯！${firstError.cardA.playerName} 的【${firstError.cardA.cardValue}】落在 ${firstError.cardB.playerName} 的【${firstError.cardB.cardValue}】前面。`;
+      detailRoast = `在【第 ${firstError.slotIdx} 格】排錯了！${firstError.cardA.playerName} 的【${firstError.cardA.cardValue}】比後面 ${firstError.cardB.playerName} 的【${firstError.cardB.cardValue}】還要大。`;
     } else {
-      detailRoast = "某張卡牌順序微幅交錯，彼此的心跳節奏稍有誤差，再試一局！";
+      detailRoast = "有幾張牌的大小順序顛倒了，再試一局一定能過！";
     }
   }
 
   const handleCopyReport = async () => {
     try {
-      const shareText = `🎴 心天秤 (Mind Sync) ‧ 默契檢定報告\n📌 本局主題：《${topic?.title || "純數字心流"}》\n⚖️ 判定：【${stampLabel}】 心靈同步率 ${syncRate}%\n💬 結語：${detailRoast}\n\n🌐 來測你們的價值觀默契：https://louis-369.github.io/mind-sync/`;
+      const shareText = `🎴 心天秤 (Mind Sync) ‧ 戰報\n📌 本局題目：《${topic?.title || "數字排序"}》\n⚖️ 結果：【${stampLabel}】 默契同步率 ${syncRate}%\n💬 戰況：${detailRoast}\n\n🌐 來測你們的默契：https://louis-369.github.io/mind-sync/`;
       await navigator.clipboard.writeText(shareText);
       sound.playSlotTap();
       setCopiedReport(true);
@@ -142,12 +142,12 @@ export function ResultOverlay({
       <div className="game-action-bar animate-fade-in relative z-20">
         {isHost ? (
           <Button variant="primary" size="md" onClick={onRestart}>
-            <RotateCcw className="w-4 h-4 text-black mr-1" /> 房主重新開局
+            <RotateCcw className="w-4 h-4 text-black mr-1" /> 再來一局
           </Button>
         ) : (
           <div className="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-300">
             <span className="w-2 h-2 rounded-full bg-[#f59e0b] animate-ping" />
-            <span>靜候房主重新開局...</span>
+            <span>等待房主開始下一局...</span>
           </div>
         )}
       </div>
@@ -172,13 +172,13 @@ export function ResultOverlay({
           {resultTitle}
         </h2>
 
-        {/* 心靈同步率膠囊 */}
+        {/* 默契同步率膠囊 */}
         <div className="flex items-center gap-2 my-2 bg-slate-800 px-4 py-1.5 rounded-full border border-slate-700">
-          <span className="text-xs text-slate-400">心靈同步率</span>
+          <span className="text-xs text-slate-400">默契同步率</span>
           <span className="text-base font-bold text-[#f59e0b] font-mono">{syncRate}%</span>
         </div>
 
-        {/* 評語調侃 */}
+        {/* 評語 */}
         <p className="text-xs sm:text-sm text-slate-200 my-3 max-w-xs leading-relaxed bg-slate-800/80 p-3 rounded-xl border border-slate-700 text-left">
           {detailRoast}
         </p>
@@ -194,39 +194,37 @@ export function ResultOverlay({
             {copiedReport ? (
               <>
                 <Check className="w-4 h-4 text-emerald-400" />
-                <span>已複製戰報，快去分享發串！</span>
+                <span>已複製戰報！快去貼給朋友看</span>
               </>
             ) : (
               <>
-                <Share2 className="w-4 h-4 text-slate-300" />
-                <span>複製對局戰報 (分享好友/Threads)</span>
+                <Share2 className="w-3.5 h-3.5 text-[#f59e0b]" />
+                <span>複製本局戰報分享</span>
               </>
             )}
           </Button>
 
-          {isHost ? (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 w-full mt-1">
             <Button
-              variant={isWin ? "primary" : "danger"}
+              variant="ghost"
               size="md"
-              onClick={onRestart}
-              className="w-full flex items-center justify-center gap-2 text-xs font-bold"
+              onClick={() => setShowModal(false)}
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 text-xs"
             >
-              <RotateCcw className="w-4 h-4" /> 房主重新開局
+              <Eye className="w-4 h-4" />
+              <span>查看桌面卡牌</span>
             </Button>
-          ) : (
-            <div className="text-xs text-slate-400 py-2.5 text-center bg-slate-800/60 w-full rounded-lg border border-slate-700">
-              靜候房主重新開局...
-            </div>
-          )}
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowModal(false)}
-            className="w-full text-xs text-slate-400 hover:text-white"
-          >
-            <Eye className="w-3.5 h-3.5" /> 檢視盤面席位
-          </Button>
+            {isHost ? (
+              <Button variant="primary" size="md" onClick={onRestart} className="w-full sm:w-auto text-xs font-bold">
+                <RotateCcw className="w-3.5 h-3.5 text-black mr-1" /> 再來一局
+              </Button>
+            ) : (
+              <div className="text-xs text-slate-400 py-1 px-2">
+                等待房主開新局...
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

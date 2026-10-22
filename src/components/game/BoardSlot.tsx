@@ -94,7 +94,7 @@ export function BoardSlot({
             : "border-dashed border-slate-700 bg-[#12161f]/80 text-slate-500 hover:border-slate-500"
         }`}
       >
-        <span className="text-[10px] text-slate-400 font-bold">第 {slotIndex} 席</span>
+        <span className="text-[10px] text-slate-400 font-bold">第 {slotIndex} 格</span>
 
         {/* 清楚大字 1, 2, 3, 4 */}
         <div className="text-xl sm:text-2xl font-black text-slate-300">
@@ -103,14 +103,14 @@ export function BoardSlot({
 
         {isSelected ? (
           <span className="text-[10px] font-bold text-[#f59e0b] tracking-wider animate-pulse">
-            落此席
+            放這格
           </span>
         ) : focusedByNames.length > 0 ? (
           <span className="text-[9px] text-[#38bdf8] truncate max-w-full">
-            {focusedByNames[0]} 凝視
+            {focusedByNames[0]} 想放這
           </span>
         ) : (
-          <span className="text-[9px] text-slate-500">空席</span>
+          <span className="text-[9px] text-slate-500">空位</span>
         )}
       </div>
     );
@@ -160,16 +160,16 @@ export function BoardSlot({
       {/* 狀態指示標籤 */}
       {isFinishedReveal && isCorrectOrder === false ? (
         <span className="absolute top-0 z-30 text-[10px] px-2 py-0.5 bg-red-600 text-white font-bold rounded-full whitespace-nowrap shadow-md border border-white animate-ascii-glitch">
-          破綻 ✕
+          順序錯 ✕
         </span>
       ) : hasCollision ? (
         <div className="absolute top-0 z-30 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap shadow-md border border-white animate-bounce">
-          ⚡ 撞席！({collisionNamesText})
+          ⚡ 撞牌！({collisionNamesText})
         </div>
       ) : status === "locked" && topCard && !topCard?.flipped ? (
         myUnflippedCard ? (
           <span className="absolute top-0 z-30 text-[10px] px-2 py-0.5 bg-[#f59e0b] text-black font-bold rounded-full whitespace-nowrap animate-pulse shadow-md">
-            翻牌
+            點擊翻牌
           </span>
         ) : !isOwnerOnline ? (
           <span className="absolute top-0 z-30 text-[10px] px-2 py-0.5 bg-[#38bdf8] text-black font-bold rounded-full whitespace-nowrap border border-white">
@@ -182,7 +182,7 @@ export function BoardSlot({
         ) : null
       ) : null}
 
-      {/* 卡匣容器 */}
+      {/* 卡牌容器 */}
       <div
         className={`relative flex items-center justify-center p-0.5 rounded-lg transition-all ${
           isFinishedReveal && isCorrectOrder === true
@@ -199,58 +199,66 @@ export function BoardSlot({
           paddingBottom: hasCollision ? `${(allCards.length - 1) * 16}px` : "2px",
         }}
       >
-        {allCards.map((c, idx) => {
-          const isMe =
-            (currentConnectionId && (c.playerId === currentConnectionId || (c as any).connectionId === currentConnectionId)) ||
-            (currentPlayerId && c.playerId === currentPlayerId) ||
-            (c.playerId === topCard?.playerId && isCurrentPlayer);
+        <Card
+          value={allCards[0].cardValue}
+          flipped={Boolean(allCards[0].flipped || isCardMine(allCards[0]))}
+          isOwner={Boolean(isCardMine(allCards[0]))}
+          playerName={allCards[0].playerName}
+          showSeal={Boolean(lockedList.includes(allCards[0].playerId))}
+          isError={isFinishedReveal && isCorrectOrder === false}
+          onClick={() => handleCardClick(allCards[0])}
+        />
 
-          const isCardLocked =
-            (c.playerId && lockedList.includes(c.playerId)) ||
-            ((c as any).connectionId && lockedList.includes((c as any).connectionId)) ||
-            (isOwnerLocked && (isMe || idx === allCards.length - 1));
-
+        {allCards.slice(1).map((c, idx) => {
+          const offsetY = (idx + 1) * 16;
+          const offsetX = (idx + 1) % 2 === 1 ? 6 : -6;
           return (
             <div
-              key={`${c.placedAt}-${idx}`}
+              key={c.uniqueKey || `${c.playerId}-${idx}`}
               style={{
-                transform: idx > 0 ? `translateY(${idx * 16}px)` : "none",
-                zIndex: idx + 1,
+                top: `${offsetY}px`,
+                left: `${offsetX}px`,
+                zIndex: (idx + 1) * 10,
               }}
-              className={idx > 0 ? "absolute top-0 left-0 pointer-events-auto" : "relative pointer-events-auto"}
+              className="absolute transition-all duration-200 hover:scale-105"
             >
               <Card
                 value={c.cardValue}
-                flipped={c.flipped || isFlipped}
-                isOwner={isMe}
+                flipped={Boolean(c.flipped || isCardMine(c))}
+                isOwner={Boolean(isCardMine(c))}
                 playerName={c.playerName}
-                showSeal={status === "playing" && Boolean(isCardLocked) && !(c.flipped || isFlipped)}
+                showSeal={Boolean(lockedList.includes(c.playerId))}
                 isError={isFinishedReveal && isCorrectOrder === false}
                 onClick={() => handleCardClick(c)}
               />
-
-              {/* 自己未翻開之卡牌右下角數值 */}
-              {isMe && !c.flipped && (status === "playing" || status === "locked") && (
-                <div className="absolute bottom-1 right-1.5 z-20 pointer-events-none text-[11px] font-mono font-black text-[#f59e0b] bg-black/90 px-1 rounded border border-[#f59e0b]">
-                  {c.cardValue}
-                </div>
-              )}
             </div>
           );
         })}
       </div>
 
-      {/* 玩家暱稱標籤 */}
-      <div className="mt-1 flex items-center space-x-1 z-10">
+      {/* 底部玩家標籤 */}
+      <div className="mt-1 flex flex-col items-center">
         <span
-          className={`text-[10px] px-2 py-0.5 rounded border truncate max-w-[120px] font-medium ${
-            isAnyCardMine
-              ? "bg-[#f59e0b]/20 text-[#f59e0b] border-[#f59e0b] font-bold"
-              : "bg-slate-800 text-slate-300 border-slate-700"
+          className={`text-[10px] font-bold truncate max-w-[85px] px-1.5 py-0.5 rounded ${
+            hasCollision
+              ? "bg-red-950/90 text-red-300 border border-red-500/60"
+              : isAnyCardMine
+              ? "bg-amber-950/80 text-[#f59e0b] border border-[#f59e0b]/40"
+              : "text-slate-300"
           }`}
         >
           {bottomPlayerNamesText}
         </span>
+
+        {!isFlipped && status === "playing" && (
+          <span
+            className={`text-[9px] mt-0.5 font-medium ${
+              isOwnerLocked ? "text-emerald-400" : "text-slate-400"
+            }`}
+          >
+            {isOwnerLocked ? "✓ 已鎖定" : "待鎖定"}
+          </span>
+        )}
       </div>
     </div>
   );

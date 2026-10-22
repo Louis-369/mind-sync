@@ -11,7 +11,7 @@ export function NameInput({ name, onChange }: NameInputProps) {
   return (
     <div className="flex flex-col space-y-1.5 w-full max-w-xs text-left">
       <label className="text-xs font-bold text-slate-300 tracking-wide">
-        你的稱號 / 暱稱
+        你的暱稱
       </label>
       <input
         type="text"
