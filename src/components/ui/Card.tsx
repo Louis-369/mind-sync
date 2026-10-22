@@ -138,12 +138,21 @@ export function Card({
           isOwner ? "ring-2 ring-ukiyo-gold/80 shadow-ukiyo-gold/30" : "border border-ukiyo-foam/20"
         )}
       >
-        {/* 卡牌背面 (浮世繪海浪質感極簡純圖騰 + 金箔古紋) */}
+        {/* 卡牌背面 (浮世繪海浪質感極簡純圖騰 + 金箔古紋 / ASCII 字符圖騰) */}
         <div className="absolute inset-0 w-full h-full backface-hidden ukiyo-card-back rounded-xl p-1 flex flex-col items-center justify-center border border-ukiyo-gold/30 overflow-hidden shadow-inner">
           <div className="w-full h-full rounded-lg border border-ukiyo-gold/25 flex flex-col items-center justify-center relative bg-gradient-to-b from-ukiyo-surface/80 to-ukiyo-bg/90">
-            {/* 朱紅日式心印 */}
-            <div className="w-7 h-7 md:w-9 md:h-9 rounded-full ukiyo-seal flex items-center justify-center text-xs md:text-sm font-serif shadow-lg border border-ukiyo-gold/40">
+            {/* 朱紅日式心印 (浮世繪主題) */}
+            <div className="theme-ukiyo-show w-7 h-7 md:w-9 md:h-9 rounded-full ukiyo-seal flex items-center justify-center text-xs md:text-sm font-serif shadow-lg border border-ukiyo-gold/40">
               心
+            </div>
+
+            {/* ASCII-Magic 字符圖騰 (ASCII 主題) */}
+            <div className="theme-ascii-show flex-col items-center justify-center font-mono text-[8px] sm:text-[9.5px] md:text-[11px] leading-[1.1] text-ukiyo-gold select-none whitespace-pre text-center">
+              <div>{"╔═════╗"}</div>
+              <div>{"║░▒▓▒░║"}</div>
+              <div>{"║▒[心]▒║"}</div>
+              <div>{"║░▒▓▒░║"}</div>
+              <div>{"╚═════╝"}</div>
             </div>
           </div>
         </div>

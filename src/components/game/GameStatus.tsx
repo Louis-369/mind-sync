@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Users, Copy, Check, Settings, Edit3, Volume2, VolumeX, ArrowLeft } from "lucide-react";
+import { Users, Copy, Check, Settings, Edit3, Volume2, VolumeX, ArrowLeft, Terminal } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 import { sound } from "../../lib/soundEngine";
+import { useVisualTheme } from "../../hooks/useVisualTheme";
 
 interface GameStatusProps {
   roomId: string;
@@ -31,6 +32,7 @@ export function GameStatus({
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [tempName, setTempName] = useState<string>(playerName);
   const [muted, setMuted] = useState<boolean>(false);
+  const { isAscii, toggleTheme } = useVisualTheme();
 
   useEffect(() => {
     setMuted(sound.isMuted());
@@ -127,6 +129,24 @@ export function GameStatus({
           className="p-1.5 rounded-xl bg-ukiyo-surface/80 hover:bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-foam/15 transition-colors cursor-pointer touch-manipulation active:scale-95"
         >
           {muted ? <VolumeX className="w-3.5 h-3.5 text-ukiyo-mist" /> : <Volume2 className="w-3.5 h-3.5" />}
+        </button>
+
+        {/* ASCII / 和紙 雙主題一鍵切換開關 (Develop 專屬) */}
+        <button
+          onClick={toggleTheme}
+          title={isAscii ? "點擊切換為 🎴 浮世繪和紙主題" : "點擊切換為 📟 ASCII-Magic 主題"}
+          className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-ukiyo-surface/90 hover:bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-gold/40 transition-all cursor-pointer touch-manipulation active:scale-95 font-mono text-[11px] font-bold shadow-sm"
+        >
+          {isAscii ? (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>ASCII</span>
+            </>
+          ) : (
+            <>
+              <span>🎴 和紙</span>
+            </>
+          )}
         </button>
 
         {/* 人數席位 */}

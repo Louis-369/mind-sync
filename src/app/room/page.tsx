@@ -17,6 +17,8 @@ import { PlayerHand } from "../../components/game/PlayerHand";
 import { HostPanel } from "../../components/game/HostPanel";
 import { ResultOverlay } from "../../components/game/ResultOverlay";
 import { Button } from "../../components/ui/Button";
+import { AsciiWaveCanvas } from "../../components/ui/AsciiWaveCanvas";
+import { useVisualTheme } from "../../hooks/useVisualTheme";
 import { TOPIC_DECK, DEFAULT_TOPIC } from "../../lib/constants";
 
 function RoomInner() {
@@ -28,6 +30,7 @@ function RoomInner() {
   const [inputNameTemp, setInputNameTemp] = React.useState<string>("");
   const [selectedSlotId, setSelectedSlotId] = React.useState<string | null>(null);
   const [mounted, setMounted] = useState<boolean>(false);
+  const { isAscii } = useVisualTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -328,6 +331,9 @@ function RoomInner() {
 
   return (
     <main className="w-full max-w-4xl mx-auto flex flex-col justify-between min-h-[100dvh] relative py-1.5 px-2 sm:px-4">
+      {/* 60fps 互動 ASCII 字符海浪畫布 (ascii-magic 靈魂) */}
+      <AsciiWaveCanvas active={isAscii} />
+
       {mounted && warningBannerJSX && createPortal(warningBannerJSX, document.body)}
 
       {/* 鎖定階段聚光暗角特效層 */}

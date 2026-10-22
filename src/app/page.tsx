@@ -7,11 +7,14 @@ import { NameInput } from "../components/lobby/NameInput";
 import { EmojiPicker } from "../components/lobby/EmojiPicker";
 import { TutorialModal } from "../components/lobby/TutorialModal";
 import { Button } from "../components/ui/Button";
+import { AsciiWaveCanvas } from "../components/ui/AsciiWaveCanvas";
 import { usePlayerId } from "../hooks/usePlayerId";
+import { useVisualTheme } from "../hooks/useVisualTheme";
 
 export default function LobbyPage() {
   const router = useRouter();
   const { playerName, setPlayerName } = usePlayerId();
+  const { isAscii, toggleTheme } = useVisualTheme();
   const [selectedRoomId, setSelectedRoomId] = useState<string>("🐶-🚀-🍎");
   const [isTutorialOpen, setIsTutorialOpen] = useState<boolean>(false);
 
@@ -26,6 +29,29 @@ export default function LobbyPage() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative overflow-hidden">
+      {/* 60fps 互動 ASCII 字符海浪畫布 (ascii-magic 靈魂) */}
+      <AsciiWaveCanvas active={isAscii} />
+
+      {/* 右上角雙主題快速切換器 (Develop 專屬) */}
+      <div className="absolute top-4 right-4 z-30">
+        <button
+          onClick={toggleTheme}
+          title={isAscii ? "切換至 🎴 浮世繪和紙主題" : "切換至 📟 ASCII-Magic 主題"}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-ukiyo-surface/90 hover:bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-gold/40 transition-all cursor-pointer font-mono text-xs font-bold shadow-xl backdrop-blur-md active:scale-95"
+        >
+          {isAscii ? (
+            <>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>📟 ASCII 主題</span>
+            </>
+          ) : (
+            <>
+              <span>🎴 浮世繪和紙</span>
+            </>
+          )}
+        </button>
+      </div>
+
       {/* 背景浮世繪深海波浪暈光 */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-ukiyo-wave/25 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-80 h-80 bg-ukiyo-gold/10 rounded-full blur-[120px] pointer-events-none" />
