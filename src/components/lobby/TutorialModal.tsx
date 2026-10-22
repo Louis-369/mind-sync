@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Terminal, ArrowRight, ArrowLeft, CheckCircle2, ShieldAlert, Cpu, Eye } from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle2, Sparkles, Layers, Eye } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 
@@ -15,51 +15,45 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
 
   const steps = [
     {
-      title: "01 // BENCHMARK PROTOCOL [基準測試]",
-      icon: <Cpu className="w-8 h-8 text-[#00ff9d]" />,
-      subtitle: "禁言絕對數字，純粹透過語意訊號溝通頻率",
+      title: "① 展卷抽題 ‧ 禁言數字",
+      icon: <Sparkles className="w-8 h-8 text-[#f59e0b]" />,
+      subtitle: "不能直接說出數字，只能用情境描述你的感受",
       content: (
-        <div className="space-y-3 text-left font-mono">
-          <div className="p-3 bg-[#04080e] border border-[#00ff9d]/30 text-xs text-[#00ff9d]/80 space-y-2">
-            <p className="font-bold text-[#00e5ff] flex items-center gap-1.5">
-              <Terminal className="w-3.5 h-3.5" /> 核心通訊規則：
-            </p>
+        <div className="space-y-3 text-left">
+          <div className="p-3.5 bg-slate-900 rounded-xl border border-slate-700 text-xs text-slate-200 space-y-2 leading-relaxed">
+            <p className="font-bold text-[#f59e0b]">核心玩法規則：</p>
             <p>
-              系統會發布一組情境基準測試（例如：「收到最想翻白眼的交換禮物」）。特工在不直接透露 001~100 數值的前提下，自由討論並各自在心中評定信號強度。
+              每局會有一道情境題（例如：「收到最想翻白眼的交換禮物」）。每位玩家會拿到 1~100 的數字手牌，請用言語形容你手中數字對應的事物，但<span className="text-white font-bold">絕對不能直接說出數字</span>！
             </p>
           </div>
         </div>
       ),
     },
     {
-      title: "02 // PACKET ALLOCATION [封包調度]",
-      icon: <Terminal className="w-8 h-8 text-[#00ff9d]" />,
-      subtitle: "由左至右 [0x01..]，將加密卡匣落入記憶體節點",
+      title: "② 暗出心證 ‧ 由小至大落席",
+      icon: <Layers className="w-8 h-8 text-[#f59e0b]" />,
+      subtitle: "憑藉彼此的描述與默契，由第 1 席往後依序排好",
       content: (
-        <div className="space-y-3 text-left font-mono">
-          <div className="p-3 bg-[#04080e] border border-[#00ff9d]/30 text-xs text-[#00ff9d]/80 space-y-2">
-            <p className="font-bold text-[#00e5ff] flex items-center gap-1.5">
-              <Terminal className="w-3.5 h-3.5" /> 節點插槽機制：
-            </p>
+        <div className="space-y-3 text-left">
+          <div className="p-3.5 bg-slate-900 rounded-xl border border-slate-700 text-xs text-slate-200 space-y-2 leading-relaxed">
+            <p className="font-bold text-[#f59e0b]">自由搶位與讓席：</p>
             <p>
-              將你評定的信號強度轉化為手中的卡匣。憑藉與同伴的直覺默契，點擊盤面槽位（<span className="text-[#00ff9d] font-bold">NODE_0x01, 0x02...</span>），依頻率由低到高排序。若發生撞席，請積極協商讓位！
+              點擊盤面的槽位（<span className="text-white font-bold">第 1 席、第 2 席...</span>）再點擊手牌即可出牌。目標是讓全場卡牌由左至右、由上至下**由小到大排列**。如果跟隊友撞在同一格，可以隨時點擊卡牌收回重放！
             </p>
           </div>
         </div>
       ),
     },
     {
-      title: "03 // DECRYPT & SYNC [解密驗證]",
-      icon: <Eye className="w-8 h-8 text-[#00ff9d]" />,
-      subtitle: "全體特工提交鎖定，解密節點判定同步率",
+      title: "③ 翻牌共鳴 ‧ 心天秤平衡",
+      icon: <Eye className="w-8 h-8 text-[#f59e0b]" />,
+      subtitle: "全員確認鎖定後揭曉，完全遞增即獲勝！",
       content: (
-        <div className="space-y-3 text-left font-mono">
-          <div className="p-3 bg-[#04080e] border border-[#00ff9d]/30 text-xs text-[#00ff9d]/80 space-y-2">
-            <p className="font-bold text-[#00e5ff] flex items-center gap-1.5">
-              <Terminal className="w-3.5 h-3.5" /> 判定條件：
-            </p>
+        <div className="space-y-3 text-left">
+          <div className="p-3.5 bg-slate-900 rounded-xl border border-slate-700 text-xs text-slate-200 space-y-2 leading-relaxed">
+            <p className="font-bold text-[#f59e0b]">勝利條件：</p>
             <p>
-              卡匣派發完畢後點擊「COMMIT_SYNC」提交鎖定。全員鎖定後進入解密階段，可從最有把握的節點開始揭牌。只要所有封包數值<span className="text-[#00ff9d] font-bold">由左至右嚴格遞增</span>，即達成 100% 神經頻率同步成功！
+              所有人出完手牌並點擊「確認鎖定」後，即可從全場最有把握的席位開始翻牌。只要翻開後所有數字<span className="text-emerald-400 font-bold">符合由小到大遞增</span>，即達成心天秤完美平衡！
             </p>
           </div>
         </div>
@@ -82,15 +76,15 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="SYS://PROTOCOL_MANUAL">
-      <div className="space-y-4 font-mono text-center">
+    <Modal isOpen={isOpen} onClose={onClose} title="30 秒上手指南">
+      <div className="space-y-4 text-center">
         <div className="flex justify-center my-1">{steps[currentStep].icon}</div>
 
         <div>
-          <h4 className="text-sm font-bold text-[#00ff9d] mb-1">
+          <h4 className="text-base font-bold text-white mb-1">
             {steps[currentStep].title}
           </h4>
-          <p className="text-[11px] text-[#00e5ff]">
+          <p className="text-xs text-slate-400">
             {steps[currentStep].subtitle}
           </p>
         </div>
@@ -102,15 +96,15 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
           {steps.map((_, idx) => (
             <div
               key={idx}
-              className={`h-1.5 transition-all ${
-                idx === currentStep ? "w-6 bg-[#00ff9d]" : "w-1.5 bg-[#00ff9d]/30"
+              className={`h-1.5 rounded-full transition-all ${
+                idx === currentStep ? "w-6 bg-[#f59e0b]" : "w-1.5 bg-slate-700"
               }`}
             />
           ))}
         </div>
 
         {/* 導航按鈕列 */}
-        <div className="flex items-center justify-between pt-2 border-t border-[#00ff9d]/20">
+        <div className="flex items-center justify-between pt-2 border-t border-slate-800">
           <Button
             variant="ghost"
             size="sm"
@@ -118,7 +112,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
             disabled={currentStep === 0}
             className="text-xs"
           >
-            <ArrowLeft className="w-3.5 h-3.5 mr-1" /> [PREV]
+            <ArrowLeft className="w-3.5 h-3.5 mr-1" /> 上一步
           </Button>
 
           <Button
@@ -129,11 +123,11 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
           >
             {currentStep === steps.length - 1 ? (
               <span className="flex items-center gap-1 text-black">
-                <CheckCircle2 className="w-3.5 h-3.5 text-black" /> [INITIALIZE]
+                <CheckCircle2 className="w-3.5 h-3.5 text-black" /> 準備好了！
               </span>
             ) : (
               <span className="flex items-center gap-1 text-black">
-                [NEXT] <ArrowRight className="w-3.5 h-3.5 text-black" />
+                下一步 <ArrowRight className="w-3.5 h-3.5 text-black" />
               </span>
             )}
           </Button>

@@ -641,7 +641,26 @@ export function useGameState(roomId?: string) {
     storage.set("result", null);
   }, []);
 
+  // 判斷 Liveblocks Storage 是否已經載入就緒 (未載入時 useStorage 回傳 null)
+  const isStorageLoaded = status !== null && status !== undefined && boardMap !== null;
+
+  // 安全包裝器：確保 Storage 載入完成前絕不呼叫 useMutation，徹底消除 "This mutation cannot be used until storage has been loaded" 錯誤
+  const safeMutation = useCallback(
+    <T extends (...args: any[]) => any>(mutationFn: T) => {
+      return (...args: Parameters<T>) => {
+        if (!isStorageLoaded) return;
+        try {
+          return mutationFn(...args);
+        } catch (err) {
+          // 忽略載入競態期間的變更
+        }
+      };
+    },
+    [isStorageLoaded]
+  );
+
   return {
+    isStorageLoaded,
     settings,
     topic,
     board,
@@ -656,20 +675,20 @@ export function useGameState(roomId?: string) {
     updateMyPresence,
     self,
     others,
-    dealCards,
-    placeCard,
-    recallCard,
-    toggleLock,
-    flipCard,
-    flipAllCards,
-    updateSettings,
-    changeTopic,
+    dealCards: safeMutation(dealCards),
+    placeCard: safeMutation(placeCard),
+    recallCard: safeMutation(recallCard),
+    toggleLock: safeMutation(toggleLock),
+    flipCard: safeMutation(flipCard),
+    flipAllCards: safeMutation(flipAllCards),
+    updateSettings: safeMutation(updateSettings),
+    changeTopic: safeMutation(changeTopic),
     setFocusedSlot,
     sendReaction,
-    resetGame,
-    claimHost,
-    autoResetStaleRoom,
-    syncOfflinePlayers,
+    resetGame: safeMutation(resetGame),
+    claimHost: safeMutation(claimHost),
+    autoResetStaleRoom: safeMutation(autoResetStaleRoom),
+    syncOfflinePlayers: safeMutation(syncOfflinePlayers),
     getActivePlayerIds,
   };
 }

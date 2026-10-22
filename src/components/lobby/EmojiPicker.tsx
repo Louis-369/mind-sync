@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Shuffle } from "lucide-react";
 import { EMOJI_GROUPS } from "../../lib/constants";
 import { buildRoomId } from "../../lib/gameLogic";
 
@@ -13,20 +14,42 @@ function getRandomEmoji(arr: string[]): string {
 }
 
 export function EmojiPicker({ onRoomSelect }: EmojiPickerProps) {
-  const [e1, setE1] = useState(() => getRandomEmoji(EMOJI_GROUPS.animals));
-  const [e2, setE2] = useState(() => getRandomEmoji(EMOJI_GROUPS.items));
-  const [e3, setE3] = useState(() => getRandomEmoji(EMOJI_GROUPS.foods));
+  // SSR 與 CSR 初次渲染使用固定初始值，彻底避免 Hydration Mismatch
+  const [e1, setE1] = useState<string>(EMOJI_GROUPS.animals[0]);
+  const [e2, setE2] = useState<string>(EMOJI_GROUPS.items[0]);
+  const [e3, setE3] = useState<string>(EMOJI_GROUPS.foods[0]);
+
+  // 客戶端掛載後自動隨機產生一組暗號
+  useEffect(() => {
+    setE1(getRandomEmoji(EMOJI_GROUPS.animals));
+    setE2(getRandomEmoji(EMOJI_GROUPS.items));
+    setE3(getRandomEmoji(EMOJI_GROUPS.foods));
+  }, []);
 
   useEffect(() => {
     onRoomSelect(buildRoomId(e1, e2, e3));
-    return () => {};
   }, [e1, e2, e3, onRoomSelect]);
+
+  const handleRandomize = () => {
+    setE1(getRandomEmoji(EMOJI_GROUPS.animals));
+    setE2(getRandomEmoji(EMOJI_GROUPS.items));
+    setE3(getRandomEmoji(EMOJI_GROUPS.foods));
+  };
 
   return (
     <div className="flex flex-col items-center space-y-2 w-full max-w-xs text-left">
-      <label className="text-xs font-bold text-slate-300 tracking-wide w-full">
-        選擇房間暗號 (快速配對)
-      </label>
+      <div className="flex items-center justify-between w-full">
+        <label className="text-xs font-bold text-slate-300 tracking-wide">
+          選擇房間暗號 (快速配對)
+        </label>
+        <button
+          type="button"
+          onClick={handleRandomize}
+          className="text-[11px] text-[#f59e0b] hover:text-amber-300 flex items-center gap-1 font-medium cursor-pointer"
+        >
+          <Shuffle className="w-3 h-3" /> 隨機換一組
+        </button>
+      </div>
 
       {/* 3 個 Emoji 選擇列 */}
       <div className="grid grid-cols-3 gap-2 w-full">

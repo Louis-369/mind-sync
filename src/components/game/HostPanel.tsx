@@ -40,58 +40,58 @@ export function HostPanel({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="SYS://ROOT_CONFIG">
-      <div className="space-y-4 font-mono text-xs">
+    <Modal isOpen={isOpen} onClose={onClose} title="房間規則設定">
+      <div className="space-y-4 text-xs">
         {settings && onUpdateSettings && (
-          <div className="grid grid-cols-2 gap-3 bg-[#04080e] p-3 border border-[#00ff9d]/40">
-            {/* 最大特工席位 */}
+          <div className="grid grid-cols-2 gap-3 bg-slate-900 p-3.5 rounded-xl border border-slate-700">
+            {/* 最大人數 */}
             <div className="flex flex-col">
-              <label className="text-[#00e5ff] mb-1 font-bold">MAX_NODES (人數上限)</label>
+              <label className="text-slate-300 mb-1.5 font-bold">房間人數上限</label>
               <select
                 value={settings.maxPlayers}
                 disabled={status !== "waiting"}
                 onChange={(e) => handleMaxPlayersChange(Number(e.target.value))}
-                className="bg-[#030609] border border-[#00ff9d]/40 px-2 py-1 text-xs text-[#00ff9d] focus:outline-none focus:border-[#00ff9d]"
+                className="bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#f59e0b]"
               >
-                <option value={2}>2 NODES (MAX 6 CARTS)</option>
-                <option value={3}>3 NODES (MAX 4 CARTS)</option>
-                <option value={4}>4 NODES (MAX 3 CARTS)</option>
+                <option value={2}>2 人局 (最多 6 張/人)</option>
+                <option value={3}>3 人局 (最多 4 張/人)</option>
+                <option value={4}>4 人局 (最多 3 張/人)</option>
               </select>
             </div>
 
-            {/* 每位特工配發卡匣數 */}
+            {/* 每人手牌數 */}
             <div className="flex flex-col">
-              <label className="text-[#00e5ff] mb-1 font-bold">CARTS_PER_OP (卡匣張數)</label>
+              <label className="text-slate-300 mb-1.5 font-bold">每人手牌張數</label>
               <select
                 value={currentCardsPerPlayer}
                 disabled={status !== "waiting"}
                 onChange={(e) => onUpdateSettings({ cardsPerPlayer: Number(e.target.value) })}
-                className="bg-[#030609] border border-[#00ff9d]/40 px-2 py-1 text-xs text-[#00ff9d] focus:outline-none focus:border-[#00ff9d]"
+                className="bg-slate-800 border border-slate-600 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#f59e0b]"
               >
                 {Array.from({ length: maxAllowedCards }, (_, i) => i + 1).map((num) => (
                   <option key={num} value={num}>
-                    {num} PACKETS
+                    {num} 張手牌
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* 啟用基準測試橫幅 */}
-            <div className="col-span-2 flex items-center justify-between pt-2 border-t border-[#00ff9d]/20">
+            {/* 啟用主題卷軸 */}
+            <div className="col-span-2 flex items-center justify-between pt-2.5 border-t border-slate-800">
               <div className="flex flex-col">
-                <span className="text-[#00ff9d] font-bold">ENABLE_BENCHMARK_QUERY</span>
-                <span className="text-[10px] text-[#00ff9d]/60">關閉後進入純數字頻率同步模式</span>
+                <span className="text-white font-bold">啟用情境主題卷軸</span>
+                <span className="text-[11px] text-slate-400">關閉後可進行純數字心電感應模式</span>
               </div>
               <button
                 type="button"
                 onClick={() => onUpdateSettings({ showTopic: settings.showTopic === false ? true : false })}
-                className={`relative inline-flex h-5 w-10 items-center border transition-colors ${
-                  settings.showTopic !== false ? "bg-[#00ff9d] border-[#00ff9d]" : "bg-black border-[#00ff9d]/30"
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                  settings.showTopic !== false ? "bg-[#f59e0b]" : "bg-slate-700"
                 }`}
               >
                 <span
-                  className={`inline-block h-3.5 w-3.5 transform transition-transform ${
-                    settings.showTopic !== false ? "translate-x-5 bg-black" : "translate-x-0.5 bg-[#00ff9d]/50"
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    settings.showTopic !== false ? "translate-x-6" : "translate-x-1"
                   }`}
                 />
               </button>
@@ -105,9 +105,9 @@ export function HostPanel({
             variant="primary"
             size="md"
             onClick={onClose}
-            className="w-full flex items-center justify-center gap-1.5 font-mono font-bold"
+            className="w-full flex items-center justify-center gap-1.5 font-bold"
           >
-            <Check className="w-4 h-4 text-black" /> [APPLY_SYS_CONFIG]
+            <Check className="w-4 h-4 text-black" /> 完成設定
           </Button>
         </div>
       </div>
