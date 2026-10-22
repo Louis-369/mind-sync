@@ -4,118 +4,123 @@
 
 @layer base {
   body {
-    background-color: #090b0e;
-    color: #f8fafc;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f5f2eb;
+    color: #18181b;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif;
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
     user-select: none;
     -webkit-user-select: none;
-    background-image: 
-      radial-gradient(circle at 50% 5%, rgba(245, 158, 11, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 50% 95%, rgba(14, 165, 233, 0.04) 0%, transparent 60%);
   }
 }
 
-/* 現代高對比實心面板 (取代發光掃描線，確保框內文字 100% 乾淨清晰) */
-.glass-panel,
-.terminal-window {
-  background: rgba(18, 22, 31, 0.98) !important;
-  border: 1px solid #334155 !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
-  border-radius: 12px !important;
-  color: #f8fafc !important;
+/* 實體玩具風 (Tactile Pop) 面板與按鈕 */
+.toy-panel {
+  background-color: #ffffff !important;
+  border: 2px solid #18181b !important;
+  box-shadow: 4px 4px 0px #18181b !important;
+  border-radius: 16px !important;
+  color: #18181b !important;
 }
 
-/* 題目橫幅 (高清晰琥珀金邊框) */
+.toy-panel-subtle {
+  background-color: #faf8f5 !important;
+  border: 1.5px solid #d4cebe !important;
+  border-radius: 12px !important;
+}
+
+.toy-btn-press {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.toy-btn-press:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #18181b !important;
+}
+
+/* 題目橫幅 (醒目亮黃實體框) */
 .topic-scroll-banner {
-  background: #151a24 !important;
-  border: 1px solid rgba(245, 158, 11, 0.6) !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+  background: #ffffff !important;
+  border: 2px solid #18181b !important;
+  box-shadow: 3px 3px 0px #18181b !important;
+  border-radius: 14px !important;
+}
+
+/* 卡牌背面 (未翻開：深海藍底 + 活力明黃粗邊框 + 心印) */
+.toy-card-back {
+  background-color: #1e293b !important;
+  border: 2px solid #18181b !important;
+  box-shadow: 3px 3px 0px #18181b !important;
+  color: #f59e0b !important;
   border-radius: 10px !important;
 }
 
-/* 卡匣背面 (未翻開) */
-.ukiyo-card-back,
-.ascii-card-back {
-  background-color: #141b29 !important;
-  border: 1.5px solid #f59e0b !important;
-  color: #f59e0b !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6) !important;
-  border-radius: 8px !important;
-}
-
-/* 卡匣正面 (純白高反差實體卡面 + 粗黑大數字，一眼秒看清！) */
-.washi-card-front,
-.ascii-card-front {
+/* 卡牌正面 (純白實體卡面 + 粗黑大數字 + 4px 硬陰影) */
+.toy-card-front {
   background-color: #ffffff !important;
-  background-image: none !important;
-  color: #090d16 !important;
-  border: 2px solid #cbd5e1 !important;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
-  border-radius: 8px !important;
+  border: 2px solid #18181b !important;
+  box-shadow: 3px 3px 0px #18181b !important;
+  color: #18181b !important;
+  border-radius: 10px !important;
 }
 
 /* 鎖定狀態標籤 */
-.ukiyo-seal {
+.toy-seal {
   background: #10b981 !important;
   color: #ffffff !important;
-  border: 1px solid #34d399 !important;
-  border-radius: 4px !important;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5) !important;
-  font-family: monospace !important;
+  border: 1.5px solid #18181b !important;
+  box-shadow: 2px 2px 0px #18181b !important;
+  border-radius: 6px !important;
+  font-weight: 800 !important;
 }
 
-/* 鎖定階段暗角特效層 */
+/* 鎖定階段聚光遮罩 */
 .stage-vignette-locked {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 5;
-  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.7);
+  background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, rgba(24, 24, 27, 0.25) 100%);
 }
 
-/* ASCII Glitch 抽搐動效 (紅藍色差) */
-.animate-ascii-glitch {
-  animation: asciiGlitch 0.2s steps(2) infinite;
-  color: #ef4444 !important;
+/* 錯誤牌抽搐動效 */
+.animate-error-shake {
+  animation: errorShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
 }
 
-@keyframes asciiGlitch {
-  0% { transform: translate(0) scale(1.04); }
-  25% { transform: translate(-2px, 1.5px) scale(1.08); }
-  50% { transform: translate(2px, -1.5px) scale(0.98); }
-  75% { transform: translate(-1.5px, -2px) scale(1.05); }
-  100% { transform: translate(0) scale(1.04); }
+@keyframes errorShake {
+  10%, 90% { transform: translate3d(-1px, 0, 0) rotate(-1deg); }
+  20%, 80% { transform: translate3d(2px, 0, 0) rotate(2deg); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0) rotate(-2deg); }
+  40%, 60% { transform: translate3d(3px, 0, 0) rotate(1deg); }
 }
 
 @keyframes reactionPop {
   0% { transform: translateY(0) scale(0.5); opacity: 0; }
-  15% { transform: translateY(-8px) scale(1.2); opacity: 1; }
-  75% { transform: translateY(-20px) scale(1); opacity: 1; }
-  100% { transform: translateY(-34px) scale(0.85); opacity: 0; }
+  15% { transform: translateY(-8px) scale(1.3); opacity: 1; }
+  75% { transform: translateY(-22px) scale(1.1); opacity: 1; }
+  100% { transform: translateY(-38px) scale(0.85); opacity: 0; }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.2s ease-out forwards;
+  animation: fadeIn 0.15s ease-out forwards;
 }
 
-/* 自訂舒適滾動條 */
+/* 滾動條 */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #090b0e;
+  background: #f5f2eb;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #d4cebe;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {

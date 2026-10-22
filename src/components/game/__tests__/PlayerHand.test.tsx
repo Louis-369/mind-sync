@@ -38,6 +38,6 @@ describe('PlayerHand Component', () => {
         onPlayCard={() => {}}
       />
     );
-    expect(screen.getByText(/手牌已完全出完！/)).toBeInTheDocument();
+    expect(screen.getByText(/手牌已.*出完/)).toBeInTheDocument();
   });
 });

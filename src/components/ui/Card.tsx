@@ -11,8 +11,17 @@ interface CardProps {
   playerName?: string;
   showSeal?: boolean;
   isError?: boolean;
+  isSelected?: boolean;
   onClick?: () => void;
   className?: string;
+}
+
+// 根據數值計算冷暖光譜色標
+export function getSpectrumColor(val: number) {
+  if (val <= 25) return { bg: "bg-[#0ea5e9]", text: "text-[#0ea5e9]", border: "border-[#0ea5e9]", icon: "❄️" };
+  if (val <= 50) return { bg: "bg-[#10b981]", text: "text-[#10b981]", border: "border-[#10b981]", icon: "🌿" };
+  if (val <= 75) return { bg: "bg-[#f59e0b]", text: "text-[#f59e0b]", border: "border-[#f59e0b]", icon: "☀️" };
+  return { bg: "bg-[#ef4444]", text: "text-[#ef4444]", border: "border-[#ef4444]", icon: "🔥" };
 }
 
 export function Card({
@@ -22,51 +31,21 @@ export function Card({
   playerName,
   showSeal = false,
   isError = false,
+  isSelected = false,
   onClick,
   className,
 }: CardProps) {
   const showUnderline = value === 6 || value === 9 || value === 66 || value === 99;
+  const spec = getSpectrumColor(value);
 
-  // 錯誤牌跳動提示 (1.8s 高頻跳動 + 每 2.2s 間歇提醒)
-  const [glitchText, setGlitchText] = useState<string | null>(null);
-
+  // 錯誤牌左右搖擺提示
+  const [shake, setShake] = useState(false);
   React.useEffect(() => {
-    if (!isError || !flipped) {
-      setGlitchText(null);
-      return;
+    if (isError && flipped) {
+      setShake(true);
+      const timer = setTimeout(() => setShake(false), 800);
+      return () => clearTimeout(timer);
     }
-
-    const glitchChars = ["排錯!", "順序錯!", "✕✕", "卡住!"];
-    let burstCount = 0;
-    let echoInterval: NodeJS.Timeout | null = null;
-
-    // 第一階段：爆發跳動期 (1.8 秒)
-    const burstInterval = setInterval(() => {
-      setGlitchText(glitchChars[burstCount % glitchChars.length]);
-      burstCount++;
-      if (burstCount >= 18) {
-        clearInterval(burstInterval);
-        setGlitchText(null);
-
-        // 第二階段：持續間歇提醒 (每 2.2 秒閃現 0.45 秒)
-        echoInterval = setInterval(() => {
-          let flickerCount = 0;
-          const flickerSub = setInterval(() => {
-            setGlitchText(glitchChars[flickerCount % glitchChars.length]);
-            flickerCount++;
-            if (flickerCount >= 4) {
-              clearInterval(flickerSub);
-              setGlitchText(null);
-            }
-          }, 90);
-        }, 2200);
-      }
-    }, 100);
-
-    return () => {
-      clearInterval(burstInterval);
-      if (echoInterval) clearInterval(echoInterval);
-    };
   }, [isError, flipped]);
 
   // 3D 視差傾斜
@@ -79,8 +58,8 @@ export function Card({
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const rx = ((y - rect.height / 2) / (rect.height / 2)) * -12;
-    const ry = ((x - rect.width / 2) / (rect.width / 2)) * 12;
+    const rx = ((y - rect.height / 2) / (rect.height / 2)) * -10;
+    const ry = ((x - rect.width / 2) / (rect.width / 2)) * 10;
     setTilt({ rx, ry });
   };
 
@@ -102,75 +81,95 @@ export function Card({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={clsx(
-        "relative select-none cursor-pointer transition-transform duration-150 perspective-1000 touch-manipulation",
-        "w-14 h-20 sm:w-16 sm:h-24 md:w-20 md:h-28",
+        "relative select-none cursor-pointer transition-all duration-150 perspective-1000 touch-manipulation",
+        "w-15 h-22 sm:w-18 sm:h-26 md:w-22 md:h-30",
+        isSelected && "-translate-y-4",
+        shake && "animate-error-shake",
         className
       )}
       style={{
-        transform: isHovered
-          ? `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateY(-6px) scale(1.06)`
+        transform: isSelected
+          ? "translateY(-14px) scale(1.06)"
+          : isHovered
+          ? `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateY(-6px) scale(1.05)`
           : "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)",
         transformStyle: "preserve-3d",
       }}
     >
-      {/* 右上角 ↗ 已鎖定標籤 */}
+      {/* 右上角 ↗ 已鎖定印章 */}
       {showSeal && (
-        <div className="absolute -top-2 -right-2 z-40 px-1.5 py-0.5 bg-[#10b981] text-white text-[10px] font-bold rounded shadow-lg border border-white pointer-events-none animate-pulse">
+        <div className="absolute -top-2.5 -right-2.5 z-40 px-2 py-0.5 bg-[#10b981] text-white text-[11px] font-black rounded-lg border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b] pointer-events-none animate-pulse">
           已鎖定
         </div>
       )}
 
-      {/* 卡牌主體 */}
+      {/* 選中高亮浮標 */}
+      {isSelected && (
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 z-40 px-2 py-0.5 bg-[#f59e0b] text-[#18181b] text-[10px] font-black rounded-full border-2 border-[#18181b] shadow-[1px_1px_0px_#18181b] pointer-events-none whitespace-nowrap animate-bounce">
+          已選取
+        </div>
+      )}
+
+      {/* 卡匣主體 */}
       <div
         className={clsx(
-          "w-full h-full duration-500 transform-style-3d relative rounded-lg transition-transform shadow-xl",
+          "w-full h-full duration-500 transform-style-3d relative rounded-xl transition-transform border-2 border-[#18181b]",
           flipped ? "rotate-y-180" : "",
-          isOwner ? "ring-2 ring-[#f59e0b] shadow-[0_0_15px_rgba(245,158,11,0.4)]" : "border border-slate-600"
+          isOwner && !isError
+            ? "shadow-[4px_4px_0px_#f59e0b]"
+            : "shadow-[4px_4px_0px_#18181b]"
         )}
       >
-        {/* 卡牌背面 (未翻開：深藍底 + 字符框 + 心字) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden bg-[#141b29] border-2 border-[#f59e0b]/80 rounded-lg p-1 flex flex-col items-center justify-center text-[#f59e0b] shadow-inner">
-          <div className="w-full h-full border border-[#f59e0b]/30 rounded flex flex-col items-center justify-center text-center">
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#f59e0b] bg-[#1e293b] flex items-center justify-center text-xs sm:text-sm font-bold text-[#f59e0b] shadow-sm mb-1">
-              心
-            </div>
-            <div className="text-[8px] sm:text-[9px] font-mono text-[#f59e0b]/70 tracking-wider">
-              1 ~ 100
-            </div>
+        {/* 卡牌背面 (未翻開：活力深海藍 + 粗黑邊框 + 幾何心印) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden bg-[#1e293b] rounded-[10px] p-1.5 flex flex-col items-center justify-between text-[#f59e0b] shadow-inner">
+          <div className="w-full flex justify-between items-center px-1">
+            <span className="w-2 h-2 rounded-full bg-[#f59e0b]/50" />
+            <span className="text-[9px] font-mono font-bold text-[#94a3b8]">MIND</span>
+            <span className="w-2 h-2 rounded-full bg-[#f59e0b]/50" />
+          </div>
+
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 border-[#f59e0b] bg-[#0f172a] flex items-center justify-center text-base sm:text-lg font-black text-[#f59e0b] shadow-[2px_2px_0px_#18181b]">
+            心
+          </div>
+
+          <div className="text-[9px] font-mono font-bold text-[#f59e0b] tracking-wider bg-[#0f172a] px-2 py-0.5 rounded-full border border-[#f59e0b]/40">
+            1 ~ 100
           </div>
         </div>
 
-        {/* 卡牌正面 (純白實體卡面 + 粗黑大數字) */}
-        <div className={clsx(
-          "absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-lg p-1.5 flex flex-col items-center justify-between border-2 shadow-2xl transition-colors",
-          isError
-            ? "bg-[#fee2e2] text-[#991b1b] border-[#ef4444]"
-            : "bg-white text-[#090d16] border-[#e2e8f0]"
-        )}>
-          {/* 左上角小數字 */}
-          <div className="w-full flex items-center justify-between text-[10px] sm:text-xs font-mono font-bold text-slate-500 border-b border-slate-200 pb-0.5">
-            <span className={clsx(glitchText && "text-red-600 font-black animate-ascii-glitch")}>
-              {glitchText ? "✕" : String(value).padStart(2, "0")}
+        {/* 卡牌正面 (純白實體卡面 + 粗黑大數字 + 左上角溫度色標) */}
+        <div
+          className={clsx(
+            "absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-[10px] p-2 flex flex-col items-center justify-between transition-colors",
+            isError
+              ? "bg-[#fee2e2] text-[#991b1b]"
+              : "bg-[#ffffff] text-[#18181b]"
+          )}
+        >
+          {/* 頂部溫度標籤 */}
+          <div className="w-full flex items-center justify-between text-[11px] font-mono font-black border-b border-slate-200 pb-0.5">
+            <span className="flex items-center gap-1">
+              <span>{spec.icon}</span>
+              <span className="text-slate-600 font-bold">{String(value).padStart(2, "0")}</span>
             </span>
-            <span className="text-[8px] text-slate-400">1~100</span>
+            <span className={clsx("w-2 h-2 rounded-full", spec.bg)} />
           </div>
 
-          {/* 中央巨型數字 */}
+          {/* 中央巨型數字 (極粗字體，一眼看清) */}
           <div className="flex flex-col items-center justify-center my-auto">
             <span
               className={clsx(
-                "font-mono text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-none select-none",
-                glitchText ? "text-red-600 animate-ascii-glitch text-lg sm:text-xl" : "text-[#090d16]",
-                showUnderline && "border-b-3 border-[#090d16] pb-0.5"
+                "font-mono text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-none select-none text-[#18181b]",
+                showUnderline && "border-b-4 border-[#18181b] pb-0.5"
               )}
             >
-              {glitchText !== null ? glitchText : value}
+              {value}
             </span>
           </div>
 
-          {/* 底部裝飾條 */}
-          <div className="w-full text-center text-[8px] text-slate-400 font-bold tracking-widest border-t border-slate-200 pt-0.5">
-            心天秤
+          {/* 底部小標籤 */}
+          <div className="w-full text-center text-[8px] font-bold tracking-widest text-slate-400 border-t border-slate-200 pt-0.5">
+            MIND SYNC
           </div>
         </div>
       </div>

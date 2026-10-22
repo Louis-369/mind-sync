@@ -10,7 +10,7 @@ interface NameInputProps {
 export function NameInput({ name, onChange }: NameInputProps) {
   return (
     <div className="flex flex-col space-y-1.5 w-full max-w-xs text-left">
-      <label className="text-xs font-bold text-slate-300 tracking-wide">
+      <label className="text-xs font-black text-[#18181b] tracking-wide">
         你的暱稱
       </label>
       <input
@@ -19,7 +19,7 @@ export function NameInput({ name, onChange }: NameInputProps) {
         maxLength={12}
         onChange={(e) => onChange(e.target.value)}
         placeholder="請輸入暱稱..."
-        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2.5 text-center text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#f59e0b] transition-colors"
+        className="w-full bg-[#f4f1ea] border-2 border-[#18181b] rounded-xl px-3.5 py-2.5 text-center text-sm font-black text-[#18181b] placeholder-slate-400 focus:outline-none focus:bg-[#ffffff] shadow-[2px_2px_0px_#18181b] transition-colors"
       />
     </div>
   );

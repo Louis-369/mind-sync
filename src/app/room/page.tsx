@@ -28,6 +28,7 @@ function RoomInner() {
   const [isHostModalOpen, setIsHostModalOpen] = React.useState<boolean>(false);
   const [inputNameTemp, setInputNameTemp] = React.useState<string>("");
   const [selectedSlotId, setSelectedSlotId] = React.useState<string | null>(null);
+  const [selectedHandCard, setSelectedHandCard] = React.useState<number | null>(null);
   const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
@@ -100,14 +101,33 @@ function RoomInner() {
       ? myOnlineRank >= maxPlayers && totalUniqueOnlineCount > maxPlayers
       : totalUniqueOnlineCount > maxPlayers;
 
-  // 處理卡牌放置事件
-  const handlePlayCard = (cardValue: number) => {
-    placeCard(cardValue, playerName, selectedSlotId || undefined, playerId);
-    setSelectedSlotId(null);
-    setFocusedSlot(null);
+  // 雙向直覺出牌核心邏輯：
+  // 情況 A：玩家點選了手牌
+  const handleSelectHandCard = (cardValue: number) => {
+    if (selectedSlotId) {
+      // 若先前已選定空位，直接將這張牌放進該空位！
+      placeCard(cardValue, playerName, selectedSlotId, playerId);
+      setSelectedSlotId(null);
+      setSelectedHandCard(null);
+      setFocusedSlot(null);
+      return;
+    }
+
+    // 否則切換手牌選取狀態
+    setSelectedHandCard((prev) => (prev === cardValue ? null : cardValue));
   };
 
+  // 情況 B：玩家點選了場上槽位
   const handleSelectSlot = (slotId: string) => {
+    if (selectedHandCard !== null) {
+      // 若當前已有選中的手牌，直接放入該槽位！
+      placeCard(selectedHandCard, playerName, slotId, playerId);
+      setSelectedHandCard(null);
+      setSelectedSlotId(null);
+      setFocusedSlot(null);
+      return;
+    }
+
     const nextSlot = selectedSlotId === slotId ? null : slotId;
     setSelectedSlotId(nextSlot);
     setFocusedSlot(nextSlot);
@@ -178,7 +198,7 @@ function RoomInner() {
     };
   }, [playerId, playerName, isStorageLoaded, updateMyPresence, claimHost, syncOfflinePlayers]);
 
-  // 當 WebSocket 連線恢復為 connected 且 Storage 載入完成時自動刷新身分與狀態
+  // 當 WebSocket 連線恢復且 Storage 載入就緒時校準身分
   useEffect(() => {
     if (connectionStatus === "connected") {
       try {
@@ -239,15 +259,18 @@ function RoomInner() {
 
   const isLocked = lockedList.includes(currentConnId) || (playerId ? lockedList.includes(playerId) : false);
 
-  // 1. 暱稱未填寫阻斷 (分享連結直連進房時之暱稱輸入視窗)
+  // 1. 暱稱未填寫阻斷
   if (!playerName) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#090b0e]">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#f5f2eb]">
         <AsciiWaveCanvas active={true} />
-        <div className="bg-[#12161f] p-6 max-w-sm w-full border border-slate-700 rounded-2xl flex flex-col items-center space-y-4 shadow-2xl relative z-30">
-          <h2 className="text-lg font-bold text-white">加入遊戲房間</h2>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            準備進入房間 <span className="font-bold text-[#f59e0b]">{roomId}</span>，請先輸入你的暱稱：
+        <div className="bg-[#ffffff] p-6 sm:p-8 max-w-sm w-full border-2 border-[#18181b] rounded-2xl flex flex-col items-center space-y-4 shadow-[6px_6px_0px_#18181b] relative z-30">
+          <div className="w-12 h-12 rounded-2xl bg-[#fef3c7] border-2 border-[#18181b] flex items-center justify-center text-xl font-black text-[#f59e0b] shadow-[2px_2px_0px_#18181b]">
+            心
+          </div>
+          <h2 className="text-xl font-black text-[#18181b]">加入遊戲房間</h2>
+          <p className="text-xs text-slate-600 leading-relaxed font-medium">
+            房間暗號 <span className="font-mono font-bold text-[#f59e0b] bg-[#f4f1ea] px-1.5 py-0.5 rounded border border-slate-300">{roomId}</span>，請先輸入你的暱稱：
           </p>
           <input
             type="text"
@@ -255,7 +278,7 @@ function RoomInner() {
             onChange={(e) => setInputNameTemp(e.target.value)}
             placeholder="請輸入暱稱..."
             maxLength={14}
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-center text-sm text-white focus:outline-none focus:border-[#f59e0b]"
+            className="w-full bg-[#f4f1ea] border-2 border-[#18181b] rounded-xl px-3 py-2.5 text-center text-sm font-black text-[#18181b] focus:outline-none focus:bg-[#ffffff]"
           />
           <Button
             variant="primary"
@@ -274,11 +297,11 @@ function RoomInner() {
   // 2. 滿員阻斷檢測
   if (isOverflow) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#090b0e]">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#f5f2eb]">
         <AsciiWaveCanvas active={true} />
-        <div className="bg-[#12161f] p-6 max-w-md border border-red-500/50 rounded-2xl shadow-2xl relative z-30">
-          <h2 className="text-lg font-bold text-red-400 mb-2">房間席位已滿</h2>
-          <p className="text-xs text-slate-300 mb-4">
+        <div className="bg-[#ffffff] p-6 max-w-md border-2 border-[#18181b] rounded-2xl shadow-[6px_6px_0px_#18181b] relative z-30">
+          <h2 className="text-lg font-black text-[#ef4444] mb-2">房間席位已滿</h2>
+          <p className="text-xs text-slate-600 mb-4 font-medium">
             此房間已達人數上限 ({maxPlayers} 人)，請返回大廳選擇其他房間暗號。
           </p>
           <Button variant="primary" onClick={() => router.push("/")}>
@@ -292,15 +315,15 @@ function RoomInner() {
   // 3. 閒置斷線提示彈窗
   if (isIdle) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#090b0e]">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#f5f2eb]/90">
         <AsciiWaveCanvas active={true} />
-        <div className="bg-[#12161f] p-6 max-w-md border border-[#f59e0b]/50 rounded-2xl flex flex-col items-center space-y-3 shadow-2xl relative z-30">
-          <div className="w-12 h-12 rounded-full bg-amber-950/60 border border-[#f59e0b] flex items-center justify-center text-[#f59e0b]">
+        <div className="bg-[#ffffff] p-6 max-w-md border-2 border-[#18181b] rounded-2xl flex flex-col items-center space-y-3 shadow-[6px_6px_0px_#18181b] relative z-30">
+          <div className="w-12 h-12 rounded-2xl bg-[#fef3c7] border-2 border-[#18181b] flex items-center justify-center text-[#f59e0b] shadow-[2px_2px_0px_#18181b]">
             <Clock className="w-6 h-6" />
           </div>
-          <h2 className="text-lg font-bold text-[#f59e0b]">閒置連線已暫停</h2>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            您已超過 5 分鐘未操作，系統已自動釋放連線名額。點擊下方按鈕即可立即重連！
+          <h2 className="text-lg font-black text-[#18181b]">閒置連線已暫停</h2>
+          <p className="text-xs text-slate-600 leading-relaxed font-medium">
+            超過 5 分鐘未操作，系統已自動釋放席位資源。點擊下方按鈕即可重新進入！
           </p>
           <Button
             variant="primary"
@@ -310,7 +333,7 @@ function RoomInner() {
             }}
             className="gap-2 font-bold mt-2"
           >
-            <RefreshCw className="w-4 h-4 text-black" /> 重新進入房間
+            <RefreshCw className="w-4 h-4 text-[#18181b]" /> 重新進入房間
           </Button>
         </div>
       </div>
@@ -319,13 +342,13 @@ function RoomInner() {
 
   // 30 秒閒置預警浮動提示列
   const warningBannerJSX = mounted && isWarning ? (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[250] w-[92%] max-w-md bg-[#12161f] border border-[#f59e0b] rounded-xl p-3 shadow-2xl flex items-center justify-between animate-fade-in">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[250] w-[92%] max-w-md bg-[#ffffff] border-2 border-[#18181b] rounded-2xl p-3 shadow-[4px_4px_0px_#18181b] flex items-center justify-between animate-fade-in">
       <div className="flex items-center gap-3">
         <AlertCircle className="w-5 h-5 text-[#f59e0b] shrink-0" />
         <div className="text-left">
-          <h4 className="text-xs font-bold text-[#f59e0b]">即將自動離席</h4>
-          <p className="text-[11px] text-slate-300">
-            閒置倒數 <span className="font-bold text-sm text-[#f59e0b]">{remainingSeconds}</span> 秒
+          <h4 className="text-xs font-black text-[#18181b]">即將自動離席</h4>
+          <p className="text-[11px] text-slate-600 font-bold">
+            閒置倒數 <span className="font-mono text-sm text-[#ef4444]">{remainingSeconds}</span> 秒
           </p>
         </div>
       </div>
@@ -337,12 +360,12 @@ function RoomInner() {
 
   return (
     <main className="w-full max-w-4xl mx-auto flex flex-col justify-between min-h-[100dvh] relative py-1 px-2 sm:px-4">
-      {/* 互動 ASCII 字符海浪畫布 */}
+      {/* 互動波點陣列畫布 */}
       <AsciiWaveCanvas active={true} />
 
       {mounted && warningBannerJSX && createPortal(warningBannerJSX, document.body)}
 
-      {/* 鎖定階段聚光暗角特效層 */}
+      {/* 鎖定階段聚光遮罩 */}
       {status === "locked" && <div className="stage-vignette-locked" />}
 
       {/* 頂部全合一緊湊 HUD */}
@@ -368,7 +391,7 @@ function RoomInner() {
         onSendReaction={sendReaction}
       />
 
-      {/* 中央主舞台：價值主題卷軸 + 牌席 */}
+      {/* 中央主舞台：冷暖色溫光譜牌桌 + 翻牌水位線 */}
       <GameBoard
         board={board}
         currentConnectionId={currentConnId}
@@ -378,6 +401,7 @@ function RoomInner() {
         cardsPerPlayer={settings?.cardsPerPlayer || 2}
         lockedList={lockedList}
         selectedSlotId={selectedSlotId}
+        selectedHandCard={selectedHandCard}
         topic={topic}
         showTopicSetting={settings?.showTopic !== false}
         presenceSlotsMap={presenceSlotsMap}
@@ -390,12 +414,18 @@ function RoomInner() {
         onFlipCard={(targetKey) => flipCard(targetKey, playerId)}
       />
 
-      {/* 底部玩家扇形手牌與鎖定按鈕 */}
+      {/* 底部雙向直覺出牌塢 */}
       {status === "playing" && (
         <PlayerHand
           hand={myHand}
           playerName={playerName}
-          onPlayCard={handlePlayCard}
+          selectedCard={selectedHandCard}
+          onSelectCard={handleSelectHandCard}
+          onPlayCard={(cardVal) => {
+            placeCard(cardVal, playerName, selectedSlotId || undefined, playerId);
+            setSelectedSlotId(null);
+            setSelectedHandCard(null);
+          }}
           isLocked={isLocked}
           lockedCount={lockedList.filter((id) => uniquePlayerIds.has(id)).length}
           totalPlayers={totalPlayers}
@@ -406,13 +436,13 @@ function RoomInner() {
 
       {/* 揭牌階段底部指揮列 */}
       {status === "locked" && (
-        <div className="w-full bg-[#12161f] p-3 my-1.5 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-2 border border-[#f59e0b] shadow-lg animate-fade-in">
+        <div className="w-full bg-[#ffffff] p-3 my-1.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 border-2 border-[#18181b] shadow-[3px_3px_0px_#18181b] animate-fade-in">
           <div className="flex items-center gap-2 text-xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] animate-ping" />
-            <span className="text-white font-bold">
-              翻牌階段（已翻開 {board.filter((c) => c.flipped).length} / {board.length} 張）
+            <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] border border-[#18181b] animate-ping" />
+            <span className="text-[#18181b] font-black">
+              翻牌進度：已翻開 {board.filter((c) => c.flipped).length} / {board.length} 張
             </span>
-            <span className="text-slate-300 hidden md:inline text-xs">
+            <span className="text-slate-500 hidden md:inline text-xs font-bold">
               — 請點擊最有把握的卡牌翻開驗證！
             </span>
           </div>
@@ -432,15 +462,15 @@ function RoomInner() {
 
       {/* 大廳等待提示與房主開局按鈕 */}
       {(!status || status === "waiting") && (
-        <div className="w-full bg-[#12161f] p-3.5 my-1.5 rounded-xl text-center flex flex-col items-center border border-slate-700 shadow-lg">
-          <p className="text-xs text-slate-300 mb-2.5">
+        <div className="w-full bg-[#ffffff] p-4 my-1.5 rounded-2xl text-center flex flex-col items-center border-2 border-[#18181b] shadow-[4px_4px_0px_#18181b]">
+          <p className="text-xs text-slate-700 font-bold mb-3">
             {!isStorageLoaded
-              ? "正在連線同步房間狀態..."
+              ? "正在同步房間狀態..."
               : isHost
               ? totalPlayers >= 2
-                ? "全員已就緒！點擊下方按鈕即可開始發牌。"
-                : "等待至少 2 位玩家加入房間即可開始（可開新分頁測試）..."
-              : "等待房主開始發牌..."}
+                ? "全員就緒！點擊下方按鈕開始發牌。"
+                : "等待至少 2 位玩家加入即可開局（可開新視窗測試）..."
+              : "等待房主發牌開局..."}
           </p>
           {isHost && (
             <Button
@@ -450,13 +480,13 @@ function RoomInner() {
               onClick={() => {
                 if (isStorageLoaded && totalPlayers >= 2) dealCards(playerId);
               }}
-              className={`font-bold tracking-wider ${
+              className={`font-black tracking-wider ${
                 !isStorageLoaded || totalPlayers < 2 ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              <span className="flex items-center gap-1.5 text-black">
-                <Sparkles className="w-4 h-4 text-black" />
-                {totalPlayers < 2 ? "等待其他玩家加入 (至少 2 人)" : "開始發牌"}
+              <span className="flex items-center gap-2 text-[#18181b]">
+                <Sparkles className="w-4 h-4 text-[#18181b]" />
+                {totalPlayers < 2 ? "等待玩家加入 (至少 2 人)" : "開始發牌"}
               </span>
             </Button>
           )}
@@ -490,7 +520,7 @@ export default function RoomPage() {
 
   if (!roomId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#090b0e] text-white text-sm">
+      <div className="flex items-center justify-center min-h-screen bg-[#f5f2eb] text-[#18181b] text-sm font-black">
         正在載入房間資訊...
       </div>
     );

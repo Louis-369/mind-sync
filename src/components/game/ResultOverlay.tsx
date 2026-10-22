@@ -47,10 +47,10 @@ export function ResultOverlay({
           try {
             sound.playVictory();
             confetti({
-              particleCount: 90,
-              spread: 70,
+              particleCount: 100,
+              spread: 75,
               origin: { y: 0.6 },
-              colors: ["#f59e0b", "#38bdf8", "#10b981", "#ffffff"],
+              colors: ["#f59e0b", "#0ea5e9", "#10b981", "#ef4444"],
             });
           } catch (error) {
             console.error("觸發彩帶動畫失敗:", error);
@@ -142,11 +142,11 @@ export function ResultOverlay({
       <div className="game-action-bar animate-fade-in relative z-20">
         {isHost ? (
           <Button variant="primary" size="md" onClick={onRestart}>
-            <RotateCcw className="w-4 h-4 text-black mr-1" /> 再來一局
+            <RotateCcw className="w-4 h-4 text-[#18181b] mr-1" /> 再來一局
           </Button>
         ) : (
-          <div className="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-[#f59e0b] animate-ping" />
+          <div className="flex items-center gap-2 bg-[#ffffff] px-4 py-2 rounded-xl border-2 border-[#18181b] text-xs font-black text-[#18181b] shadow-[2px_2px_0px_#18181b]">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] border border-[#18181b] animate-ping" />
             <span>等待房主開始下一局...</span>
           </div>
         )}
@@ -157,34 +157,34 @@ export function ResultOverlay({
   if (!mounted) return null;
 
   const modalJSX = (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in pointer-events-auto">
-      <div className="bg-[#12161f] border border-slate-700 rounded-2xl p-6 text-center shadow-2xl relative w-full max-w-md my-auto flex flex-col items-center">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in pointer-events-auto">
+      <div className="bg-[#ffffff] border-2 border-[#18181b] rounded-3xl p-6 sm:p-8 text-center shadow-[8px_8px_0px_#18181b] relative w-full max-w-md my-auto flex flex-col items-center">
         {/* 圖示徽章 */}
-        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold mb-3 shadow-lg border-2 ${
-          isWin
-            ? "bg-emerald-500/20 border-emerald-500 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.4)]"
-            : "bg-red-500/20 border-red-500 text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.4)]"
-        }`}>
-          {isWin ? <CheckCircle2 className="w-8 h-8" /> : <AlertTriangle className="w-8 h-8" />}
+        <div
+          className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black mb-3 shadow-[3px_3px_0px_#18181b] border-2 border-[#18181b] ${
+            isWin ? "bg-[#d1fae5] text-[#059669]" : "bg-[#fee2e2] text-[#dc2626]"
+          }`}
+        >
+          {isWin ? <CheckCircle2 className="w-9 h-9" /> : <AlertTriangle className="w-9 h-9" />}
         </div>
 
-        <h2 className={`text-xl font-bold mb-1 tracking-wide ${isWin ? "text-emerald-400" : "text-red-400"}`}>
+        <h2 className={`text-xl sm:text-2xl font-black mb-1 tracking-wide ${isWin ? "text-[#059669]" : "text-[#dc2626]"}`}>
           {resultTitle}
         </h2>
 
         {/* 默契同步率膠囊 */}
-        <div className="flex items-center gap-2 my-2 bg-slate-800 px-4 py-1.5 rounded-full border border-slate-700">
-          <span className="text-xs text-slate-400">默契同步率</span>
-          <span className="text-base font-bold text-[#f59e0b] font-mono">{syncRate}%</span>
+        <div className="flex items-center gap-2 my-2 bg-[#f4f1ea] px-4 py-1.5 rounded-full border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b]">
+          <span className="text-xs font-bold text-slate-600">默契同步率</span>
+          <span className="text-lg font-black text-[#f59e0b] font-mono">{syncRate}%</span>
         </div>
 
         {/* 評語 */}
-        <p className="text-xs sm:text-sm text-slate-200 my-3 max-w-xs leading-relaxed bg-slate-800/80 p-3 rounded-xl border border-slate-700 text-left">
+        <p className="text-xs sm:text-sm text-slate-700 font-bold my-3 max-w-xs leading-relaxed bg-[#f4f1ea] p-3.5 rounded-2xl border-2 border-[#18181b] text-left shadow-[2px_2px_0px_#18181b]">
           {detailRoast}
         </p>
 
         {/* 操作按鈕組 */}
-        <div className="flex flex-col items-center justify-center gap-2 w-full max-w-xs mx-auto mt-2">
+        <div className="flex flex-col items-center justify-center gap-2.5 w-full max-w-xs mx-auto mt-2">
           <Button
             variant="secondary"
             size="md"
@@ -193,8 +193,8 @@ export function ResultOverlay({
           >
             {copiedReport ? (
               <>
-                <Check className="w-4 h-4 text-emerald-400" />
-                <span>已複製戰報！快去貼給朋友看</span>
+                <Check className="w-4 h-4 text-emerald-600" />
+                <span>已複製戰報！快貼給朋友看</span>
               </>
             ) : (
               <>
@@ -209,18 +209,18 @@ export function ResultOverlay({
               variant="ghost"
               size="md"
               onClick={() => setShowModal(false)}
-              className="w-full sm:w-auto flex items-center justify-center gap-1.5 text-xs"
+              className="w-full sm:w-auto flex items-center justify-center gap-1.5 text-xs font-bold"
             >
               <Eye className="w-4 h-4" />
-              <span>查看桌面卡牌</span>
+              <span>看桌面卡牌</span>
             </Button>
 
             {isHost ? (
-              <Button variant="primary" size="md" onClick={onRestart} className="w-full sm:w-auto text-xs font-bold">
-                <RotateCcw className="w-3.5 h-3.5 text-black mr-1" /> 再來一局
+              <Button variant="primary" size="md" onClick={onRestart} className="w-full sm:w-auto text-xs font-black">
+                <RotateCcw className="w-3.5 h-3.5 text-[#18181b] mr-1" /> 再來一局
               </Button>
             ) : (
-              <div className="text-xs text-slate-400 py-1 px-2">
+              <div className="text-xs text-slate-500 font-bold py-1 px-2">
                 等待房主開新局...
               </div>
             )}

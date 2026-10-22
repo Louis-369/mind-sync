@@ -18,19 +18,24 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = "inline-flex items-center justify-center font-bold rounded-lg transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer tracking-wide";
+  const baseStyles =
+    "inline-flex items-center justify-center font-black rounded-xl transition-all duration-100 disabled:opacity-40 disabled:pointer-events-none cursor-pointer tracking-wider select-none";
 
   const variants = {
-    primary: "bg-[#f59e0b] hover:bg-[#fbbf24] text-black shadow-md border border-[#f59e0b]",
-    secondary: "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shadow-sm",
-    danger: "bg-red-600 hover:bg-red-500 text-white shadow-md border border-red-500",
-    ghost: "bg-transparent hover:bg-slate-800 text-slate-400 hover:text-white",
+    primary:
+      "bg-[#f59e0b] hover:bg-[#fbbf24] text-[#18181b] border-2 border-[#18181b] shadow-[3px_3px_0px_#18181b] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#18181b]",
+    secondary:
+      "bg-[#ffffff] hover:bg-[#f4f1ea] text-[#18181b] border-2 border-[#18181b] shadow-[3px_3px_0px_#18181b] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#18181b]",
+    danger:
+      "bg-[#ef4444] hover:bg-[#f87171] text-white border-2 border-[#18181b] shadow-[3px_3px_0px_#18181b] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0px_#18181b]",
+    ghost:
+      "bg-transparent hover:bg-[#e7e1d5]/60 text-[#52525b] hover:text-[#18181b] border-2 border-transparent active:scale-95",
   };
 
   const sizes = {
-    sm: "px-3 py-1 text-xs",
+    sm: "px-3 py-1.5 text-xs rounded-lg shadow-[2px_2px_0px_#18181b] active:shadow-[0px_0px_0px_#18181b]",
     md: "px-4 py-2 text-xs sm:text-sm",
-    lg: "px-6 py-2.5 text-sm sm:text-base font-bold",
+    lg: "px-6 py-3 text-sm sm:text-base shadow-[4px_4px_0px_#18181b] active:shadow-[2px_2px_0px_#18181b]",
   };
 
   return (
