@@ -7,7 +7,6 @@ import { NameInput } from "../components/lobby/NameInput";
 import { EmojiPicker } from "../components/lobby/EmojiPicker";
 import { TutorialModal } from "../components/lobby/TutorialModal";
 import { Button } from "../components/ui/Button";
-import { CalligraphyMatrix } from "../components/ui/CalligraphyMatrix";
 import { usePlayerId } from "../hooks/usePlayerId";
 
 export default function LobbyPage() {
@@ -27,9 +26,6 @@ export default function LobbyPage() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative overflow-hidden">
-      {/* 偷師 ascii-magic 之背景和風字符水波流動 */}
-      <CalligraphyMatrix />
-
       {/* 背景浮世繪深海波浪暈光 */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-ukiyo-wave/25 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-80 h-80 bg-ukiyo-gold/10 rounded-full blur-[120px] pointer-events-none" />

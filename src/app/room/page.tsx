@@ -17,7 +17,6 @@ import { PlayerHand } from "../../components/game/PlayerHand";
 import { HostPanel } from "../../components/game/HostPanel";
 import { ResultOverlay } from "../../components/game/ResultOverlay";
 import { Button } from "../../components/ui/Button";
-import { CalligraphyMatrix } from "../../components/ui/CalligraphyMatrix";
 import { TOPIC_DECK, DEFAULT_TOPIC } from "../../lib/constants";
 
 function RoomInner() {
@@ -329,9 +328,6 @@ function RoomInner() {
 
   return (
     <main className="w-full max-w-4xl mx-auto flex flex-col justify-between min-h-[100dvh] relative py-1.5 px-2 sm:px-4">
-      {/* 偷師 ascii-magic 之背景和風字符水波流動 */}
-      <CalligraphyMatrix />
-
       {mounted && warningBannerJSX && createPortal(warningBannerJSX, document.body)}
 
       {/* 鎖定階段聚光暗角特效層 */}
@@ -371,6 +367,7 @@ function RoomInner() {
         lockedList={lockedList}
         selectedSlotId={selectedSlotId}
         topic={topic}
+        showTopicSetting={settings?.showTopic !== false}
         presenceSlotsMap={presenceSlotsMap}
         isHost={isHost}
         activePlayerIds={getActivePlayerIds()}

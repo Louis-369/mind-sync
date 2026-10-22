@@ -127,41 +127,11 @@ export function ResultOverlay({
     }
   }
 
-  // 偷師 ascii-magic 的 ASCII 證書戰報單生成
-  const asciiProgressBar = (() => {
-    const totalBars = 10;
-    const filled = Math.min(totalBars, Math.max(0, Math.round((syncRate / 100) * totalBars)));
-    return "█".repeat(filled) + "░".repeat(totalBars - filled);
-  })();
-
-  const balanceSymbol = isWin ? "━━━━━━━●━━━━━━━" : "━━━━━▲━━●━━━━━━";
-
-  const cardChainText = sortedBoard
-    .map((c, idx) => {
-      const valStr = String(c.cardValue).padStart(2, "0");
-      const prev = sortedBoard[idx - 1];
-      const isErr = prev && prev.cardValue > c.cardValue;
-      return isErr ? `[!${valStr}!]:${c.playerName}` : `[${valStr}]:${c.playerName}`;
-    })
-    .join(" ─► ");
-
-  const asciiReportText = [
-    "┌─── 🎴 心天秤 ‧ 默契檢定戰報 ───┐",
-    ` 主題：《${topic?.title || "純數字心流"}》`,
-    ` 判定：【${stampLabel}】 ${balanceSymbol}`,
-    ` 同步：[${asciiProgressBar}] ${syncRate}%`,
-    " 牌席鏈：",
-    ` ${cardChainText || "無卡牌"}`,
-    " 結語：",
-    ` ${detailRoast}`,
-    "└──────────────────────────────┘",
-    "來測你們的心靈天秤：https://louis-369.github.io/mind-sync/",
-  ].join("\n");
-
   // 產生 Threads / 社群複製戰報
   const handleCopyReport = async () => {
     try {
-      await navigator.clipboard.writeText(asciiReportText);
+      const shareText = `🎴 心天秤 (Mind Sync) ‧ 默契檢定報告\n📌 本局主題：《${topic?.title || "純數字心流"}》\n⚖️ 判定：【${stampLabel}】 心靈同步率 ${syncRate}%\n💬 結語：${detailRoast}\n\n🌐 來測你們的價值觀默契：https://louis-369.github.io/mind-sync/`;
+      await navigator.clipboard.writeText(shareText);
       sound.playSlotTap();
       setCopiedReport(true);
       setTimeout(() => setCopiedReport(false), 2500);
@@ -221,20 +191,9 @@ export function ResultOverlay({
           </div>
 
           {/* 戰犯抓包 / 神默契調侃評語 */}
-          <p className="text-xs sm:text-sm text-ukiyo-foam/90 my-2 max-w-xs leading-relaxed font-serif bg-ukiyo-surface/60 p-3 rounded-2xl border border-ukiyo-foam/10">
+          <p className="text-xs sm:text-sm text-ukiyo-foam/90 my-3 max-w-xs leading-relaxed font-serif bg-ukiyo-surface/60 p-3 rounded-2xl border border-ukiyo-foam/10">
             {detailRoast}
           </p>
-
-          {/* ASCII 證書戰報預覽框 (偷師 ascii-magic) */}
-          <div className="w-full max-w-xs my-1 text-left">
-            <div className="flex items-center justify-between text-[10px] text-ukiyo-mist/70 font-mono px-1 pb-1">
-              <span>ASCII 默契戰報預覽</span>
-              <span>[純文字可複製]</span>
-            </div>
-            <pre className="w-full text-left font-mono text-[9.5px] sm:text-[10.5px] leading-tight text-ukiyo-gold/90 bg-black/60 p-2.5 rounded-xl border border-ukiyo-gold/20 overflow-x-auto whitespace-pre select-all shadow-inner scrollbar-thin">
-              {asciiReportText}
-            </pre>
-          </div>
 
           {/* 操作按鈕組 */}
           <div className="flex flex-col items-center justify-center gap-2 w-full max-w-xs mx-auto mt-2">

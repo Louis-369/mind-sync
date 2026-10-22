@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Sparkles, Trophy, ArrowRight, Dices } from "lucide-react";
+import React, { useState } from "react";
+import { Sparkles, Trophy, ArrowRight, Dices, Eye, EyeOff } from "lucide-react";
 import { BoardSlot } from "./BoardSlot";
 import { BoardCard, TopicItem } from "../../types/game";
 import { useBoardState } from "../../hooks/useBoardState";
@@ -16,6 +16,7 @@ interface GameBoardProps {
   lockedList?: string[];
   selectedSlotId?: string | null;
   topic?: TopicItem;
+  showTopicSetting?: boolean;
   presenceSlotsMap?: Record<string, string[]>;
   isHost?: boolean;
   activePlayerIds?: Set<string>;
@@ -36,6 +37,7 @@ export function GameBoard({
   lockedList = [],
   selectedSlotId,
   topic,
+  showTopicSetting = true,
   presenceSlotsMap = {},
   isHost = false,
   activePlayerIds,
@@ -45,6 +47,7 @@ export function GameBoard({
   onRecallCard,
   onFlipCard,
 }: GameBoardProps) {
+  const [isTopicCollapsed, setIsTopicCollapsed] = useState<boolean>(false);
   const { totalSlotsCount, slotsMap, slotCorrectnessMap, isFinishedReveal } = useBoardState(
     board,
     totalPlayers,
@@ -91,50 +94,77 @@ export function GameBoard({
             已落牌 {board.length} / {totalSlotsCount} 張 (共 {totalSlotsCount} 席)
           </span>
         </div>
-        <div className="text-[10px] text-ukiyo-mist font-normal hidden md:block">
-          💡 點選空席位可預定落牌，點擊已出卡牌可收回
-        </div>
-      </div>
 
-      {/* 本局價值主題卷軸 (Topic Scroll Banner) */}
-      <div className="relative z-10 w-full max-w-xl topic-scroll-banner rounded-2xl p-2.5 my-1 text-center flex flex-col items-center">
-        <div className="flex items-center justify-between w-full mb-1">
-          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-ukiyo-gold font-serif font-bold">
-            <span className="w-2 h-2 rounded-full bg-ukiyo-gold animate-pulse" />
-            <span>價值天秤主題</span>
-          </div>
-
-          {isHost && onRandomTopic && status === "waiting" && (
+        {/* 主題收合時的展開快捷按鈕，或操作提示 */}
+        <div className="flex items-center gap-2">
+          {showTopicSetting && isTopicCollapsed && (
             <button
-              onClick={onRandomTopic}
-              className="flex items-center gap-1 text-[10px] sm:text-xs text-ukiyo-gold hover:text-ukiyo-foam bg-ukiyo-gold/15 hover:bg-ukiyo-gold/25 px-2.5 py-0.5 rounded-full border border-ukiyo-gold/40 transition-all font-serif cursor-pointer active:scale-95"
+              onClick={() => setIsTopicCollapsed(false)}
+              className="flex items-center gap-1 text-[10px] text-ukiyo-gold bg-ukiyo-surface/90 hover:bg-ukiyo-gold/15 px-2 py-0.5 rounded-full border border-ukiyo-gold/40 transition-all font-serif cursor-pointer active:scale-95"
             >
-              <Dices className="w-3 h-3" />
-              <span>抽籤換題</span>
+              <Eye className="w-3 h-3 text-ukiyo-gold" />
+              <span>展開主題:《{topic?.title || "心流"}》</span>
             </button>
           )}
-        </div>
-
-        <h3 className="text-sm sm:text-base md:text-lg font-serif font-black text-ukiyo-foam tracking-wider my-0.5 drop-shadow">
-          {topic?.title || "純數字心流默契"}
-        </h3>
-
-        {/* 標尺兩端極端標籤 */}
-        <div className="flex items-center justify-between w-full mt-1.5 pt-1.5 border-t border-ukiyo-foam/10 text-[10px] sm:text-xs font-serif">
-          <span className="text-ukiyo-gold/90 font-bold truncate max-w-[45%] text-left">
-            1 ‧ {topic?.minLabel || "極小值"}
-          </span>
-
-          <div className="flex items-center gap-1 text-[9px] text-ukiyo-mist shrink-0 px-1 font-mono">
-            <span>默契遞增</span>
-            <ArrowRight className="w-2.5 h-2.5 text-ukiyo-gold" />
+          <div className="text-[10px] text-ukiyo-mist font-normal hidden md:block">
+            💡 點選空席位預定落牌，點擊已出卡牌收回
           </div>
-
-          <span className="text-ukiyo-gold/90 font-bold truncate max-w-[45%] text-right">
-            {topic?.maxLabel || "極大值"} ‧ 100
-          </span>
         </div>
       </div>
+
+      {/* 本局價值主題卷軸 (Topic Scroll Banner) - 支援一鍵隱藏/收合 */}
+      {showTopicSetting && !isTopicCollapsed && (
+        <div className="relative z-10 w-full max-w-xl topic-scroll-banner rounded-2xl p-2.5 my-1 text-center flex flex-col items-center transition-all animate-fade-in">
+          <div className="flex items-center justify-between w-full mb-1">
+            <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-ukiyo-gold font-serif font-bold">
+              <span className="w-2 h-2 rounded-full bg-ukiyo-gold animate-pulse" />
+              <span>價值天秤主題</span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              {isHost && onRandomTopic && status === "waiting" && (
+                <button
+                  onClick={onRandomTopic}
+                  className="flex items-center gap-1 text-[10px] sm:text-xs text-ukiyo-gold hover:text-ukiyo-foam bg-ukiyo-gold/15 hover:bg-ukiyo-gold/25 px-2.5 py-0.5 rounded-full border border-ukiyo-gold/40 transition-all font-serif cursor-pointer active:scale-95"
+                >
+                  <Dices className="w-3 h-3" />
+                  <span>抽籤換題</span>
+                </button>
+              )}
+
+              {/* 一鍵收合隱藏主題按鈕 */}
+              <button
+                onClick={() => setIsTopicCollapsed(true)}
+                title="收合隱藏主題卷軸，獲取更大牌桌視野"
+                className="flex items-center gap-1 text-[10px] text-ukiyo-mist hover:text-ukiyo-gold bg-ukiyo-bg/80 hover:bg-ukiyo-gold/10 px-2 py-0.5 rounded-full border border-ukiyo-foam/20 hover:border-ukiyo-gold/40 transition-all font-serif cursor-pointer active:scale-95"
+              >
+                <EyeOff className="w-3 h-3" />
+                <span>隱藏主題</span>
+              </button>
+            </div>
+          </div>
+
+          <h3 className="text-sm sm:text-base md:text-lg font-serif font-black text-ukiyo-foam tracking-wider my-0.5 drop-shadow">
+            {topic?.title || "純數字心流默契"}
+          </h3>
+
+          {/* 標尺兩端極端標籤 */}
+          <div className="flex items-center justify-between w-full mt-1.5 pt-1.5 border-t border-ukiyo-foam/10 text-[10px] sm:text-xs font-serif">
+            <span className="text-ukiyo-gold/90 font-bold truncate max-w-[45%] text-left">
+              1 ‧ {topic?.minLabel || "極小值"}
+            </span>
+
+            <div className="flex items-center gap-1 text-[9px] text-ukiyo-mist shrink-0 px-1 font-mono">
+              <span>默契遞增</span>
+              <ArrowRight className="w-2.5 h-2.5 text-ukiyo-gold" />
+            </div>
+
+            <span className="text-ukiyo-gold/90 font-bold truncate max-w-[45%] text-right">
+              {topic?.maxLabel || "極大值"} ‧ 100
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* 盤面槽位 (席位精準動態排版：每列固定 4 個席位，手機屏一次全覽免橫滾) */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-full gap-2 sm:gap-3 md:gap-4 min-h-[140px] my-auto">

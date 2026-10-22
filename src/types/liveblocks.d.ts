@@ -27,6 +27,7 @@ declare global {
         maxPlayers: number;
         cardsPerPlayer: number;
         showCollisionName: boolean;
+        showTopic?: boolean;
       }>;
       
       // 盤面位置與卡片對照 (位置索引 string -> BoardCard)

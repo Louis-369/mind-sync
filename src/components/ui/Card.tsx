@@ -28,25 +28,48 @@ export function Card({
   // 檢查數字下方是否有底線 (針對 6 與 9 避免混淆)
   const showUnderline = value === 6 || value === 9 || value === 66 || value === 99;
 
-  // ASCII Glitch 抽搐特效 (當翻開且順序錯誤時觸發)
+  // ASCII Glitch 抽搐特效 (雙階段：1.8s 高頻崩潰期 + 每 2.2s 間歇餘震)
   const [glitchText, setGlitchText] = useState<string | null>(null);
 
   React.useEffect(() => {
-    if (isError && flipped) {
-      const glitchChars = ["¥#", "?!", "§∆", "ERR", "破!"];
-      let count = 0;
-      const interval = setInterval(() => {
-        setGlitchText(glitchChars[count % glitchChars.length]);
-        count++;
-        if (count >= 6) {
-          clearInterval(interval);
-          setGlitchText(null);
-        }
-      }, 55);
-      return () => clearInterval(interval);
-    } else {
+    if (!isError || !flipped) {
       setGlitchText(null);
+      return;
     }
+
+    const glitchChars = ["破!", "凶!", "逆!", "¥#?", "ERR", "裂!", "§∆", "✘✘"];
+    let burstCount = 0;
+    let echoInterval: NodeJS.Timeout | null = null;
+    let echoTimeout: NodeJS.Timeout | null = null;
+
+    // 第一階段：爆發劇烈崩潰期 (1.8 秒，每 90ms 切換，共 20 次)
+    const burstInterval = setInterval(() => {
+      setGlitchText(glitchChars[burstCount % glitchChars.length]);
+      burstCount++;
+      if (burstCount >= 20) {
+        clearInterval(burstInterval);
+        setGlitchText(null);
+
+        // 第二階段：持續間歇餘震 (每 2.2 秒閃現 0.45 秒故障)
+        echoInterval = setInterval(() => {
+          let flickerCount = 0;
+          const flickerSubInterval = setInterval(() => {
+            setGlitchText(glitchChars[flickerCount % glitchChars.length]);
+            flickerCount++;
+            if (flickerCount >= 5) {
+              clearInterval(flickerSubInterval);
+              setGlitchText(null);
+            }
+          }, 90);
+        }, 2200);
+      }
+    }, 90);
+
+    return () => {
+      clearInterval(burstInterval);
+      if (echoInterval) clearInterval(echoInterval);
+      if (echoTimeout) clearTimeout(echoTimeout);
+    };
   }, [isError, flipped]);
 
   // 3D 視差傾斜 (3D Tilt) 與金箔反光位置

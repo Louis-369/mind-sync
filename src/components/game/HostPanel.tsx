@@ -75,6 +75,27 @@ export function HostPanel({
                 ))}
               </select>
             </div>
+
+            {/* 價值主題卷軸全局開關 */}
+            <div className="col-span-2 flex items-center justify-between pt-2 border-t border-ukiyo-foam/10">
+              <div className="flex flex-col">
+                <span className="text-xs text-ukiyo-foam font-bold">啟用價值天秤主題</span>
+                <span className="text-[10px] text-ukiyo-mist">關閉後進入純數字默契模式，隱藏主題卷軸</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onUpdateSettings({ showTopic: settings.showTopic === false ? true : false })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                  settings.showTopic !== false ? "bg-ukiyo-gold" : "bg-ukiyo-bg border border-ukiyo-foam/20"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-ukiyo-surface shadow-md transition-transform ${
+                    settings.showTopic !== false ? "translate-x-6 bg-ukiyo-bg" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         )}
 

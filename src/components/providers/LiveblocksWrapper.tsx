@@ -120,6 +120,7 @@ function RoomProviderContent({ roomId, children, fallback }: { roomId: string; c
           maxPlayers: DEFAULT_SETTINGS.maxPlayers,
           cardsPerPlayer: DEFAULT_SETTINGS.cardsPerPlayer,
           showCollisionName: DEFAULT_SETTINGS.showCollisionName,
+          showTopic: DEFAULT_SETTINGS.showTopic !== false,
         }),
         board: new LiveMap(),
         lockedPlayers: new LiveList([]),

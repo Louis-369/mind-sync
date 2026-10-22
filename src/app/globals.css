@@ -207,20 +207,21 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(201, 169, 110, 0.1);
   }
 
-  /* ASCII Glitch 抽搐動效 */
+  /* ASCII Glitch 劇烈抽搐動效 (強化紅藍色差與斷層跳動) */
   .animate-ascii-glitch {
-    animation: asciiGlitch 0.35s steps(2) infinite;
-    text-shadow: -1.5px 0 #c73e1d, 1.5px 0 #2d5a7b;
+    animation: asciiGlitch 0.22s steps(2) infinite;
+    text-shadow: -2.5px 0 rgba(199, 62, 29, 0.95), 2.5px 0 rgba(45, 90, 123, 0.95);
+    filter: drop-shadow(0 0 6px rgba(199, 62, 29, 0.6));
   }
 }
 
 @keyframes asciiGlitch {
-  0% { transform: translate(0) scale(1); }
-  20% { transform: translate(-2px, 1px) scale(1.05); }
-  40% { transform: translate(2px, -1px) scale(0.97); }
-  60% { transform: translate(-1px, -2px) scale(1.03); }
-  80% { transform: translate(1px, 2px) scale(0.98); }
-  100% { transform: translate(0) scale(1); }
+  0% { transform: translate(0) scale(1.05); }
+  20% { transform: translate(-3px, 2px) skewX(-2deg) scale(1.12); }
+  40% { transform: translate(3px, -2px) skewX(3deg) scale(1.02); }
+  60% { transform: translate(-2px, -3px) skewY(2deg) scale(1.1); }
+  80% { transform: translate(2px, 3px) skewX(-1deg) scale(1.04); }
+  100% { transform: translate(0) scale(1.05); }
 }
 
 @keyframes screenShake {
@@ -240,19 +241,4 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-@keyframes matrixWave {
-  0% {
-    transform: translateY(0px) scale(0.95);
-    opacity: 0.35;
-  }
-  50% {
-    transform: translateY(-8px) scale(1.08);
-    opacity: 0.95;
-  }
-  100% {
-    transform: translateY(-16px) scale(0.95);
-    opacity: 0.4;
-  }
 }

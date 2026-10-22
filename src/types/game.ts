@@ -18,6 +18,7 @@ export interface GameSettings {
   maxPlayers: number;           // 人數上限 (2-4人)
   cardsPerPlayer: number;       // 每人發牌數 (1-10張)
   showCollisionName: boolean;   // 顯示碰撞撞牌玩家名稱
+  showTopic?: boolean;          // 是否啟用並顯示價值主題卷軸 (預設 true)
 }
 
 // 盤面單張卡片放置狀態
