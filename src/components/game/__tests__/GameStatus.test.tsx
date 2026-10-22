@@ -14,6 +14,6 @@ describe('GameStatus Component', () => {
       />
     );
     expect(screen.getByText('🐶-🚀-🍎')).toBeInTheDocument();
-    expect(screen.getByText('3/4 NODES')).toBeInTheDocument();
+    expect(screen.getByText('3/4 人席')).toBeInTheDocument();
   });
 });

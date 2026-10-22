@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Terminal, Cpu, ArrowRight, Dices, Eye, EyeOff } from "lucide-react";
+import { Sparkles, Trophy, ArrowRight, Dices, Eye, EyeOff } from "lucide-react";
 import { BoardSlot } from "./BoardSlot";
 import { BoardCard, TopicItem } from "../../types/game";
 import { useBoardState } from "../../hooks/useBoardState";
@@ -67,29 +67,23 @@ export function GameBoard({
   }
 
   return (
-    <div className="w-full flex-1 min-h-[260px] sm:min-h-[300px] md:min-h-[360px] bg-[#030609]/95 border-2 border-[#00ff9d]/40 p-2 sm:p-4 relative flex flex-col items-center justify-between my-2 font-mono shadow-[0_0_25px_rgba(0,0,0,0.9)] overflow-hidden">
-      {/* 頂部四角裝飾錨點 */}
-      <div className="absolute top-1 left-1 text-[9px] text-[#00ff9d]/40 pointer-events-none">+</div>
-      <div className="absolute top-1 right-1 text-[9px] text-[#00ff9d]/40 pointer-events-none">+</div>
-      <div className="absolute bottom-1 left-1 text-[9px] text-[#00ff9d]/40 pointer-events-none">+</div>
-      <div className="absolute bottom-1 right-1 text-[9px] text-[#00ff9d]/40 pointer-events-none">+</div>
-
+    <div className="w-full flex-1 min-h-[260px] sm:min-h-[300px] md:min-h-[360px] bg-[#12161f] border border-slate-700 rounded-xl p-3 sm:p-5 relative flex flex-col items-center justify-between my-2 shadow-2xl overflow-hidden">
       {/* 結算完成提示列 */}
       {status === "finished" && (
-        <div className="relative z-20 w-full mb-1.5 p-1.5 bg-[#00ff9d]/15 border border-[#00ff9d] flex items-center justify-between text-xs text-[#00ff9d] animate-fade-in font-bold">
+        <div className="relative z-20 w-full mb-2 p-2 rounded-lg bg-slate-800 border border-[#f59e0b]/50 flex items-center justify-between text-xs text-[#f59e0b] animate-fade-in font-bold">
           <div className="flex items-center gap-1.5">
-            <Cpu className="w-4 h-4 text-[#00ff9d] animate-pulse" />
-            <span>SYS://MEM_SCAN_COMPLETE (檢視資料節點數值與順序)</span>
+            <Trophy className="w-4 h-4 text-[#f59e0b] animate-bounce" />
+            <span>盤面檢視模式（點數與順序已全數揭曉）</span>
           </div>
         </div>
       )}
 
       {/* 頂部狀態列 */}
-      <div className="relative z-10 w-full flex items-center justify-between px-1 py-1 text-xs border-b border-[#00ff9d]/20 pb-1.5">
-        <div className="flex items-center gap-1.5 font-bold text-[#00ff9d] text-[11px] sm:text-xs">
-          <Terminal className="w-3.5 h-3.5 text-[#00e5ff]" />
+      <div className="relative z-10 w-full flex items-center justify-between px-1 py-1 text-xs border-b border-slate-800 pb-2">
+        <div className="flex items-center gap-1.5 font-bold text-white text-[11px] sm:text-xs">
+          <Sparkles className="w-3.5 h-3.5 text-[#f59e0b]" />
           <span>
-            MEM_ALLOC: {board.length} / {totalSlotsCount} NODES (MAX: {totalSlotsCount})
+            已落牌 {board.length} / {totalSlotsCount} 張 (共 {totalSlotsCount} 席)
           </span>
         </div>
 
@@ -98,77 +92,77 @@ export function GameBoard({
           {showTopicSetting && isTopicCollapsed && (
             <button
               onClick={() => setIsTopicCollapsed(false)}
-              className="flex items-center gap-1 text-[10px] text-[#00e5ff] bg-black/80 hover:bg-[#00e5ff]/20 px-2 py-0.5 border border-[#00e5ff]/50 transition-all cursor-pointer active:scale-95"
+              className="flex items-center gap-1 text-[11px] text-[#f59e0b] bg-slate-800 hover:bg-slate-700 px-2.5 py-0.5 rounded border border-[#f59e0b]/40 transition-all cursor-pointer active:scale-95 font-medium"
             >
-              <Eye className="w-3 h-3 text-[#00e5ff]" />
-              <span>[EXPAND_BENCHMARK: {topic?.title || "CLASSIC"}]</span>
+              <Eye className="w-3 h-3 text-[#f59e0b]" />
+              <span>展開主題：《{topic?.title || "經典心流"}》</span>
             </button>
           )}
-          <div className="text-[10px] text-[#00ff9d]/50 hidden md:block">
-            &gt; SELECT_NODE_TO_INSERT_OR_RECALL
+          <div className="text-[11px] text-slate-400 hidden md:block">
+            點選空席位落牌，點擊已出卡牌可收回
           </div>
         </div>
       </div>
 
-      {/* 基準測試協定橫幅 (Benchmark Query) */}
+      {/* 本局價值主題橫幅 */}
       {showTopicSetting && !isTopicCollapsed && (
-        <div className="relative z-10 w-full max-w-xl bg-[#04080e] border border-[#00e5ff]/60 p-2 sm:p-2.5 my-1 text-center flex flex-col items-center shadow-[0_0_15px_rgba(0,229,255,0.15)] animate-fade-in">
-          <div className="flex items-center justify-between w-full mb-1 border-b border-[#00e5ff]/20 pb-1">
-            <div className="flex items-center gap-1.5 text-[10px] text-[#00e5ff] font-bold">
-              <span className="w-1.5 h-1.5 bg-[#00e5ff] animate-ping" />
-              <span>[ PROTOCOL_BENCHMARK ]</span>
+        <div className="relative z-10 w-full max-w-xl topic-scroll-banner p-3 my-1.5 text-center flex flex-col items-center animate-fade-in">
+          <div className="flex items-center justify-between w-full mb-1">
+            <div className="flex items-center gap-1.5 text-xs text-[#f59e0b] font-bold">
+              <span className="w-2 h-2 rounded-full bg-[#f59e0b] animate-pulse" />
+              <span>本局主題</span>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               {isHost && onRandomTopic && status === "waiting" && (
                 <button
                   onClick={onRandomTopic}
-                  className="flex items-center gap-1 text-[10px] text-[#ffb000] hover:bg-[#ffb000]/20 px-2 py-0.5 border border-[#ffb000]/50 transition-all cursor-pointer active:scale-95"
+                  className="flex items-center gap-1 text-[11px] text-[#f59e0b] bg-[#f59e0b]/15 hover:bg-[#f59e0b]/25 px-2.5 py-0.5 rounded border border-[#f59e0b]/40 transition-all cursor-pointer active:scale-95"
                 >
                   <Dices className="w-3 h-3" />
-                  <span>[REROLL_QUERY]</span>
+                  <span>抽籤換題</span>
                 </button>
               )}
 
               <button
                 onClick={() => setIsTopicCollapsed(true)}
-                title="最小化測試協定"
-                className="flex items-center gap-1 text-[10px] text-[#00ff9d]/70 hover:text-[#00ff9d] hover:bg-[#00ff9d]/20 px-2 py-0.5 border border-[#00ff9d]/40 transition-all cursor-pointer active:scale-95"
+                title="隱藏主題以獲取更大牌桌視野"
+                className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded border border-slate-700 transition-all cursor-pointer active:scale-95"
               >
                 <EyeOff className="w-3 h-3" />
-                <span>[HIDE]</span>
+                <span>隱藏主題</span>
               </button>
             </div>
           </div>
 
-          <h3 className="text-sm sm:text-base font-black text-[#ffffff] tracking-wider my-0.5 drop-shadow-[0_0_6px_#00e5ff]">
-            &gt; {topic?.title || "SYS://BENCHMARK_ALPHA"}
+          <h3 className="text-base sm:text-lg font-bold text-white tracking-wide my-1">
+            {topic?.title || "純數字心流默契"}
           </h3>
 
-          {/* 兩端極限標尺刻度 */}
-          <div className="flex items-center justify-between w-full mt-1 pt-1 border-t border-[#00e5ff]/20 text-[10px] sm:text-[11px]">
-            <span className="text-[#00e5ff] font-bold truncate max-w-[45%] text-left">
-              [001: {topic?.minLabel || "MIN_LIMIT"}]
+          {/* 兩端極限標尺 */}
+          <div className="flex items-center justify-between w-full mt-1.5 pt-1.5 border-t border-slate-800 text-xs">
+            <span className="text-[#f59e0b] font-bold truncate max-w-[45%] text-left">
+              1 ‧ {topic?.minLabel || "極小值"}
             </span>
 
-            <div className="flex items-center gap-1 text-[9px] text-[#00ff9d]/60 shrink-0 px-1 font-mono">
-              <span>SYNC_GRADIENT</span>
-              <ArrowRight className="w-2.5 h-2.5 text-[#00ff9d]" />
+            <div className="flex items-center gap-1 text-[10px] text-slate-400 shrink-0 px-1 font-mono">
+              <span>默契遞增</span>
+              <ArrowRight className="w-2.5 h-2.5 text-[#f59e0b]" />
             </div>
 
-            <span className="text-[#00e5ff] font-bold truncate max-w-[45%] text-right">
-              [{topic?.maxLabel || "MAX_LIMIT"} :100]
+            <span className="text-[#f59e0b] font-bold truncate max-w-[45%] text-right">
+              {topic?.maxLabel || "極大值"} ‧ 100
             </span>
           </div>
         </div>
       )}
 
-      {/* 盤面記憶體節點 (每列 4 槽位) */}
+      {/* 盤面槽位 (每列 4 槽位) */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-full gap-2 sm:gap-3 min-h-[140px] my-auto">
         {slotRows.map((rowSlotIndexes, rowIndex) => (
           <div
             key={`row-${rowIndex}`}
-            className="flex items-center justify-center gap-1.5 sm:gap-3 w-full flex-wrap py-0.5"
+            className="flex items-center justify-center gap-2 sm:gap-4 w-full flex-wrap py-1"
           >
             {rowSlotIndexes.map((idx) => {
               const slotKey = `slot-${idx}`;
@@ -204,8 +198,8 @@ export function GameBoard({
                   isHost={isHost}
                   activePlayerIds={activePlayerIds}
                   onSelectSlot={onSelectSlot}
-                  onRecall={onRecallCard}
-                  onFlip={onFlipCard}
+                  onRecallCard={onRecallCard}
+                  onFlipCard={onFlipCard}
                 />
               );
             })}

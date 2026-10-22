@@ -22,7 +22,9 @@ interface BoardSlotProps {
   activePlayerIds?: Set<string>;
   onSelectSlot?: (slotId: string) => void;
   onRecall?: (uniqueKey: string) => void;
+  onRecallCard?: (slotId: string) => void;
   onFlip?: (uniqueKey: string) => void;
+  onFlipCard?: (slotId: string) => void;
 }
 
 export function BoardSlot({
@@ -42,10 +44,13 @@ export function BoardSlot({
   activePlayerIds,
   onSelectSlot,
   onRecall,
+  onRecallCard,
   onFlip,
+  onFlipCard,
 }: BoardSlotProps) {
+  const handleRecall = onRecallCard || onRecall;
+  const handleFlip = onFlipCard || onFlip;
   const slotIndex = parseInt(slotId.replace("slot-", ""), 10) + 1;
-  const hexLabel = `0x${slotIndex.toString(16).toUpperCase().padStart(2, "0")}`;
 
   const allCards = cards;
   const topCard = allCards[allCards.length - 1];
@@ -79,36 +84,33 @@ export function BoardSlot({
             onSelectSlot(slotId);
           }
         }}
-        className={`relative w-16 h-24 sm:w-18 sm:h-26 md:w-20 md:h-28 border transition-all flex flex-col items-center justify-between p-2 font-mono ${
-          canSelect ? "cursor-pointer hover:border-[#00ff9d] hover:bg-[#00ff9d]/10 active:scale-95" : "cursor-default opacity-50"
+        className={`relative w-16 h-24 sm:w-18 sm:h-26 md:w-20 md:h-28 rounded-lg border-2 transition-all flex flex-col items-center justify-between p-2 font-mono ${
+          canSelect ? "cursor-pointer hover:border-[#f59e0b] hover:bg-[#f59e0b]/10 active:scale-95" : "cursor-default opacity-40"
         } ${
           isSelected
-            ? "border-2 border-[#00ff9d] bg-[#00ff9d]/20 text-[#00ff9d] shadow-[0_0_15px_rgba(0,255,157,0.5)]"
+            ? "border-[#f59e0b] bg-[#f59e0b]/20 text-[#f59e0b] shadow-[0_0_15px_rgba(245,158,11,0.5)]"
             : focusedByNames.length > 0
-            ? "border border-[#00e5ff] bg-[#00e5ff]/10 text-[#00e5ff] shadow-[0_0_10px_rgba(0,229,255,0.4)]"
-            : "border-dashed border-[#00ff9d]/30 bg-[#030609]/80 text-[#00ff9d]/40"
+            ? "border-[#38bdf8] bg-[#38bdf8]/15 text-[#38bdf8]"
+            : "border-dashed border-slate-700 bg-[#12161f]/80 text-slate-500 hover:border-slate-500"
         }`}
       >
-        <div className="w-full flex items-center justify-between text-[8px] text-[#00e5ff]/80">
-          <span>+</span>
-          <span>NODE</span>
-          <span>+</span>
-        </div>
+        <span className="text-[10px] text-slate-400 font-bold">第 {slotIndex} 席</span>
 
-        <div className="text-sm sm:text-base font-black tracking-widest text-[#00ff9d]">
-          {hexLabel}
+        {/* 清楚大字 1, 2, 3, 4 */}
+        <div className="text-xl sm:text-2xl font-black text-slate-300">
+          {slotIndex}
         </div>
 
         {isSelected ? (
-          <span className="text-[9px] font-bold text-[#00ff9d] tracking-widest animate-pulse">
-            [INSERT]
+          <span className="text-[10px] font-bold text-[#f59e0b] tracking-wider animate-pulse">
+            落此席
           </span>
         ) : focusedByNames.length > 0 ? (
-          <span className="text-[8px] text-[#00e5ff] truncate max-w-full">
-            &gt; {focusedByNames[0]}
+          <span className="text-[9px] text-[#38bdf8] truncate max-w-full">
+            {focusedByNames[0]} 凝視
           </span>
         ) : (
-          <span className="text-[8px] text-[#00ff9d]/40">EMPTY</span>
+          <span className="text-[9px] text-slate-500">空席</span>
         )}
       </div>
     );
@@ -125,8 +127,8 @@ export function BoardSlot({
         : myUnflippedCard;
 
     if (targetCard && !targetCard.flipped) {
-      if (status === "playing" && !isOwnerLocked && onRecall) {
-        onRecall(targetCard.uniqueKey || slotId);
+      if (status === "playing" && !isOwnerLocked && handleRecall) {
+        handleRecall(targetCard.uniqueKey || slotId);
         return;
       }
     }
@@ -137,8 +139,8 @@ export function BoardSlot({
       !topCard.flipped &&
       (Boolean(myUnflippedCard) || !isOwnerOnline || Boolean(isHost));
 
-    if (canFlipNow && onFlip) {
-      onFlip(topCard.uniqueKey || slotId);
+    if (canFlipNow && handleFlip) {
+      handleFlip(topCard.uniqueKey || slotId);
       return;
     }
 
@@ -153,44 +155,44 @@ export function BoardSlot({
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
-      className="relative flex flex-col items-center pt-3 p-1 cursor-pointer font-mono touch-manipulation group"
+      className="relative flex flex-col items-center pt-3.5 p-1 cursor-pointer touch-manipulation group"
     >
       {/* 狀態指示標籤 */}
       {isFinishedReveal && isCorrectOrder === false ? (
-        <span className="absolute top-0 z-30 text-[9px] px-1.5 py-0.5 bg-[#ff0055] text-white font-bold whitespace-nowrap animate-ascii-glitch shadow-[0_0_10px_#ff0055] border border-white">
-          [ERR_NODE ✕]
+        <span className="absolute top-0 z-30 text-[10px] px-2 py-0.5 bg-red-600 text-white font-bold rounded-full whitespace-nowrap shadow-md border border-white animate-ascii-glitch">
+          破綻 ✕
         </span>
       ) : hasCollision ? (
-        <div className="absolute top-0 z-30 bg-[#ff0055] text-white text-[9px] font-bold px-1.5 py-0.5 whitespace-nowrap shadow-[0_0_12px_#ff0055] border border-white animate-bounce">
-          [!! COLLISION !!]
+        <div className="absolute top-0 z-30 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap shadow-md border border-white animate-bounce">
+          ⚡ 撞席！({collisionNamesText})
         </div>
       ) : status === "locked" && topCard && !topCard?.flipped ? (
         myUnflippedCard ? (
-          <span className="absolute top-0 z-30 text-[9px] px-2 py-0.5 bg-[#00ff9d] text-black font-black whitespace-nowrap animate-pulse shadow-[0_0_10px_#00ff9d]">
-            [DECRYPT]
+          <span className="absolute top-0 z-30 text-[10px] px-2 py-0.5 bg-[#f59e0b] text-black font-bold rounded-full whitespace-nowrap animate-pulse shadow-md">
+            翻牌
           </span>
         ) : !isOwnerOnline ? (
-          <span className="absolute top-0 z-30 text-[9px] px-1.5 py-0.5 bg-[#00e5ff] text-black font-bold whitespace-nowrap border border-[#00e5ff]">
-            [FORCE_DEC]
+          <span className="absolute top-0 z-30 text-[10px] px-2 py-0.5 bg-[#38bdf8] text-black font-bold rounded-full whitespace-nowrap border border-white">
+            代翻 (離線)
           </span>
         ) : isHost ? (
-          <span className="absolute top-0 z-30 text-[9px] px-1.5 py-0.5 bg-[#ffb000] text-black font-bold whitespace-nowrap border border-[#ffb000]">
-            [ROOT_DEC]
+          <span className="absolute top-0 z-30 text-[10px] px-2 py-0.5 bg-amber-500 text-black font-bold rounded-full whitespace-nowrap border border-white">
+            房主代翻
           </span>
         ) : null
       ) : null}
 
       {/* 卡匣容器 */}
       <div
-        className={`relative flex items-center justify-center p-0.5 transition-all ${
+        className={`relative flex items-center justify-center p-0.5 rounded-lg transition-all ${
           isFinishedReveal && isCorrectOrder === true
-            ? "ring-2 ring-[#00ff9d] shadow-[0_0_18px_rgba(0,255,157,0.6)]"
+            ? "ring-3 ring-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)]"
             : isFinishedReveal && isCorrectOrder === false
-            ? "ring-2 ring-[#ff0055] shadow-[0_0_20px_#ff0055]"
+            ? "ring-3 ring-red-500 shadow-[0_0_15px_rgba(239,68,68,0.6)]"
             : isHighlightSelected
-            ? "ring-2 ring-[#00e5ff] shadow-[0_0_15px_#00e5ff]"
+            ? "ring-3 ring-[#f59e0b] shadow-[0_0_12px_rgba(245,158,11,0.5)]"
             : hasCollision
-            ? "ring-2 ring-[#ff0055] shadow-[0_0_15px_#ff0055]"
+            ? "ring-3 ring-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]"
             : ""
         }`}
         style={{
@@ -229,7 +231,7 @@ export function BoardSlot({
 
               {/* 自己未翻開之卡牌右下角數值 */}
               {isMe && !c.flipped && (status === "playing" || status === "locked") && (
-                <div className="absolute bottom-1 right-1.5 z-20 pointer-events-none text-[10px] font-mono font-black text-[#00ff9d] bg-black/80 px-1 border border-[#00ff9d]/50">
+                <div className="absolute bottom-1 right-1.5 z-20 pointer-events-none text-[11px] font-mono font-black text-[#f59e0b] bg-black/90 px-1 rounded border border-[#f59e0b]">
                   {c.cardValue}
                 </div>
               )}
@@ -238,13 +240,13 @@ export function BoardSlot({
         })}
       </div>
 
-      {/* 特工代號標籤 */}
+      {/* 玩家暱稱標籤 */}
       <div className="mt-1 flex items-center space-x-1 z-10">
         <span
-          className={`text-[9px] font-mono px-1.5 py-0.2 border truncate max-w-[120px] ${
+          className={`text-[10px] px-2 py-0.5 rounded border truncate max-w-[120px] font-medium ${
             isAnyCardMine
-              ? "bg-[#00ff9d]/20 text-[#00ff9d] border-[#00ff9d] font-bold"
-              : "bg-black/60 text-[#00e5ff]/80 border-[#00e5ff]/30"
+              ? "bg-[#f59e0b]/20 text-[#f59e0b] border-[#f59e0b] font-bold"
+              : "bg-slate-800 text-slate-300 border-slate-700"
           }`}
         >
           {bottomPlayerNamesText}

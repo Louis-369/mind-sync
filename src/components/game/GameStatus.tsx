@@ -62,58 +62,58 @@ export function GameStatus({
   };
 
   return (
-    <div className="w-full bg-[#030609]/95 border border-[#00ff9d]/50 px-2 sm:px-3 py-1 my-1 flex items-center justify-between gap-2 font-mono shadow-[0_0_15px_rgba(0,0,0,0.8)] relative z-20">
-      {/* 左側：離席 + 頻道代碼 + 特工 ID */}
-      <div className="flex items-center space-x-1.5 sm:space-x-2">
+    <div className="w-full bg-[#12161f] border border-slate-700 rounded-xl px-3 py-1.5 my-1 flex items-center justify-between gap-2 shadow-lg relative z-20">
+      {/* 左側：離開按鈕 + 房間代碼 + 暱稱 */}
+      <div className="flex items-center space-x-2">
         {onLeaveRoom && (
           <button
             onClick={onLeaveRoom}
-            title="終止連線"
-            className="flex items-center gap-1 text-[11px] text-[#00ff9d]/70 hover:text-[#00ff9d] bg-black/60 hover:bg-[#00ff9d]/20 px-2 py-0.5 border border-[#00ff9d]/40 transition-all cursor-pointer active:scale-95"
+            title="離開房間"
+            className="flex items-center gap-1 text-xs text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 transition-all cursor-pointer active:scale-95"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">[EXIT]</span>
+            <span className="hidden sm:inline">離房</span>
           </button>
         )}
 
-        {/* 頻道金鑰 */}
+        {/* 房間代碼 */}
         <button
           onClick={handleCopyLink}
-          title="複製連線頻率網址"
-          className="flex items-center space-x-1.5 bg-[#04080e] hover:bg-[#00e5ff]/20 px-2 py-0.5 border border-[#00e5ff]/60 cursor-pointer transition-colors active:scale-95"
+          title="點擊複製邀請連結"
+          className="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-600 cursor-pointer transition-colors active:scale-95"
         >
-          <span className="text-xs font-bold text-[#00e5ff] tracking-wider">{roomId}</span>
-          <span className="text-[#00e5ff]">
-            {copied ? <Check className="w-3.5 h-3.5 text-[#00ff9d]" /> : <Copy className="w-3.5 h-3.5" />}
+          <span className="text-xs sm:text-sm font-bold text-white tracking-wider font-mono">{roomId}</span>
+          <span className="text-slate-400">
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           </span>
         </button>
 
-        {/* 特工代號修改 */}
+        {/* 暱稱修改 */}
         {playerName && onChangePlayerName && (
           <button
             onClick={() => {
               setTempName(playerName);
               setIsEditModalOpen(true);
             }}
-            title="修改特工代號"
-            className="hidden md:flex items-center gap-1 text-xs text-[#00ff9d] bg-black/60 hover:bg-[#00ff9d]/20 px-2 py-0.5 border border-[#00ff9d]/40 transition-all cursor-pointer active:scale-95"
+            title="點擊修改暱稱"
+            className="hidden md:flex items-center gap-1.5 text-xs text-slate-300 bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg border border-slate-700 transition-all cursor-pointer active:scale-95"
           >
-            <span className="font-bold truncate max-w-[100px]">ID: {playerName}</span>
-            <Edit3 className="w-3 h-3 text-[#00ff9d]" />
+            <span className="font-bold truncate max-w-[100px] text-[#f59e0b]">{playerName}</span>
+            <Edit3 className="w-3 h-3 text-[#f59e0b]" />
           </button>
         )}
       </div>
 
       {/* 右側：音效 + 連線數 + 房主設定 */}
-      <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs">
+      <div className="flex items-center space-x-2 text-xs">
         {playerName && onChangePlayerName && (
           <button
             onClick={() => {
               setTempName(playerName);
               setIsEditModalOpen(true);
             }}
-            title="修改特工代號"
-            className="md:hidden p-1 bg-black/60 text-[#00ff9d] border border-[#00ff9d]/40 active:scale-95"
+            title="修改暱稱"
+            className="md:hidden p-1.5 bg-slate-800 text-[#f59e0b] rounded-lg border border-slate-700 active:scale-95"
           >
             <Edit3 className="w-3.5 h-3.5" />
           </button>
@@ -122,39 +122,39 @@ export function GameStatus({
         {/* 音效開關 */}
         <button
           onClick={handleToggleMute}
-          title={muted ? "開啟合成音效" : "靜音"}
-          className="p-1 bg-black/60 hover:bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/40 transition-colors cursor-pointer active:scale-95"
+          title={muted ? "開啟音效" : "靜音"}
+          className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition-colors cursor-pointer active:scale-95"
         >
-          {muted ? <VolumeX className="w-3.5 h-3.5 text-[#00ff9d]/40" /> : <Volume2 className="w-3.5 h-3.5" />}
+          {muted ? <VolumeX className="w-3.5 h-3.5 text-slate-500" /> : <Volume2 className="w-3.5 h-3.5 text-[#f59e0b]" />}
         </button>
 
-        {/* 特工在線席位 */}
-        <div className="flex items-center space-x-1 text-[#00ff9d] bg-black/80 px-2 py-0.5 border border-[#00ff9d]/40">
-          <Users className="w-3 h-3 text-[#00e5ff]" />
-          <span className="text-[11px] font-bold">{`${connectedCount}/${maxPlayers}`} NODES</span>
+        {/* 人數席位 */}
+        <div className="flex items-center space-x-1 text-slate-300 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700 font-medium">
+          <Users className="w-3.5 h-3.5 text-[#f59e0b]" />
+          <span className="text-[11px] sm:text-xs">{`${connectedCount}/${maxPlayers}`} 人席</span>
         </div>
 
-        {/* ROOT 權限設定 */}
+        {/* 房主設定按鈕 */}
         {isHost && onOpenHostPanel && (
           <button
             onClick={onOpenHostPanel}
-            title="ROOT 系統規則設定"
-            className="p-1 bg-[#ffb000]/15 hover:bg-[#ffb000]/30 text-[#ffb000] border border-[#ffb000]/70 cursor-pointer active:scale-95"
+            title="房主規則設定"
+            className="p-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-[#f59e0b] rounded-lg border border-[#f59e0b]/50 cursor-pointer active:scale-95"
           >
             <Settings className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
 
-      {/* 特工代號修改 Modal */}
+      {/* 稱號修改 Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title="SYS://RENAME_OPERATOR"
+        title="修改稱號"
       >
-        <div className="space-y-4 font-mono text-center pt-1">
-          <p className="text-xs text-[#00ff9d]/70">
-            請輸入新的特工代號 (OPERATOR_ID)，將同步廣播至全節點。
+        <div className="space-y-4 text-center pt-1">
+          <p className="text-xs text-slate-400">
+            請輸入新的稱號，修改後將自動同步給全場玩家。
           </p>
 
           <input
@@ -162,8 +162,8 @@ export function GameStatus({
             value={tempName}
             onChange={(e) => setTempName(e.target.value)}
             maxLength={14}
-            placeholder="OPERATOR_NAME..."
-            className="w-full bg-[#030609] border-2 border-[#00ff9d] px-3 py-2 text-center text-sm font-mono text-[#00ff9d] focus:outline-none focus:shadow-[0_0_15px_#00ff9d]"
+            placeholder="請輸入暱稱..."
+            className="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-center text-sm text-white focus:outline-none focus:border-[#f59e0b]"
           />
 
           <div className="flex items-center justify-end gap-2 pt-2">
@@ -171,18 +171,18 @@ export function GameStatus({
               variant="secondary"
               size="sm"
               onClick={() => setIsEditModalOpen(false)}
-              className="text-xs font-mono"
+              className="text-xs"
             >
-              [ABORT]
+              取消
             </Button>
             <Button
               variant="primary"
               size="sm"
               disabled={!tempName.trim()}
               onClick={handleSaveName}
-              className="text-xs font-mono font-bold"
+              className="text-xs font-bold"
             >
-              [SAVE_ID]
+              儲存稱號
             </Button>
           </div>
         </div>

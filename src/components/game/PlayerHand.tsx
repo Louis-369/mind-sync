@@ -33,16 +33,16 @@ export function PlayerHand({
   const isLockDisabled = (disabled || hasBoardCollision || hasUnplayedCards) && !isLocked;
 
   const getLockStatusText = () => {
-    if (hasBoardCollision) return "[!! COLLISION_DETECTED: PLEASE RESOLVE !!]";
-    if (hasUnplayedCards) return `[INSERT_ALL_PACKETS: ${hand.length} REMAINING]`;
-    return `[SYNC_COMMIT_PROGRESS: ${lockedCount}/${totalPlayers}]`;
+    if (hasBoardCollision) return "⚡ 席位重疊，請先讓席";
+    if (hasUnplayedCards) return `請先落盡手牌 (尚餘 ${hand.length} 張)`;
+    return `全體同意進度: ${lockedCount}/${totalPlayers} 人`;
   };
 
   const getLockActionLabel = () => {
-    if (isLocked) return `[ REVERT_LOCK // 撤回鎖定 ]`;
-    if (hasBoardCollision) return "[ ERR: COLLISION_ACTIVE ]";
-    if (hasUnplayedCards) return "[ ERR: UNCOMMITTED_PACKETS ]";
-    return `[ COMMIT_SYNC // 執行同步鎖定 (${lockedCount}/${totalPlayers}) ]`;
+    if (isLocked) return `已鎖定 (點擊撤回)`;
+    if (hasBoardCollision) return "席位重疊無法鎖定";
+    if (hasUnplayedCards) return "請先出完手牌";
+    return `確認鎖定 (${lockedCount}/${totalPlayers})`;
   };
 
   const handleCardSelect = (cardValue: number) => {
@@ -55,34 +55,34 @@ export function PlayerHand({
   const centerIdx = (totalCards - 1) / 2;
 
   return (
-    <div className="w-full my-1 flex flex-col items-center justify-center relative z-20 font-mono">
+    <div className="w-full my-1 flex flex-col items-center justify-center relative z-20">
       {/* 狀態指示欄 */}
       <div className="mb-1 flex items-center gap-2">
-        <span className="text-xs font-bold text-[#00ff9d]">
-          &gt; {playerName}
+        <span className="text-xs font-bold text-[#f59e0b]">
+          {playerName}
         </span>
-        <span className="text-[10px] text-[#00e5ff] bg-black/80 px-2 py-0.5 border border-[#00e5ff]/40">
-          PACKETS: {hand.length}
+        <span className="text-[11px] text-slate-300 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
+          {hand.length} 張手牌
         </span>
         <span className={clsx(
-          "text-[10px] sm:text-xs px-2.5 py-0.5 border transition-all flex items-center gap-1.5",
+          "text-[11px] sm:text-xs px-2.5 py-0.5 rounded border transition-all flex items-center gap-1.5",
           hasBoardCollision
-            ? "bg-[#ff0055]/20 border-[#ff0055] text-[#ff0055] font-bold animate-pulse"
+            ? "bg-red-950/80 border-red-500 text-red-400 font-bold animate-pulse"
             : isLocked
-            ? "bg-[#00ff9d]/20 border-[#00ff9d] text-[#00ff9d] font-bold"
-            : "bg-black/80 border-[#00ff9d]/30 text-[#00ff9d]/70"
+            ? "bg-emerald-950/80 border-emerald-500 text-emerald-300 font-bold"
+            : "bg-slate-800 border-slate-700 text-slate-300"
         )}>
-          {hasBoardCollision && <AlertTriangle className="w-3 h-3 text-[#ff0055]" />}
+          {hasBoardCollision && <AlertTriangle className="w-3.5 h-3.5 text-red-400" />}
           {getLockStatusText()}
         </span>
       </div>
 
-      {/* 底部卡匣槽位架 (Cyber Deck) */}
+      {/* 底部卡牌區 */}
       <div className="relative flex items-end justify-center min-h-[110px] sm:min-h-[125px] w-full max-w-xl py-1 px-2 overflow-visible">
         {hand.length === 0 ? (
-          <div className="text-xs text-[#00ff9d] py-3 px-6 bg-[#030609]/95 border-2 border-[#00ff9d] text-center animate-fade-in shadow-[0_0_15px_rgba(0,255,157,0.3)] flex items-center gap-2">
-            <span className="text-[#00e5ff] font-bold">&gt;&gt; ALL_PACKETS_DISPATCHED!</span>
-            <span>點擊下方按鈕提交鎖定，等待同伴揭牌。</span>
+          <div className="text-xs text-white py-3 px-6 bg-[#12161f] border border-slate-700 rounded-xl text-center animate-fade-in shadow-lg flex items-center gap-2">
+            <span className="text-[#f59e0b] font-bold">✨ 手牌已完全出完！</span>
+            <span className="text-slate-300">請點擊下方按鈕確認鎖定，等待全員揭牌。</span>
           </div>
         ) : (
           hand.map((cardValue, idx) => {
@@ -127,12 +127,12 @@ export function PlayerHand({
             }}
             disabled={isLockDisabled}
             className={clsx(
-              "px-5 py-2 font-mono text-xs sm:text-sm font-bold tracking-widest transition-all duration-200 shadow-xl flex items-center gap-2 cursor-pointer active:scale-95",
+              "px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold tracking-wider transition-all duration-200 shadow-xl flex items-center gap-2 cursor-pointer active:scale-95",
               isLocked
-                ? "bg-[#ff0055] text-white border-2 border-white shadow-[0_0_15px_#ff0055]"
+                ? "bg-red-600 hover:bg-red-500 text-white border border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.5)]"
                 : isLockDisabled
-                ? "bg-black/60 border border-[#00ff9d]/20 text-[#00ff9d]/30 cursor-not-allowed opacity-50"
-                : "bg-[#00ff9d] text-black border-2 border-[#00ff9d] hover:bg-white shadow-[0_0_20px_#00ff9d] animate-pulse"
+                ? "bg-slate-800 border border-slate-700 text-slate-500 cursor-not-allowed opacity-50"
+                : "bg-[#f59e0b] hover:bg-[#fbbf24] text-black border border-[#f59e0b] shadow-[0_0_20px_rgba(245,158,11,0.5)] animate-pulse"
             )}
           >
             {isLocked ? (

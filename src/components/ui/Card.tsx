@@ -27,7 +27,7 @@ export function Card({
 }: CardProps) {
   const showUnderline = value === 6 || value === 9 || value === 66 || value === 99;
 
-  // 賽博 ASCII Glitch 抽搐特效 (1.8s 崩潰狂跳 + 每 2.2s 間歇餘震)
+  // 破綻錯誤抽搐特效 (1.8s 高頻跳動 + 每 2.2s 間歇餘震)
   const [glitchText, setGlitchText] = useState<string | null>(null);
 
   React.useEffect(() => {
@@ -36,32 +36,32 @@ export function Card({
       return;
     }
 
-    const glitchChars = ["ERR_0x", "FATAL!", "§∆#", "!DESYNC", "0xFF", "OVERFLOW", "✘✘✘", "CORRUPT"];
+    const glitchChars = ["破!", "錯位!", "ERR", "!失衡", "✘✘", "倒置!"];
     let burstCount = 0;
     let echoInterval: NodeJS.Timeout | null = null;
 
-    // 第一階段：劇烈崩潰期 (1.8 秒，每 90ms 切換，共 20 次)
+    // 第一階段：爆發劇烈跳動期 (1.8 秒)
     const burstInterval = setInterval(() => {
       setGlitchText(glitchChars[burstCount % glitchChars.length]);
       burstCount++;
-      if (burstCount >= 20) {
+      if (burstCount >= 18) {
         clearInterval(burstInterval);
         setGlitchText(null);
 
-        // 第二階段：持續間歇餘震 (每 2.2 秒閃爍 0.45 秒)
+        // 第二階段：持續間歇餘震 (每 2.2 秒閃現 0.45 秒)
         echoInterval = setInterval(() => {
           let flickerCount = 0;
           const flickerSub = setInterval(() => {
             setGlitchText(glitchChars[flickerCount % glitchChars.length]);
             flickerCount++;
-            if (flickerCount >= 5) {
+            if (flickerCount >= 4) {
               clearInterval(flickerSub);
               setGlitchText(null);
             }
           }, 90);
         }, 2200);
       }
-    }, 90);
+    }, 100);
 
     return () => {
       clearInterval(burstInterval);
@@ -79,8 +79,8 @@ export function Card({
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const rx = ((y - rect.height / 2) / (rect.height / 2)) * -14;
-    const ry = ((x - rect.width / 2) / (rect.width / 2)) * 14;
+    const rx = ((y - rect.height / 2) / (rect.height / 2)) * -12;
+    const ry = ((x - rect.width / 2) / (rect.width / 2)) * 12;
     setTilt({ rx, ry });
   };
 
@@ -102,7 +102,7 @@ export function Card({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={clsx(
-        "relative select-none cursor-pointer transition-transform duration-150 perspective-1000 touch-manipulation font-mono",
+        "relative select-none cursor-pointer transition-transform duration-150 perspective-1000 touch-manipulation",
         "w-14 h-20 sm:w-16 sm:h-24 md:w-20 md:h-28",
         className
       )}
@@ -113,60 +113,64 @@ export function Card({
         transformStyle: "preserve-3d",
       }}
     >
-      {/* 右上角 ↗ 終端鎖定標籤 [LOCKED] */}
+      {/* 右上角 ↗ 已鎖定確認標籤 */}
       {showSeal && (
-        <div className="absolute -top-2 -right-2 z-40 px-1 py-0.5 bg-[#ff0055] text-white text-[9px] md:text-[10px] font-mono font-bold leading-none shadow-[0_0_8px_#ff0055] border border-white/60 pointer-events-none animate-pulse">
+        <div className="absolute -top-2 -right-2 z-40 px-1.5 py-0.5 bg-[#10b981] text-white text-[10px] font-bold rounded shadow-lg border border-white pointer-events-none animate-pulse">
           LOCKED
         </div>
       )}
 
-      {/* 卡匣 3D 翻轉主體 */}
+      {/* 卡匣主體 */}
       <div
         className={clsx(
-          "w-full h-full duration-500 transform-style-3d relative transition-transform shadow-xl",
+          "w-full h-full duration-500 transform-style-3d relative rounded-lg transition-transform shadow-xl",
           flipped ? "rotate-y-180" : "",
-          isOwner ? "ring-2 ring-[#00ff9d] shadow-[0_0_15px_rgba(0,255,157,0.4)]" : "border border-[#00ff9d]/30"
+          isOwner ? "ring-2 ring-[#f59e0b] shadow-[0_0_15px_rgba(245,158,11,0.4)]" : "border border-slate-600"
         )}
       >
-        {/* 卡匣背面 (ASCII 晶片電路圖騰) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden bg-[#04080e] border border-[#00ff9d]/60 p-1 flex flex-col items-center justify-center text-[#00ff9d] shadow-inner">
-          <div className="w-full h-full border border-[#00ff9d]/30 flex flex-col items-center justify-center text-[8.5px] sm:text-[10px] md:text-[11.5px] leading-tight select-none whitespace-pre text-center">
-            <div className="text-[7px] text-[#00e5ff] tracking-tighter mb-0.5">DATA_CART</div>
-            <div>{"┌─────┐"}</div>
-            <div>{"│░▒█▒░│"}</div>
-            <div>{"│▒KEY▒│"}</div>
-            <div>{"│░▒█▒░│"}</div>
-            <div>{"└─────┘"}</div>
-            <div className="text-[6.5px] text-[#00ff9d]/60 mt-0.5">ENC_256</div>
+        {/* 卡牌背面 (未翻開：深藍底 + 字符幾何框 + 心印) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden bg-[#141b29] border-2 border-[#f59e0b]/80 rounded-lg p-1 flex flex-col items-center justify-center text-[#f59e0b] shadow-inner">
+          <div className="w-full h-full border border-[#f59e0b]/30 rounded flex flex-col items-center justify-center text-center">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#f59e0b] bg-[#1e293b] flex items-center justify-center text-xs sm:text-sm font-bold text-[#f59e0b] shadow-sm mb-1">
+              心
+            </div>
+            <div className="text-[7.5px] sm:text-[9px] font-mono text-[#f59e0b]/70 tracking-widest">
+              [ 01..100 ]
+            </div>
           </div>
         </div>
 
-        {/* 卡匣正面 (高對比賽博黑底 + 螢光綠數位封包) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-[#020406] text-[#00ff9d] p-1.5 flex flex-col items-center justify-between border-2 border-[#00ff9d] shadow-[0_0_20px_rgba(0,255,157,0.3)]">
-          {/* 頂部節點狀態 */}
-          <div className="w-full flex items-center justify-between text-[8px] sm:text-[9px] text-[#00e5ff] font-bold border-b border-[#00ff9d]/30 pb-0.5">
-            <span>PKG</span>
-            <span className={clsx(glitchText && "animate-ascii-glitch text-[#ff0055]")}>
-              {glitchText ? "ERR" : String(value).padStart(3, "0")}
+        {/* 卡牌正面 (純白高反差實體卡面 + 粗黑大數字，超好讀！) */}
+        <div className={clsx(
+          "absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-lg p-1.5 flex flex-col items-center justify-between border-2 shadow-2xl transition-colors",
+          isError
+            ? "bg-[#fee2e2] text-[#991b1b] border-[#ef4444]"
+            : "bg-white text-[#090d16] border-[#e2e8f0]"
+        )}>
+          {/* 左上角小數字 */}
+          <div className="w-full flex items-center justify-between text-[10px] sm:text-xs font-mono font-bold text-slate-500 border-b border-slate-200 pb-0.5">
+            <span className={clsx(glitchText && "text-red-600 font-black animate-ascii-glitch")}>
+              {glitchText ? "ERR" : String(value).padStart(2, "0")}
             </span>
+            <span className="text-[8px] text-slate-400">#SYNC</span>
           </div>
 
-          {/* 中央大數字 (ASCII Glitch 支援) */}
+          {/* 中央巨型數字 (超粗體純黑，一眼看懂！) */}
           <div className="flex flex-col items-center justify-center my-auto">
             <span
               className={clsx(
-                "text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter leading-none drop-shadow-[0_0_8px_#00ff9d]",
-                glitchText ? "animate-ascii-glitch text-lg sm:text-xl md:text-2xl" : "text-[#00ff9d]",
-                showUnderline && "border-b-2 border-[#00ff9d] pb-0.5"
+                "font-mono text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-none select-none",
+                glitchText ? "text-red-600 animate-ascii-glitch text-xl sm:text-2xl" : "text-[#090d16]",
+                showUnderline && "border-b-3 border-[#090d16] pb-0.5"
               )}
             >
               {glitchText !== null ? glitchText : value}
             </span>
           </div>
 
-          {/* 底部條碼裝飾 */}
-          <div className="w-full text-center text-[7px] sm:text-[8px] text-[#00ff9d]/60 tracking-widest font-mono border-t border-[#00ff9d]/30 pt-0.5 truncate">
-            ||||| | |||| |
+          {/* 底部裝飾條 */}
+          <div className="w-full text-center text-[7px] text-slate-400 font-mono tracking-widest border-t border-slate-200 pt-0.5">
+            MIND_SYNC
           </div>
         </div>
       </div>

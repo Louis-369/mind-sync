@@ -18,13 +18,13 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = "inline-flex items-center justify-center font-mono font-bold transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer tracking-wider";
+  const baseStyles = "inline-flex items-center justify-center font-bold rounded-lg transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer tracking-wide";
 
   const variants = {
-    primary: "bg-[#00ff9d] hover:bg-white text-black border border-[#00ff9d] shadow-[0_0_12px_rgba(0,255,157,0.5)]",
-    secondary: "bg-black/80 hover:bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff]/70 shadow-[0_0_8px_rgba(0,229,255,0.3)]",
-    danger: "bg-[#ff0055] hover:bg-white hover:text-[#ff0055] text-white border border-white shadow-[0_0_12px_#ff0055]",
-    ghost: "bg-transparent hover:bg-[#00ff9d]/10 text-[#00ff9d]/70 hover:text-[#00ff9d] border border-transparent",
+    primary: "bg-[#f59e0b] hover:bg-[#fbbf24] text-black shadow-md border border-[#f59e0b]",
+    secondary: "bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shadow-sm",
+    danger: "bg-red-600 hover:bg-red-500 text-white shadow-md border border-red-500",
+    ghost: "bg-transparent hover:bg-slate-800 text-slate-400 hover:text-white",
   };
 
   const sizes = {

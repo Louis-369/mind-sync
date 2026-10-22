@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Terminal } from "lucide-react";
+import { Crown } from "lucide-react";
 import { clsx } from "clsx";
 import { QUICK_REACTIONS } from "../../lib/constants";
 import { sound } from "../../lib/soundEngine";
@@ -40,7 +40,7 @@ export function PlayerList({
   playersMap.set(selfPId, {
     connectionId: currentConnectionId,
     playerId: selfPId,
-    name: selfPresence?.playerName || "YOU",
+    name: selfPresence?.playerName || "你",
     isSelf: true,
     reaction: selfPresence?.reaction || null,
   });
@@ -51,7 +51,7 @@ export function PlayerList({
       playersMap.set(pId, {
         connectionId: String(o.connectionId),
         playerId: pId,
-        name: o.presence?.playerName || `OP_${o.connectionId}`,
+        name: o.presence?.playerName || `玩家_${o.connectionId}`,
         isSelf: false,
         reaction: o.presence?.reaction || null,
       });
@@ -62,9 +62,9 @@ export function PlayerList({
   const now = Date.now();
 
   return (
-    <div className="w-full flex flex-col md:flex-row items-center justify-between gap-1 py-1 px-1 my-0.5 relative z-20 font-mono text-xs">
-      {/* 特工列表 */}
-      <div className="flex flex-wrap items-center gap-1.5">
+    <div className="w-full flex flex-col md:flex-row items-center justify-between gap-1.5 py-1 px-1 my-0.5 relative z-20 text-xs">
+      {/* 玩家列表 */}
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
         {allPlayers.map((p) => {
           const isHost = p.playerId === hostId || p.connectionId === hostId;
           const isLocked = lockedList.includes(p.connectionId) || lockedList.includes(p.playerId);
@@ -74,10 +74,10 @@ export function PlayerList({
             <div
               key={p.playerId}
               className={clsx(
-                "relative flex items-center space-x-1.5 px-2 py-0.5 text-[11px] border transition-all duration-200",
+                "relative flex items-center space-x-1.5 px-2.5 py-1 rounded-lg text-xs border transition-all duration-200",
                 isLocked
-                  ? "bg-[#00ff9d]/20 border-[#00ff9d] text-[#00ff9d] font-bold shadow-[0_0_10px_rgba(0,255,157,0.3)]"
-                  : "bg-black/60 border-[#00ff9d]/30 text-[#00ff9d]/70"
+                  ? "bg-emerald-950/60 border-emerald-500 text-emerald-300 font-bold shadow-sm"
+                  : "bg-slate-800/80 border-slate-700 text-slate-300"
               )}
             >
               {hasRecentReaction && (
@@ -86,19 +86,19 @@ export function PlayerList({
                 </div>
               )}
 
-              {isHost && <span className="text-[#ffb000] font-black">[ROOT]</span>}
+              {isHost && <Crown className="w-3 h-3 text-[#f59e0b] fill-[#f59e0b] shrink-0" />}
 
               <span className="truncate max-w-[90px] sm:max-w-[120px]">
-                {p.name} {p.isSelf ? "(ME)" : ""}
+                {p.name} {p.isSelf ? "(我)" : ""}
               </span>
 
               {isLocked ? (
-                <span className="text-[9px] bg-[#ff0055] text-white px-1 leading-none font-bold">
-                  LOCKED
+                <span className="text-[10px] bg-emerald-500 text-black px-1.5 py-0.2 rounded font-bold">
+                  已鎖定
                 </span>
               ) : (
-                <span className="text-[9px] text-[#00e5ff] animate-pulse">
-                  ...
+                <span className="text-[10px] text-slate-400">
+                  思考中...
                 </span>
               )}
             </div>
@@ -108,8 +108,7 @@ export function PlayerList({
 
       {/* 快速反應氣泡 */}
       {onSendReaction && (
-        <div className="flex items-center gap-1 bg-black/80 px-2 py-0.5 border border-[#00ff9d]/30">
-          <Terminal className="w-2.5 h-2.5 text-[#00e5ff] shrink-0 hidden sm:block" />
+        <div className="flex items-center gap-1 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
           {QUICK_REACTIONS.map((emoji) => (
             <button
               key={emoji}

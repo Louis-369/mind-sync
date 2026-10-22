@@ -9,17 +9,17 @@ interface NameInputProps {
 
 export function NameInput({ name, onChange }: NameInputProps) {
   return (
-    <div className="flex flex-col space-y-1.5 w-full max-w-xs font-mono">
-      <label className="text-[11px] font-bold text-[#00e5ff] tracking-wider text-left">
-        &gt; SET_OPERATOR_ID [特工代號]
+    <div className="flex flex-col space-y-1.5 w-full max-w-xs text-left">
+      <label className="text-xs font-bold text-slate-300 tracking-wide">
+        你的稱號 / 暱稱
       </label>
       <input
         type="text"
         value={name}
-        maxLength={14}
+        maxLength={12}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="INPUT_ID..."
-        className="bg-[#020406] border-2 border-[#00ff9d] px-3 py-2 text-center text-sm font-mono text-[#00ff9d] placeholder-[#00ff9d]/30 focus:outline-none focus:shadow-[0_0_12px_#00ff9d] transition-all"
+        placeholder="請輸入暱稱..."
+        className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2.5 text-center text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#f59e0b] transition-colors"
       />
     </div>
   );
