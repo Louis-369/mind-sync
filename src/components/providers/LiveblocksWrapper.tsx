@@ -3,7 +3,7 @@
 import React, { ReactNode, Component } from "react";
 import { LiveblocksProvider, RoomProvider, ClientSideSuspense, useStatus } from "@liveblocks/react";
 import { LiveObject, LiveMap, LiveList } from "@liveblocks/client";
-import { DEFAULT_PUBLIC_KEY, DEFAULT_SETTINGS } from "../../lib/constants";
+import { DEFAULT_PUBLIC_KEY, DEFAULT_SETTINGS, DEFAULT_TOPIC } from "../../lib/constants";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "../ui/Button";
 
@@ -106,8 +106,16 @@ function RoomProviderContent({ roomId, children, fallback }: { roomId: string; c
         playerId: "",
         playerName: "載入中...",
         isReady: false,
+        focusedSlotId: null,
+        reaction: null,
       }}
       initialStorage={{
+        topic: new LiveObject({
+          id: DEFAULT_TOPIC.id,
+          title: DEFAULT_TOPIC.title,
+          minLabel: DEFAULT_TOPIC.minLabel,
+          maxLabel: DEFAULT_TOPIC.maxLabel,
+        }),
         settings: new LiveObject({
           maxPlayers: DEFAULT_SETTINGS.maxPlayers,
           cardsPerPlayer: DEFAULT_SETTINGS.cardsPerPlayer,

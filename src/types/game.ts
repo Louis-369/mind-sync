@@ -1,3 +1,18 @@
+// 題目卡型別
+export interface TopicItem {
+  id: string;
+  title: string;
+  minLabel: string;
+  maxLabel: string;
+  category?: string;
+}
+
+// 玩家表情氣泡
+export interface PlayerReaction {
+  emoji: string;
+  timestamp: number;
+}
+
 // 遊戲設定型別
 export interface GameSettings {
   maxPlayers: number;           // 人數上限 (2-4人)

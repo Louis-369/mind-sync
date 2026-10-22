@@ -59,7 +59,7 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
               <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 勝負條件：
             </p>
             <p>
-              出完手牌後點擊「同意鎖定」，卡牌會蓋上日式朱紅「確」字落款。全員鎖定後進入翻牌階段，只要卡牌數字<span className="text-ukiyo-gold font-bold">由左至右完美遞增</span>，即代表默契勝利！
+              出完手牌後點擊「蓋印定案」，卡牌會蓋上日式朱紅「確」字落款。全員落印後進入揭牌階段，只要卡牌數字<span className="text-ukiyo-gold font-bold">由左至右完美遞增</span>，即代表心天秤平衡勝利！
             </p>
           </div>
         </div>

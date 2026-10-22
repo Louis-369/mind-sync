@@ -3,6 +3,7 @@
 import React from "react";
 import { Card } from "../ui/Card";
 import { BoardCard } from "../../types/game";
+import { sound } from "../../lib/soundEngine";
 
 interface BoardSlotProps {
   slotId: string;
@@ -18,6 +19,9 @@ interface BoardSlotProps {
   isSelected?: boolean;
   isCorrectOrder?: boolean;
   isFinishedReveal?: boolean;
+  focusedByNames?: string[];
+  isHost?: boolean;
+  activePlayerIds?: Set<string>;
   onSelectSlot?: (slotId: string) => void;
   onRecall?: (targetKey: string) => void;
   onFlip?: (targetKey: string) => void;
@@ -37,6 +41,9 @@ export function BoardSlot({
   isSelected = false,
   isCorrectOrder,
   isFinishedReveal = false,
+  focusedByNames = [],
+  isHost = false,
+  activePlayerIds,
   onSelectSlot,
   onRecall,
   onFlip,
@@ -54,6 +61,13 @@ export function BoardSlot({
     (c) => !c.flipped && (isCardMine(c) || (c.playerName && isCurrentPlayer))
   );
 
+  const isOwnerOnline = topCard
+    ? activePlayerIds
+      ? activePlayerIds.has(topCard.playerId) ||
+        Boolean((topCard as any).connectionId && activePlayerIds.has((topCard as any).connectionId))
+      : true
+    : true;
+
   const collisionNamesText = allCards
     .map((c) => (isCardMine(c) ? "你" : c.playerName || "匿名"))
     .join("、");
@@ -66,31 +80,46 @@ export function BoardSlot({
 
   const isAnyCardMine = allCards.some((c) => isCardMine(c));
 
-  const KANJI_NUMS = ["壹", "貳", "參", "肆", "伍", "陸", "柒", "捌", "玖", "拾"];
+  const KANJI_NUMS = ["壹", "貳", "參", "肆", "伍", "陸", "柒", "捌", "玖", "拾", "拾壹", "拾貳"];
   const kanjiLabel = KANJI_NUMS[(slotIndex - 1) % KANJI_NUMS.length] || String(slotIndex);
 
   if (allCards.length === 0) {
     const canSelect = status === "playing";
     return (
       <div
-        onClick={() => canSelect && onSelectSlot && onSelectSlot(slotId)}
-        className={`relative w-16 h-24 md:w-20 md:h-28 rounded-xl border border-dashed flex flex-col items-center justify-center transition-all ${
-          canSelect ? "cursor-pointer hover:scale-105" : "cursor-default opacity-60"
+        onClick={() => {
+          if (canSelect && onSelectSlot) {
+            sound.playSlotTap();
+            onSelectSlot(slotId);
+          }
+        }}
+        className={`relative w-16 h-24 sm:w-18 sm:h-26 md:w-20 md:h-28 rounded-2xl border transition-all flex flex-col items-center justify-center ${
+          canSelect ? "cursor-pointer hover:scale-105 active:scale-95" : "cursor-default opacity-60"
         } ${
           isSelected
-            ? "border-ukiyo-gold bg-ukiyo-gold/20 text-ukiyo-gold shadow-[0_0_20px_rgba(201,169,110,0.5)]"
-            : "border-ukiyo-foam/25 bg-ukiyo-surface/30 text-ukiyo-mist/50 hover:border-ukiyo-gold/60 hover:text-ukiyo-gold"
+            ? "border-ukiyo-gold bg-ukiyo-gold/25 text-ukiyo-gold shadow-[0_0_22px_rgba(201,169,110,0.6)] ring-2 ring-ukiyo-gold/50"
+            : focusedByNames.length > 0
+            ? "border-ukiyo-wave bg-ukiyo-wave/20 text-ukiyo-foam shadow-[0_0_15px_rgba(45,90,123,0.5)]"
+            : "border-dashed border-ukiyo-foam/20 bg-ukiyo-surface/40 text-ukiyo-mist/60 hover:border-ukiyo-gold/50 hover:bg-ukiyo-surface/60"
         }`}
       >
-        <div className="absolute top-1.5 left-2 pointer-events-none text-[11px] font-serif font-bold text-ukiyo-gold/80">
+        {/* 大字書法漢字席號 (水墨質感) */}
+        <div className={`text-2xl sm:text-3xl font-serif font-black transition-opacity select-none ${
+          isSelected ? "text-ukiyo-gold opacity-90 drop-shadow" : "text-ukiyo-foam/30"
+        }`}>
           {kanjiLabel}
         </div>
-        <span className="text-[11px] font-serif font-bold">
-          {isSelected ? "已選定" : "空席位"}
-        </span>
-        <span className="text-[9px] font-mono opacity-60 mt-1">
-          {isSelected ? "點擊手牌落牌" : canSelect ? "點擊選位" : "靜候發牌"}
-        </span>
+
+        {/* 狀態標籤 */}
+        {isSelected ? (
+          <span className="text-[10px] sm:text-xs font-serif font-bold text-ukiyo-gold tracking-widest mt-1 animate-pulse">
+            落此席
+          </span>
+        ) : focusedByNames.length > 0 ? (
+          <span className="text-[9px] font-serif text-ukiyo-mist bg-ukiyo-bg/80 px-1.5 py-0.5 rounded-full border border-ukiyo-foam/15 truncate max-w-[90%]">
+            💭 {focusedByNames[0]} 凝視
+          </span>
+        ) : null}
       </div>
     );
   }
@@ -109,13 +138,23 @@ export function BoardSlot({
       if (status === "playing" && !isOwnerLocked && onRecall) {
         onRecall(targetCard.uniqueKey || slotId);
         return;
-      } else if (status === "locked" && onFlip) {
-        onFlip(targetCard.uniqueKey || slotId);
-        return;
       }
     }
 
+    // 揭牌階段：本人、離線代翻或房主均可點擊揭牌 (徹底杜絕死鎖)
+    const canFlipNow =
+      status === "locked" &&
+      topCard &&
+      !topCard.flipped &&
+      (Boolean(myUnflippedCard) || !isOwnerOnline || Boolean(isHost));
+
+    if (canFlipNow && onFlip) {
+      onFlip(topCard.uniqueKey || slotId);
+      return;
+    }
+
     if (status === "playing" && onSelectSlot) {
+      sound.playSlotTap();
       onSelectSlot(slotId);
     }
   };
@@ -127,19 +166,29 @@ export function BoardSlot({
       onClick={(e) => handleCardClick(undefined, e)}
       className="relative group flex flex-col items-center pt-3.5 p-1 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-ukiyo-foam/20 touch-manipulation"
     >
-      {/* 標籤權重化渲染 */}
+      {/* 標籤權重化渲染 (撞牌 / 破綻 / 揭牌 / 代翻) */}
       {isFinishedReveal && isCorrectOrder === false ? (
-        <span className="absolute top-0 z-30 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-ukiyo-bg border border-ukiyo-vermillion text-ukiyo-vermillion font-bold pointer-events-none whitespace-nowrap animate-bounce">
-          ✕ 錯誤
+        <span className="absolute top-0 z-30 text-[10px] font-serif px-2.5 py-0.5 rounded-full shadow-lg bg-ukiyo-vermillion text-ukiyo-cream font-black pointer-events-none whitespace-nowrap animate-screen-shake border border-ukiyo-cream/40">
+          破綻 ✕
         </span>
       ) : hasCollision ? (
-        <div className="absolute top-0 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[9px] font-serif font-bold px-2 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
-          {collisionNamesText}
+        <div className="absolute top-0 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[10px] font-serif font-black px-2.5 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
+          ⚡ 撞席！({collisionNamesText})
         </div>
-      ) : status === "locked" && myUnflippedCard && !topCard?.flipped ? (
-        <span className="absolute top-0 z-30 text-[9px] font-serif px-2 py-0.5 rounded-full shadow bg-ukiyo-surface border border-ukiyo-gold text-ukiyo-gold font-bold pointer-events-none whitespace-nowrap animate-pulse">
-          點擊翻牌
-        </span>
+      ) : status === "locked" && topCard && !topCard?.flipped ? (
+        myUnflippedCard ? (
+          <span className="absolute top-0 z-30 text-[10px] font-serif px-2.5 py-0.5 rounded-full shadow bg-ukiyo-gold text-ukiyo-bg font-black pointer-events-none whitespace-nowrap animate-pulse">
+            揭牌
+          </span>
+        ) : !isOwnerOnline ? (
+          <span className="absolute top-0 z-30 text-[10px] font-serif px-2.5 py-0.5 rounded-full shadow bg-ukiyo-wave text-ukiyo-cream font-bold pointer-events-none whitespace-nowrap animate-pulse border border-ukiyo-foam/30">
+            代翻 (離線)
+          </span>
+        ) : isHost ? (
+          <span className="absolute top-0 z-30 text-[10px] font-serif px-2.5 py-0.5 rounded-full shadow bg-ukiyo-surface text-ukiyo-gold font-bold pointer-events-none whitespace-nowrap border border-ukiyo-gold/40">
+            房主代翻
+          </span>
+        ) : null
       ) : null}
 
       {/* 卡牌實體區域 */}
@@ -185,6 +234,7 @@ export function BoardSlot({
                 isOwner={isMe}
                 playerName={c.playerName}
                 showSeal={status === "playing" && Boolean(isCardLocked) && !(c.flipped || isFlipped)}
+                isError={isFinishedReveal && isCorrectOrder === false}
                 onClick={() => handleCardClick(c)}
               />
 

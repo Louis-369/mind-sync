@@ -7,6 +7,7 @@ import { NameInput } from "../components/lobby/NameInput";
 import { EmojiPicker } from "../components/lobby/EmojiPicker";
 import { TutorialModal } from "../components/lobby/TutorialModal";
 import { Button } from "../components/ui/Button";
+import { CalligraphyMatrix } from "../components/ui/CalligraphyMatrix";
 import { usePlayerId } from "../hooks/usePlayerId";
 
 export default function LobbyPage() {
@@ -26,6 +27,9 @@ export default function LobbyPage() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4 md:p-8 relative overflow-hidden">
+      {/* 偷師 ascii-magic 之背景和風字符水波流動 */}
+      <CalligraphyMatrix />
+
       {/* 背景浮世繪深海波浪暈光 */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-ukiyo-wave/25 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-80 h-80 bg-ukiyo-gold/10 rounded-full blur-[120px] pointer-events-none" />
@@ -53,7 +57,7 @@ export default function LobbyPage() {
         </p>
 
         <p className="text-xs md:text-sm text-ukiyo-mist mb-6 max-w-sm leading-relaxed font-serif">
-          交流價值觀 ‧ 碰撞默契 ‧ 探索彼此的共鳴點
+          禁言數字，只談價值。你們的心，能排成一線嗎？
         </p>
 
         {/* 遊戲教學按鈕 */}
@@ -62,7 +66,7 @@ export default function LobbyPage() {
           className="mb-6 px-3.5 py-1.5 rounded-full bg-ukiyo-surface/80 border border-ukiyo-gold/40 text-ukiyo-gold text-xs font-serif font-bold hover:bg-ukiyo-gold/15 transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
         >
           <HelpCircle className="w-3.5 h-3.5 text-ukiyo-gold" />
-          <span>🌸 玩法教學與詳細規則</span>
+          <span>🌸 30 秒上手指南</span>
         </button>
 
         {/* 表單區域 */}
@@ -80,28 +84,29 @@ export default function LobbyPage() {
             onClick={handleEnterRoom}
             className="w-full max-w-xs mt-4 group"
           >
-            <span className="flex items-center justify-center gap-2 font-serif tracking-widest">
-              <Sparkles className="w-4 h-4 text-ukiyo-gold" /> 加入房間
+            <span className="flex items-center justify-center gap-2 font-serif tracking-widest font-bold">
+              <Sparkles className="w-4 h-4 text-ukiyo-gold" /> 對暗號 ‧ 掀簾入座
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
           </Button>
         </div>
 
-        {/* 遊戲說明引導摘要 */}
+        {/* 遊戲說明引導三步微縮卡 */}
         <div className="mt-8 pt-6 border-t border-ukiyo-foam/10 w-full text-left">
-          <h4 className="text-xs font-serif font-bold text-ukiyo-gold uppercase tracking-widest mb-3 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 玩法概要
-          </h4>
-          <ul className="text-xs text-ukiyo-mist space-y-2.5 font-serif">
-            <li className="flex items-start gap-1.5">
-              <span className="text-ukiyo-gold font-bold shrink-0">💬 設定主題與討論：</span>
-              <span>選定一個有趣主題，自由分享彼此的價值觀。</span>
-            </li>
-            <li className="flex items-start gap-1.5">
-              <span className="text-ukiyo-gold font-bold shrink-0">🎲 價值轉化出牌：</span>
-              <span>將標準轉化為 1~100 卡牌數字，憑默契由小到大放入檯面。</span>
-            </li>
-          </ul>
+          <div className="grid grid-cols-3 gap-2 text-center font-serif">
+            <div className="bg-ukiyo-bg/60 p-2.5 rounded-xl border border-ukiyo-foam/10 flex flex-col items-center">
+              <span className="text-xs font-bold text-ukiyo-gold mb-1">① 展卷抽題</span>
+              <span className="text-[10px] text-ukiyo-mist leading-tight">不說數字<br />只聊真實想法</span>
+            </div>
+            <div className="bg-ukiyo-bg/60 p-2.5 rounded-xl border border-ukiyo-foam/10 flex flex-col items-center">
+              <span className="text-xs font-bold text-ukiyo-gold mb-1">② 暗出心證</span>
+              <span className="text-[10px] text-ukiyo-mist leading-tight">憑直覺 1~100<br />由小至大落席</span>
+            </div>
+            <div className="bg-ukiyo-bg/60 p-2.5 rounded-xl border border-ukiyo-foam/10 flex flex-col items-center">
+              <span className="text-xs font-bold text-ukiyo-gold mb-1">③ 揭牌見真章</span>
+              <span className="text-[10px] text-ukiyo-mist leading-tight">落印「確」<br />見證心靈同步率</span>
+            </div>
+          </div>
         </div>
       </div>
 

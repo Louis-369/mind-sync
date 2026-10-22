@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { Sparkles, Trophy, ArrowRight } from "lucide-react";
+import { Sparkles, Trophy, ArrowRight, Dices } from "lucide-react";
 import { BoardSlot } from "./BoardSlot";
-import { BoardCard } from "../../types/game";
+import { BoardCard, TopicItem } from "../../types/game";
 import { useBoardState } from "../../hooks/useBoardState";
 
 interface GameBoardProps {
@@ -15,8 +15,12 @@ interface GameBoardProps {
   cardsPerPlayer?: number;
   lockedList?: string[];
   selectedSlotId?: string | null;
+  topic?: TopicItem;
+  presenceSlotsMap?: Record<string, string[]>;
   isHost?: boolean;
+  activePlayerIds?: Set<string>;
   onRestart?: () => void;
+  onRandomTopic?: () => void;
   onSelectSlot?: (slotId: string) => void;
   onRecallCard?: (slotId: string) => void;
   onFlipCard?: (slotId: string) => void;
@@ -31,8 +35,12 @@ export function GameBoard({
   cardsPerPlayer = 2,
   lockedList = [],
   selectedSlotId,
+  topic,
+  presenceSlotsMap = {},
   isHost = false,
+  activePlayerIds,
   onRestart,
+  onRandomTopic,
   onSelectSlot,
   onRecallCard,
   onFlipCard,
@@ -88,20 +96,44 @@ export function GameBoard({
         </div>
       </div>
 
-      {/* 極簡典雅 [ 最小卡牌 ➔ 由左至右 ‧ 由上至下遞增 ➔ 最大卡牌 ] 順序流向引導橫條 */}
-      <div className="relative z-10 w-full max-w-xl flex items-center justify-between px-3 py-1.5 my-1.5 rounded-xl bg-ukiyo-bg/80 border border-ukiyo-gold/30 shadow-sm text-xs font-serif">
-        <span className="text-ukiyo-gold font-bold text-[10px] sm:text-xs">
-          最小卡牌
-        </span>
+      {/* 本局價值主題卷軸 (Topic Scroll Banner) */}
+      <div className="relative z-10 w-full max-w-xl topic-scroll-banner rounded-2xl p-2.5 my-1 text-center flex flex-col items-center">
+        <div className="flex items-center justify-between w-full mb-1">
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-ukiyo-gold font-serif font-bold">
+            <span className="w-2 h-2 rounded-full bg-ukiyo-gold animate-pulse" />
+            <span>價值天秤主題</span>
+          </div>
 
-        <div className="flex items-center gap-1 text-[9px] sm:text-[11px] text-ukiyo-foam/90 font-serif tracking-wider">
-          <span>由左至右 ‧ 由上至下遞增</span>
-          <ArrowRight className="w-3 h-3 text-ukiyo-gold shrink-0" />
+          {isHost && onRandomTopic && status === "waiting" && (
+            <button
+              onClick={onRandomTopic}
+              className="flex items-center gap-1 text-[10px] sm:text-xs text-ukiyo-gold hover:text-ukiyo-foam bg-ukiyo-gold/15 hover:bg-ukiyo-gold/25 px-2.5 py-0.5 rounded-full border border-ukiyo-gold/40 transition-all font-serif cursor-pointer active:scale-95"
+            >
+              <Dices className="w-3 h-3" />
+              <span>抽籤換題</span>
+            </button>
+          )}
         </div>
 
-        <span className="text-ukiyo-gold font-bold text-[10px] sm:text-xs">
-          最大卡牌
-        </span>
+        <h3 className="text-sm sm:text-base md:text-lg font-serif font-black text-ukiyo-foam tracking-wider my-0.5 drop-shadow">
+          {topic?.title || "純數字心流默契"}
+        </h3>
+
+        {/* 標尺兩端極端標籤 */}
+        <div className="flex items-center justify-between w-full mt-1.5 pt-1.5 border-t border-ukiyo-foam/10 text-[10px] sm:text-xs font-serif">
+          <span className="text-ukiyo-gold/90 font-bold truncate max-w-[45%] text-left">
+            1 ‧ {topic?.minLabel || "極小值"}
+          </span>
+
+          <div className="flex items-center gap-1 text-[9px] text-ukiyo-mist shrink-0 px-1 font-mono">
+            <span>默契遞增</span>
+            <ArrowRight className="w-2.5 h-2.5 text-ukiyo-gold" />
+          </div>
+
+          <span className="text-ukiyo-gold/90 font-bold truncate max-w-[45%] text-right">
+            {topic?.maxLabel || "極大值"} ‧ 100
+          </span>
+        </div>
       </div>
 
       {/* 盤面槽位 (席位精準動態排版：每列固定 4 個席位，手機屏一次全覽免橫滾) */}
@@ -141,6 +173,9 @@ export function GameBoard({
                     isSelected={selectedSlotId === slotKey}
                     isCorrectOrder={slotCorrectnessMap[slotKey]}
                     isFinishedReveal={isFinishedReveal}
+                    focusedByNames={presenceSlotsMap[slotKey] || []}
+                    isHost={isHost}
+                    activePlayerIds={activePlayerIds}
                     onSelectSlot={onSelectSlot}
                     onRecall={onRecallCard}
                     onFlip={onFlipCard}

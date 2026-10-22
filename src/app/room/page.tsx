@@ -17,6 +17,8 @@ import { PlayerHand } from "../../components/game/PlayerHand";
 import { HostPanel } from "../../components/game/HostPanel";
 import { ResultOverlay } from "../../components/game/ResultOverlay";
 import { Button } from "../../components/ui/Button";
+import { CalligraphyMatrix } from "../../components/ui/CalligraphyMatrix";
+import { TOPIC_DECK, DEFAULT_TOPIC } from "../../lib/constants";
 
 function RoomInner() {
   const router = useRouter();
@@ -40,6 +42,7 @@ function RoomInner() {
 
   const {
     settings,
+    topic,
     board,
     lockedList,
     status,
@@ -55,12 +58,17 @@ function RoomInner() {
     recallCard,
     toggleLock,
     flipCard,
+    flipAllCards,
     updateSettings,
+    changeTopic,
+    setFocusedSlot,
+    sendReaction,
     resetGame,
     claimHost,
     autoResetStaleRoom,
     syncOfflinePlayers,
     playerJoinOrder,
+    getActivePlayerIds,
   } = useGameState(roomId);
 
   // 1. 收集線上所有真實獨立玩家 UUID
@@ -96,7 +104,35 @@ function RoomInner() {
   const handlePlayCard = (cardValue: number) => {
     placeCard(cardValue, playerName, selectedSlotId || undefined, playerId);
     setSelectedSlotId(null);
+    setFocusedSlot(null);
   };
+
+  const handleSelectSlot = (slotId: string) => {
+    const nextSlot = selectedSlotId === slotId ? null : slotId;
+    setSelectedSlotId(nextSlot);
+    setFocusedSlot(nextSlot);
+  };
+
+  const handleRandomTopic = () => {
+    const currentId = topic?.id;
+    const candidates = TOPIC_DECK.filter((t) => t.id !== currentId);
+    const chosen = candidates[Math.floor(Math.random() * candidates.length)] || DEFAULT_TOPIC;
+    changeTopic(chosen);
+  };
+
+  // 整理隊友目光所在席位 (Presence Juice)
+  const presenceSlotsMap: Record<string, string[]> = {};
+  if (selectedSlotId) {
+    presenceSlotsMap[selectedSlotId] = ["你"];
+  }
+  others.forEach((o) => {
+    const slot = o.presence?.focusedSlotId;
+    const name = o.presence?.playerName || "同伴";
+    if (slot) {
+      if (!presenceSlotsMap[slot]) presenceSlotsMap[slot] = [];
+      if (!presenceSlotsMap[slot].includes(name)) presenceSlotsMap[slot].push(name);
+    }
+  });
 
   // 監聽離頁/重新整理事件
   useEffect(() => {
@@ -292,23 +328,16 @@ function RoomInner() {
   ) : null;
 
   return (
-    <main className="w-full max-w-4xl mx-auto flex flex-col justify-between relative py-2 px-2.5 md:px-5">
+    <main className="w-full max-w-4xl mx-auto flex flex-col justify-between min-h-[100dvh] relative py-1.5 px-2 sm:px-4">
+      {/* 偷師 ascii-magic 之背景和風字符水波流動 */}
+      <CalligraphyMatrix />
+
       {mounted && warningBannerJSX && createPortal(warningBannerJSX, document.body)}
 
-      {/* 頂部 Header */}
-      <div className="flex items-center justify-between mb-2">
-        <Button variant="ghost" size="sm" onClick={() => router.push("/")} className="gap-1 text-xs font-serif">
-          <ArrowLeft className="w-3.5 h-3.5" /> 離開席位
-        </Button>
+      {/* 鎖定階段聚光暗角特效層 */}
+      {status === "locked" && <div className="stage-vignette-locked" />}
 
-        <h1 className="text-lg md:text-xl font-serif font-black text-ukiyo-foam tracking-widest">
-          心天秤
-        </h1>
-
-        <div className="w-16 text-right" />
-      </div>
-
-      {/* 頂部狀態與房間資訊列 */}
+      {/* 頂部全合一緊湊 HUD */}
       <GameStatus
         roomId={roomId}
         connectedCount={totalPlayers}
@@ -317,9 +346,10 @@ function RoomInner() {
         isHost={isHost}
         onOpenHostPanel={() => setIsHostModalOpen(true)}
         onChangePlayerName={setPlayerName}
+        onLeaveRoom={() => router.push("/")}
       />
 
-      {/* 線上玩家清單 */}
+      {/* 線上同席玩家徽章與心情氣泡列 */}
       <PlayerList
         currentConnectionId={currentConnId}
         currentPlayerId={playerId}
@@ -327,9 +357,10 @@ function RoomInner() {
         lockedList={lockedList}
         others={others}
         selfPresence={self?.presence}
+        onSendReaction={sendReaction}
       />
 
-      {/* 中央盤面 */}
+      {/* 中央主舞台：價值主題卷軸 + 牌席 */}
       <GameBoard
         board={board}
         currentConnectionId={currentConnId}
@@ -339,14 +370,18 @@ function RoomInner() {
         cardsPerPlayer={settings?.cardsPerPlayer || 2}
         lockedList={lockedList}
         selectedSlotId={selectedSlotId}
+        topic={topic}
+        presenceSlotsMap={presenceSlotsMap}
         isHost={isHost}
+        activePlayerIds={getActivePlayerIds()}
         onRestart={resetGame}
-        onSelectSlot={(slotId) => setSelectedSlotId(slotId)}
+        onRandomTopic={handleRandomTopic}
+        onSelectSlot={handleSelectSlot}
         onRecallCard={(targetKey) => recallCard(targetKey, playerId)}
         onFlipCard={(targetKey) => flipCard(targetKey, playerId)}
       />
 
-      {/* 底部玩家手牌與鎖定按鈕 */}
+      {/* 底部玩家扇形手牌與朱印鎖定按鈕 */}
       {status === "playing" && (
         <PlayerHand
           hand={myHand}
@@ -358,6 +393,32 @@ function RoomInner() {
           hasBoardCollision={hasBoardCollision}
           onToggleLock={() => toggleLock(playerName, playerId)}
         />
+      )}
+
+      {/* 揭牌階段底部指揮列 (防死鎖與信心出發) */}
+      {status === "locked" && (
+        <div className="w-full glass-panel rounded-2xl p-3 my-2 flex flex-col sm:flex-row items-center justify-between gap-2.5 animate-fade-in shadow-xl border border-ukiyo-gold/40">
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-serif">
+            <span className="w-2.5 h-2.5 rounded-full bg-ukiyo-gold animate-ping" />
+            <span className="text-ukiyo-gold font-bold">
+              揭牌階段 ({board.filter((c) => c.flipped).length} / {board.length} 席已揭曉)
+            </span>
+            <span className="text-ukiyo-mist hidden md:inline text-xs">
+              — 請從全場最有信心的席位點擊揭牌！
+            </span>
+          </div>
+
+          {isHost && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => flipAllCards(playerId)}
+              className="text-xs font-serif text-ukiyo-gold border-ukiyo-gold/40 hover:bg-ukiyo-gold/15 whitespace-nowrap"
+            >
+              房主一鍵全揭
+            </Button>
+          )}
+        </div>
       )}
 
       {/* 大廳等待提示與房主開局按鈕 */}
@@ -398,8 +459,14 @@ function RoomInner() {
         onUpdateSettings={updateSettings}
       />
 
-      {/* 勝負結果彈窗 */}
-      <ResultOverlay result={result || null} isHost={isHost} onRestart={resetGame} />
+      {/* 勝負結果彈窗 (附帶心靈同步率與戰犯分析) */}
+      <ResultOverlay
+        result={result || null}
+        isHost={isHost}
+        onRestart={resetGame}
+        board={board}
+        topic={topic}
+      />
     </main>
   );
 }

@@ -179,24 +179,80 @@
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
   }
 
-  /* 非房主靜候提示方塊專屬樣式 */
-  .guest-wait-badge {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    font-family: var(--font-serif);
-    font-size: 0.75rem;
-    color: #94a3b8;
-    border-radius: 1rem;
-    background-color: rgba(30, 41, 59, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(8px);
+  /* 鎖定階段聚光暗角 (Vignette) */
+  .stage-vignette-locked {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+    background: radial-gradient(circle at 50% 45%, transparent 35%, rgba(13, 27, 42, 0.75) 100%);
+    box-shadow: inset 0 0 80px rgba(201, 169, 110, 0.15);
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  /* 震動回饋動效 (Screen Shake) */
+  .animate-screen-shake {
+    animation: screenShake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+
+  /* 心情氣泡漂浮動畫 */
+  .animate-reaction-pop {
+    animation: reactionPop 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  /* 和風主題卷軸樣式 */
+  .topic-scroll-banner {
+    background: linear-gradient(135deg, rgba(27, 40, 56, 0.95) 0%, rgba(13, 27, 42, 0.92) 100%);
+    border: 1px solid rgba(201, 169, 110, 0.4);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(201, 169, 110, 0.1);
+  }
+
+  /* ASCII Glitch 抽搐動效 */
+  .animate-ascii-glitch {
+    animation: asciiGlitch 0.35s steps(2) infinite;
+    text-shadow: -1.5px 0 #c73e1d, 1.5px 0 #2d5a7b;
+  }
+}
+
+@keyframes asciiGlitch {
+  0% { transform: translate(0) scale(1); }
+  20% { transform: translate(-2px, 1px) scale(1.05); }
+  40% { transform: translate(2px, -1px) scale(0.97); }
+  60% { transform: translate(-1px, -2px) scale(1.03); }
+  80% { transform: translate(1px, 2px) scale(0.98); }
+  100% { transform: translate(0) scale(1); }
+}
+
+@keyframes screenShake {
+  10%, 90% { transform: translate3d(-2px, 1px, 0); }
+  20%, 80% { transform: translate3d(3px, -2px, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 2px, 0); }
+  40%, 60% { transform: translate3d(3px, -1px, 0); }
+}
+
+@keyframes reactionPop {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  15% { transform: translateY(-10px) scale(1.2); opacity: 1; }
+  75% { transform: translateY(-24px) scale(1); opacity: 1; }
+  100% { transform: translateY(-38px) scale(0.85); opacity: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes matrixWave {
+  0% {
+    transform: translateY(0px) scale(0.95);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-8px) scale(1.08);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(-16px) scale(0.95);
+    opacity: 0.4;
   }
 }

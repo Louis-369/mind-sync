@@ -4,7 +4,9 @@ import { useStorage, useMutation, useOthers, useSelf, useMyPresence } from "@liv
 import { LiveList, LiveObject } from "@liveblocks/client";
 import { useState, useEffect, useCallback } from "react";
 import { generateSeededDeck, reconstructPlayerHand } from "../lib/gameLogic";
-import { GameSettings, BoardCard } from "../types/game";
+import { GameSettings, BoardCard, TopicItem } from "../types/game";
+import { DEFAULT_TOPIC } from "../lib/constants";
+import { sound } from "../lib/soundEngine";
 
 /**
  * 輔助函式：收集當前線上活躍玩家 ID 集合 (過濾非空 playerId)
@@ -43,6 +45,7 @@ export function useGameState(roomId?: string) {
 
   // 讀取 Liveblocks Storage 狀態
   const settings = useStorage((root) => root.settings);
+  const topicRaw = useStorage((root) => root.topic);
   const boardMap = useStorage((root) => root.board);
   const lockedPlayers = useStorage((root) => root.lockedPlayers);
   const handCountsMap = useStorage((root) => root.handCounts);
@@ -60,6 +63,14 @@ export function useGameState(roomId?: string) {
   const myPId = self?.presence?.playerId;
   const myConnId = self?.connectionId ? String(self.connectionId) : "";
   const cardsPerPlayer = settings?.cardsPerPlayer || 2;
+  const topic: TopicItem = topicRaw
+    ? {
+        id: topicRaw.id || DEFAULT_TOPIC.id,
+        title: topicRaw.title || DEFAULT_TOPIC.title,
+        minLabel: topicRaw.minLabel || DEFAULT_TOPIC.minLabel,
+        maxLabel: topicRaw.maxLabel || DEFAULT_TOPIC.maxLabel,
+      }
+    : DEFAULT_TOPIC;
 
   // 轉為純 JS 資料格式
   const board: BoardCard[] = boardMap
@@ -172,6 +183,7 @@ export function useGameState(roomId?: string) {
     storage.set("dealTimestamp", Date.now());
     storage.set("status", "playing");
     storage.set("result", null);
+    sound.playSealStamp();
   }, [self, others]);
 
   // 玩家出牌 (從本機扣除手牌，放置到盤面)
@@ -227,6 +239,7 @@ export function useGameState(roomId?: string) {
       });
 
       mutableBoard.set(uniqueKey, newCard);
+      sound.playCardSlide();
     },
     [self, cardsPerPlayer]
   );
@@ -273,6 +286,7 @@ export function useGameState(roomId?: string) {
         // 解除鎖定 (徹底清除所有鎖定紀錄)
         const mutableLocked = storage.get("lockedPlayers");
         purgeLockedPlayer(mutableLocked, myId, connId);
+        sound.playCardSlide();
       }
     },
     [self]
@@ -302,6 +316,7 @@ export function useGameState(roomId?: string) {
         if (sId) counts[sId] = (counts[sId] || 0) + 1;
       });
       if (Object.values(counts).some((cnt) => cnt > 1)) {
+        sound.playCollisionAlert();
         return;
       }
 
@@ -312,11 +327,13 @@ export function useGameState(roomId?: string) {
       if (isAlreadyLocked) {
         // 確實清除該玩家在 lockedPlayers 中的所有紀錄
         purgeLockedPlayer(mutableLocked, myId, connId);
+        sound.playSlotTap();
       } else {
         mutableLocked.push(myId);
         if (connId && connId !== myId) {
           mutableLocked.push(connId);
         }
+        sound.playSealStamp();
       }
 
       const lockedArray = Array.from(mutableLocked);
@@ -337,11 +354,13 @@ export function useGameState(roomId?: string) {
       const playerSlotsMap = storage.get("playerSlots");
       const slotPlayerIds = playerSlotsMap ? Array.from(playerSlotsMap.keys()) : [];
       const totalPlayersInGame = Math.max(2, slotPlayerIds.length || (others.length + 1));
+      const activePlayerIds = getActivePlayerIds();
+      const onlineSlotPlayerIds = slotPlayerIds.filter((pId) => activePlayerIds.has(pId));
 
-      // 嚴密檢查：必須每一位開局席位玩家 (slotPlayerIds) 均在 lockedPlayerSet 中
+      // 嚴密檢查：在線開局席位玩家均須在 lockedPlayerSet 中 (離線者不阻斷鎖定)
       let isAllPlayersLocked = false;
-      if (slotPlayerIds.length >= 2) {
-        isAllPlayersLocked = slotPlayerIds.every((pId) => {
+      if (onlineSlotPlayerIds.length >= 1) {
+        isAllPlayersLocked = onlineSlotPlayerIds.every((pId) => {
           if (lockedPlayerSet.has(pId)) return true;
           if (myId === pId && connId && lockedPlayerSet.has(connId)) return true;
           const otherMatch = others.find((o) => o.presence?.playerId === pId);
@@ -351,10 +370,9 @@ export function useGameState(roomId?: string) {
           return false;
         });
       } else {
-        const requiredOtherCount = totalPlayersInGame - 1;
+        const requiredOtherCount = Math.max(0, others.length);
         isAllPlayersLocked =
           Boolean(isSelfLocked) &&
-          others.length >= requiredOtherCount &&
           otherLockStates.length >= requiredOtherCount &&
           otherLockStates.every(Boolean);
       }
@@ -362,47 +380,62 @@ export function useGameState(roomId?: string) {
       const expectedTotalCards = totalPlayersInGame * cardsPerPlayer;
       const placedCardsCount = currentBoard.length;
 
-      // 100% 穩定判定全場鎖定：必須「所有席位玩家」均已獨立鎖定，且盤面張數放滿方可觸發翻牌鎖定！
+      // 100% 穩定判定全場鎖定：必須在線玩家均已蓋印，且盤面張數出齊方可進入揭牌！
       if (
-        totalPlayersInGame >= 2 &&
         placedCardsCount >= expectedTotalCards &&
         isAllPlayersLocked
       ) {
         storage.set("status", "locked");
       }
     },
-    [self, cardsPerPlayer, myHand.length]
+    [self, cardsPerPlayer, myHand.length, getActivePlayerIds]
   );
 
-  // 翻開盤面上屬於自己的卡牌並檢測勝負
+  // 翻開盤面上屬於自己或離線隊友的卡牌並檢測勝負 (支援離線代翻與房主救援)
   const flipCard = useMutation(
     ({ storage }, targetKey: string, currentMyPlayerId?: string) => {
       const connId = String(self?.connectionId);
       const myId = self?.presence?.playerId || currentMyPlayerId || connId;
       const mutableBoard = storage.get("board");
+      const activePlayerIds = getActivePlayerIds();
+      const currentHostId = storage.get("hostId");
+      const isHostUser = currentHostId === myId || currentHostId === connId;
+
       let card = mutableBoard.get(targetKey);
 
-      const isMyCard = (c: any) => {
+      const canFlipThisCard = (c: any) => {
+        if (!c || c.get("flipped")) return false;
         const cardPId = c.get("playerId");
         const cardConnId = c.get("connectionId");
-        return (cardPId === myId || cardPId === connId || cardConnId === connId) && !c.get("flipped");
+        // 1. 本人出牌
+        const isOwner = cardPId === myId || cardPId === connId || cardConnId === connId;
+        if (isOwner) return true;
+        // 2. 出牌者已完全離線 -> 任何在線玩家可代翻
+        const isOwnerOffline = !activePlayerIds.has(cardPId) && (!cardConnId || !activePlayerIds.has(cardConnId));
+        if (isOwnerOffline) return true;
+        // 3. 房主救援權限
+        if (isHostUser) return true;
+        return false;
       };
 
-      if (!card || !isMyCard(card)) {
+      if (!card || !canFlipThisCard(card)) {
         const boardEntries = Array.from(mutableBoard.entries());
         for (const [k, v] of boardEntries) {
-          if ((k === targetKey || v.get("slotId") === targetKey) && isMyCard(v)) {
+          if ((k === targetKey || v.get("slotId") === targetKey) && canFlipThisCard(v)) {
             card = v;
             break;
           }
         }
       }
 
-      if (card && isMyCard(card)) {
+      if (card && canFlipThisCard(card)) {
         card.set("flipped", true);
 
         const allCards = Array.from(mutableBoard.values());
+        const flippedCards = allCards.filter((c) => c.get("flipped"));
         const allFlipped = allCards.length > 0 && allCards.every((c) => c.get("flipped"));
+
+        sound.playFlipEscalation(flippedCards.length - 1, allCards.length, true);
 
         if (allFlipped) {
           // 依據槽位索引 (slot-0, slot-1...) 排序
@@ -421,11 +454,44 @@ export function useGameState(roomId?: string) {
           }
           storage.set("status", "finished");
           storage.set("result", isCorrect ? "win" : "lose");
+          sound.playResultFanfare(isCorrect);
         }
       }
     },
-    [self]
+    [self, getActivePlayerIds]
   );
+
+  // 房主一鍵全揭剩餘卡牌
+  const flipAllCards = useMutation(({ storage }, currentMyPlayerId?: string) => {
+    const connId = String(self?.connectionId);
+    const myId = self?.presence?.playerId || currentMyPlayerId || connId;
+    const currentHostId = storage.get("hostId");
+    const isHostUser = currentHostId === myId || currentHostId === connId;
+    if (!isHostUser) return;
+
+    const mutableBoard = storage.get("board");
+    const allCards = Array.from(mutableBoard.values());
+    allCards.forEach((c: any) => {
+      c.set("flipped", true);
+    });
+
+    const sorted = [...allCards].sort((a, b) => {
+      const slotA = parseInt((a.get("slotId") || "").replace("slot-", ""), 10) || 0;
+      const slotB = parseInt((b.get("slotId") || "").replace("slot-", ""), 10) || 0;
+      return slotA - slotB;
+    });
+
+    let isCorrect = true;
+    for (let i = 0; i < sorted.length - 1; i++) {
+      if (sorted[i].get("cardValue") > sorted[i + 1].get("cardValue")) {
+        isCorrect = false;
+        break;
+      }
+    }
+    storage.set("status", "finished");
+    storage.set("result", isCorrect ? "win" : "lose");
+    sound.playResultFanfare(isCorrect);
+  }, [self]);
 
   // 自動清理完全廢棄的空房間 (絕不在遊玩中因玩家暫時切換 App 誤重置房間)
   const autoResetStaleRoom = useMutation(
@@ -522,6 +588,45 @@ export function useGameState(roomId?: string) {
     [self, others]
   );
 
+  // 切換題目卡
+  const changeTopic = useMutation(({ storage }, newTopic: TopicItem) => {
+    let mutableTopic = storage.get("topic");
+    if (!mutableTopic) {
+      storage.set(
+        "topic",
+        new LiveObject({
+          id: newTopic.id,
+          title: newTopic.title,
+          minLabel: newTopic.minLabel,
+          maxLabel: newTopic.maxLabel,
+        })
+      );
+    } else {
+      mutableTopic.set("id", newTopic.id);
+      mutableTopic.set("title", newTopic.title);
+      mutableTopic.set("minLabel", newTopic.minLabel);
+      mutableTopic.set("maxLabel", newTopic.maxLabel);
+    }
+    sound.playSlotTap();
+  }, []);
+
+  // 設定當前目光/準備出牌的席位 (Presence)
+  const setFocusedSlot = useCallback(
+    (slotId: string | null) => {
+      updateMyPresence({ focusedSlotId: slotId });
+    },
+    [updateMyPresence]
+  );
+
+  // 發送即時心情氣泡 (Presence)
+  const sendReaction = useCallback(
+    (emoji: string) => {
+      updateMyPresence({ reaction: { emoji, timestamp: Date.now() } });
+      sound.playSlotTap();
+    },
+    [updateMyPresence]
+  );
+
   // 重置遊戲回到大廳等待
   const resetGame = useMutation(({ storage }) => {
     const boardMap = storage.get("board");
@@ -538,6 +643,7 @@ export function useGameState(roomId?: string) {
 
   return {
     settings,
+    topic,
     board,
     lockedList,
     playerJoinOrder: playerJoinOrder ? Array.from(playerJoinOrder) : [],
@@ -555,10 +661,15 @@ export function useGameState(roomId?: string) {
     recallCard,
     toggleLock,
     flipCard,
+    flipAllCards,
     updateSettings,
+    changeTopic,
+    setFocusedSlot,
+    sendReaction,
     resetGame,
     claimHost,
     autoResetStaleRoom,
     syncOfflinePlayers,
+    getActivePlayerIds,
   };
 }

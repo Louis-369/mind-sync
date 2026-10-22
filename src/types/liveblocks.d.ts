@@ -8,10 +8,20 @@ declare global {
       playerId: string;
       playerName: string;
       isReady: boolean;
+      focusedSlotId?: string | null;
+      reaction?: { emoji: string; timestamp: number } | null;
     };
 
     // 共享持久狀態 (Storage)
     Storage: {
+      // 本局題目卡
+      topic: LiveObject<{
+        id: string;
+        title: string;
+        minLabel: string;
+        maxLabel: string;
+      }>;
+
       // 遊戲規則設定
       settings: LiveObject<{
         maxPlayers: number;
