@@ -25,10 +25,9 @@ export function Card({
   onClick,
   className,
 }: CardProps) {
-  // 檢查數字下方是否有底線 (針對 6 與 9 避免混淆)
   const showUnderline = value === 6 || value === 9 || value === 66 || value === 99;
 
-  // ASCII Glitch 抽搐特效 (雙階段：1.8s 高頻崩潰期 + 每 2.2s 間歇餘震)
+  // 賽博 ASCII Glitch 抽搐特效 (1.8s 崩潰狂跳 + 每 2.2s 間歇餘震)
   const [glitchText, setGlitchText] = useState<string | null>(null);
 
   React.useEffect(() => {
@@ -37,12 +36,11 @@ export function Card({
       return;
     }
 
-    const glitchChars = ["破!", "凶!", "逆!", "¥#?", "ERR", "裂!", "§∆", "✘✘"];
+    const glitchChars = ["ERR_0x", "FATAL!", "§∆#", "!DESYNC", "0xFF", "OVERFLOW", "✘✘✘", "CORRUPT"];
     let burstCount = 0;
     let echoInterval: NodeJS.Timeout | null = null;
-    let echoTimeout: NodeJS.Timeout | null = null;
 
-    // 第一階段：爆發劇烈崩潰期 (1.8 秒，每 90ms 切換，共 20 次)
+    // 第一階段：劇烈崩潰期 (1.8 秒，每 90ms 切換，共 20 次)
     const burstInterval = setInterval(() => {
       setGlitchText(glitchChars[burstCount % glitchChars.length]);
       burstCount++;
@@ -50,14 +48,14 @@ export function Card({
         clearInterval(burstInterval);
         setGlitchText(null);
 
-        // 第二階段：持續間歇餘震 (每 2.2 秒閃現 0.45 秒故障)
+        // 第二階段：持續間歇餘震 (每 2.2 秒閃爍 0.45 秒)
         echoInterval = setInterval(() => {
           let flickerCount = 0;
-          const flickerSubInterval = setInterval(() => {
+          const flickerSub = setInterval(() => {
             setGlitchText(glitchChars[flickerCount % glitchChars.length]);
             flickerCount++;
             if (flickerCount >= 5) {
-              clearInterval(flickerSubInterval);
+              clearInterval(flickerSub);
               setGlitchText(null);
             }
           }, 90);
@@ -68,18 +66,12 @@ export function Card({
     return () => {
       clearInterval(burstInterval);
       if (echoInterval) clearInterval(echoInterval);
-      if (echoTimeout) clearTimeout(echoTimeout);
     };
   }, [isError, flipped]);
 
-  // 3D 視差傾斜 (3D Tilt) 與金箔反光位置
+  // 3D 視差傾斜
   const cardRef = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState<{ rx: number; ry: number; gx: number; gy: number }>({
-    rx: 0,
-    ry: 0,
-    gx: 50,
-    gy: 50,
-  });
+  const [tilt, setTilt] = useState<{ rx: number; ry: number }>({ rx: 0, ry: 0 });
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -89,9 +81,7 @@ export function Card({
     const y = e.clientY - rect.top;
     const rx = ((y - rect.height / 2) / (rect.height / 2)) * -14;
     const ry = ((x - rect.width / 2) / (rect.width / 2)) * 14;
-    const gx = (x / rect.width) * 100;
-    const gy = (y / rect.height) * 100;
-    setTilt({ rx, ry, gx, gy });
+    setTilt({ rx, ry });
   };
 
   const handleMouseEnter = () => {
@@ -101,7 +91,7 @@ export function Card({
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    setTilt({ rx: 0, ry: 0, gx: 50, gy: 50 });
+    setTilt({ rx: 0, ry: 0 });
   };
 
   return (
@@ -112,103 +102,71 @@ export function Card({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={clsx(
-        "relative select-none cursor-pointer transition-transform duration-200 perspective-1000 touch-manipulation",
+        "relative select-none cursor-pointer transition-transform duration-150 perspective-1000 touch-manipulation font-mono",
         "w-14 h-20 sm:w-16 sm:h-24 md:w-20 md:h-28",
         className
       )}
       style={{
         transform: isHovered
-          ? `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateY(-8px) scale(1.08)`
+          ? `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateY(-6px) scale(1.06)`
           : "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)",
         transformStyle: "preserve-3d",
       }}
     >
-      {/* 右上角 ↗ 日式朱紅「確」落款印章 (個別玩家點擊鎖定時顯示，全場鎖定後自動消失) */}
+      {/* 右上角 ↗ 終端鎖定標籤 [LOCKED] */}
       {showSeal && (
-        <div className="absolute -top-1.5 -right-1.5 z-40 w-5 h-5 md:w-6 md:h-6 rounded ukiyo-seal flex items-center justify-center text-[10px] md:text-xs font-serif leading-none shadow-xl border border-ukiyo-cream/60 pointer-events-none animate-bounce">
-          確
+        <div className="absolute -top-2 -right-2 z-40 px-1 py-0.5 bg-[#ff0055] text-white text-[9px] md:text-[10px] font-mono font-bold leading-none shadow-[0_0_8px_#ff0055] border border-white/60 pointer-events-none animate-pulse">
+          LOCKED
         </div>
       )}
 
-      {/* 卡牌 3D 翻轉主體 */}
+      {/* 卡匣 3D 翻轉主體 */}
       <div
         className={clsx(
-          "w-full h-full duration-500 transform-style-3d relative rounded-xl transition-transform shadow-xl hover:shadow-2xl",
+          "w-full h-full duration-500 transform-style-3d relative transition-transform shadow-xl",
           flipped ? "rotate-y-180" : "",
-          isOwner ? "ring-2 ring-ukiyo-gold/80 shadow-ukiyo-gold/30" : "border border-ukiyo-foam/20"
+          isOwner ? "ring-2 ring-[#00ff9d] shadow-[0_0_15px_rgba(0,255,157,0.4)]" : "border border-[#00ff9d]/30"
         )}
       >
-        {/* 卡牌背面 (浮世繪海浪質感極簡純圖騰 + 金箔古紋 / ASCII 字符圖騰) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden ukiyo-card-back rounded-xl p-1 flex flex-col items-center justify-center border border-ukiyo-gold/30 overflow-hidden shadow-inner">
-          <div className="w-full h-full rounded-lg border border-ukiyo-gold/25 flex flex-col items-center justify-center relative bg-gradient-to-b from-ukiyo-surface/80 to-ukiyo-bg/90">
-            {/* 朱紅日式心印 (浮世繪主題) */}
-            <div className="theme-ukiyo-show w-7 h-7 md:w-9 md:h-9 rounded-full ukiyo-seal flex items-center justify-center text-xs md:text-sm font-serif shadow-lg border border-ukiyo-gold/40">
-              心
-            </div>
-
-            {/* ASCII-Magic 字符圖騰 (ASCII 主題) */}
-            <div className="theme-ascii-show flex-col items-center justify-center font-mono text-[8px] sm:text-[9.5px] md:text-[11px] leading-[1.1] text-ukiyo-gold select-none whitespace-pre text-center">
-              <div>{"╔═════╗"}</div>
-              <div>{"║░▒▓▒░║"}</div>
-              <div>{"║▒[心]▒║"}</div>
-              <div>{"║░▒▓▒░║"}</div>
-              <div>{"╚═════╝"}</div>
-            </div>
+        {/* 卡匣背面 (ASCII 晶片電路圖騰) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden bg-[#04080e] border border-[#00ff9d]/60 p-1 flex flex-col items-center justify-center text-[#00ff9d] shadow-inner">
+          <div className="w-full h-full border border-[#00ff9d]/30 flex flex-col items-center justify-center text-[8.5px] sm:text-[10px] md:text-[11.5px] leading-tight select-none whitespace-pre text-center">
+            <div className="text-[7px] text-[#00e5ff] tracking-tighter mb-0.5">DATA_CART</div>
+            <div>{"┌─────┐"}</div>
+            <div>{"│░▒█▒░│"}</div>
+            <div>{"│▒KEY▒│"}</div>
+            <div>{"│░▒█▒░│"}</div>
+            <div>{"└─────┘"}</div>
+            <div className="text-[6.5px] text-[#00ff9d]/60 mt-0.5">ENC_256</div>
           </div>
         </div>
 
-        {/* 卡牌正面 (100% 不透明天然和紙實體牌面 + 和紙質感 + 墨黑數字 + 動態金箔光) */}
-        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 washi-card-front text-[#1c2d37] rounded-xl p-1.5 flex flex-col items-center justify-center border border-ukiyo-gold/40 shadow-xl overflow-hidden">
-          {/* 金箔流動高光反射層 */}
-          {isHovered && (
-            <div
-              className="absolute inset-0 pointer-events-none transition-opacity duration-200 opacity-60 z-20"
-              style={{
-                background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255, 245, 205, 0.5) 0%, rgba(201, 169, 110, 0.15) 45%, transparent 75%)`,
-              }}
-            />
-          )}
+        {/* 卡匣正面 (高對比賽博黑底 + 螢光綠數位封包) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-[#020406] text-[#00ff9d] p-1.5 flex flex-col items-center justify-between border-2 border-[#00ff9d] shadow-[0_0_20px_rgba(0,255,157,0.3)]">
+          {/* 頂部節點狀態 */}
+          <div className="w-full flex items-center justify-between text-[8px] sm:text-[9px] text-[#00e5ff] font-bold border-b border-[#00ff9d]/30 pb-0.5">
+            <span>PKG</span>
+            <span className={clsx(glitchText && "animate-ascii-glitch text-[#ff0055]")}>
+              {glitchText ? "ERR" : String(value).padStart(3, "0")}
+            </span>
+          </div>
 
-          {/* 金箔燙印微光細內框 */}
-          <div className="absolute inset-1 rounded-lg border border-ukiyo-gold/25 pointer-events-none" />
-
-          {/* 左上角 ↖ 斜對角小數字 */}
-          <div className="absolute top-1.5 left-2 flex flex-col items-center z-10">
+          {/* 中央大數字 (ASCII Glitch 支援) */}
+          <div className="flex flex-col items-center justify-center my-auto">
             <span
               className={clsx(
-                "font-mono text-[10px] md:text-xs font-black text-ukiyo-ink leading-none tracking-tight",
-                glitchText && "animate-ascii-glitch text-ukiyo-vermillion font-bold",
-                showUnderline && "border-b-2 border-ukiyo-ink/80 pb-0.5"
+                "text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter leading-none drop-shadow-[0_0_8px_#00ff9d]",
+                glitchText ? "animate-ascii-glitch text-lg sm:text-xl md:text-2xl" : "text-[#00ff9d]",
+                showUnderline && "border-b-2 border-[#00ff9d] pb-0.5"
               )}
             >
               {glitchText !== null ? glitchText : value}
             </span>
           </div>
 
-          {/* 中央大數字 (墨黑水墨感 + 陰影深邃質感 + ASCII Glitch 支援) */}
-          <div className="flex flex-col items-center justify-center my-auto z-10">
-            <span
-              className={clsx(
-                "font-mono text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tighter text-ukiyo-ink leading-none drop-shadow-md",
-                glitchText && "animate-ascii-glitch text-ukiyo-vermillion scale-110",
-                showUnderline && "border-b-2 border-ukiyo-ink/90 pb-1"
-              )}
-            >
-              {glitchText !== null ? glitchText : value}
-            </span>
-          </div>
-
-          {/* 右下角 ↘ 斜對角小數字 (倒轉對稱) */}
-          <div className="absolute bottom-1.5 right-2 flex flex-col items-center rotate-180 z-10">
-            <span
-              className={clsx(
-                "font-mono text-[10px] md:text-xs font-black text-ukiyo-ink leading-none tracking-tight",
-                glitchText && "animate-ascii-glitch text-ukiyo-vermillion font-bold",
-                showUnderline && "border-b-2 border-ukiyo-ink/80 pb-0.5"
-              )}
-            >
-              {glitchText !== null ? glitchText : value}
-            </span>
+          {/* 底部條碼裝飾 */}
+          <div className="w-full text-center text-[7px] sm:text-[8px] text-[#00ff9d]/60 tracking-widest font-mono border-t border-[#00ff9d]/30 pt-0.5 truncate">
+            ||||| | |||| |
           </div>
         </div>
       </div>

@@ -7,15 +7,13 @@ import { sound } from "../../lib/soundEngine";
 
 interface BoardSlotProps {
   slotId: string;
-  cards?: BoardCard[];
-  card?: BoardCard;
-  status?: string;
+  cards: BoardCard[];
+  status: string;
   lockedList?: string[];
   isOwnerLocked?: boolean;
   isCurrentPlayer?: boolean;
   currentConnectionId?: string;
   currentPlayerId?: string;
-  isFlipped?: boolean;
   isSelected?: boolean;
   isCorrectOrder?: boolean;
   isFinishedReveal?: boolean;
@@ -23,21 +21,19 @@ interface BoardSlotProps {
   isHost?: boolean;
   activePlayerIds?: Set<string>;
   onSelectSlot?: (slotId: string) => void;
-  onRecall?: (targetKey: string) => void;
-  onFlip?: (targetKey: string) => void;
+  onRecall?: (uniqueKey: string) => void;
+  onFlip?: (uniqueKey: string) => void;
 }
 
 export function BoardSlot({
   slotId,
-  cards = [],
-  card,
-  status = "playing",
+  cards,
+  status,
   lockedList = [],
   isOwnerLocked = false,
   isCurrentPlayer = false,
   currentConnectionId,
   currentPlayerId,
-  isFlipped = false,
   isSelected = false,
   isCorrectOrder,
   isFinishedReveal = false,
@@ -49,39 +45,29 @@ export function BoardSlot({
   onFlip,
 }: BoardSlotProps) {
   const slotIndex = parseInt(slotId.replace("slot-", ""), 10) + 1;
-  const allCards = cards.length > 0 ? cards : card ? [card] : [];
+  const hexLabel = `0x${slotIndex.toString(16).toUpperCase().padStart(2, "0")}`;
+
+  const allCards = cards;
   const topCard = allCards[allCards.length - 1];
+  const isFlipped = topCard ? topCard.flipped : false;
   const hasCollision = allCards.length > 1;
 
   const isCardMine = (c: BoardCard) =>
     (currentConnectionId && (c.playerId === currentConnectionId || (c as any).connectionId === currentConnectionId)) ||
-    (currentPlayerId && c.playerId === currentPlayerId);
+    (currentPlayerId && c.playerId === currentPlayerId) ||
+    (c.playerId === topCard?.playerId && isCurrentPlayer);
 
-  const myUnflippedCard = allCards.find(
-    (c) => !c.flipped && (isCardMine(c) || (c.playerName && isCurrentPlayer))
-  );
+  const myUnflippedCard = allCards.find((c) => isCardMine(c) && !c.flipped);
 
   const isOwnerOnline = topCard
     ? activePlayerIds
-      ? activePlayerIds.has(topCard.playerId) ||
-        Boolean((topCard as any).connectionId && activePlayerIds.has((topCard as any).connectionId))
+      ? activePlayerIds.has(topCard.playerId) || (Boolean((topCard as any).connectionId) && activePlayerIds.has((topCard as any).connectionId))
       : true
-    : true;
+    : false;
 
-  const collisionNamesText = allCards
-    .map((c) => (isCardMine(c) ? "你" : c.playerName || "匿名"))
-    .join("、");
-
-  const bottomPlayerNamesText = hasCollision
-    ? Array.from(new Set(allCards.map((c) => (isCardMine(c) ? "你" : c.playerName || "匿名")))).join("、")
-    : isCurrentPlayer
-    ? "你"
-    : topCard?.playerName || "匿名";
-
+  const collisionNamesText = allCards.map((c) => c.playerName).join(" ⚡ ");
+  const bottomPlayerNamesText = allCards.map((c) => c.playerName).join(", ");
   const isAnyCardMine = allCards.some((c) => isCardMine(c));
-
-  const KANJI_NUMS = ["壹", "貳", "參", "肆", "伍", "陸", "柒", "捌", "玖", "拾", "拾壹", "拾貳"];
-  const kanjiLabel = KANJI_NUMS[(slotIndex - 1) % KANJI_NUMS.length] || String(slotIndex);
 
   if (allCards.length === 0) {
     const canSelect = status === "playing";
@@ -93,33 +79,37 @@ export function BoardSlot({
             onSelectSlot(slotId);
           }
         }}
-        className={`relative w-16 h-24 sm:w-18 sm:h-26 md:w-20 md:h-28 rounded-2xl border transition-all flex flex-col items-center justify-center ${
-          canSelect ? "cursor-pointer hover:scale-105 active:scale-95" : "cursor-default opacity-60"
+        className={`relative w-16 h-24 sm:w-18 sm:h-26 md:w-20 md:h-28 border transition-all flex flex-col items-center justify-between p-2 font-mono ${
+          canSelect ? "cursor-pointer hover:border-[#00ff9d] hover:bg-[#00ff9d]/10 active:scale-95" : "cursor-default opacity-50"
         } ${
           isSelected
-            ? "border-ukiyo-gold bg-ukiyo-gold/25 text-ukiyo-gold shadow-[0_0_22px_rgba(201,169,110,0.6)] ring-2 ring-ukiyo-gold/50"
+            ? "border-2 border-[#00ff9d] bg-[#00ff9d]/20 text-[#00ff9d] shadow-[0_0_15px_rgba(0,255,157,0.5)]"
             : focusedByNames.length > 0
-            ? "border-ukiyo-wave bg-ukiyo-wave/20 text-ukiyo-foam shadow-[0_0_15px_rgba(45,90,123,0.5)]"
-            : "border-dashed border-ukiyo-foam/20 bg-ukiyo-surface/40 text-ukiyo-mist/60 hover:border-ukiyo-gold/50 hover:bg-ukiyo-surface/60"
+            ? "border border-[#00e5ff] bg-[#00e5ff]/10 text-[#00e5ff] shadow-[0_0_10px_rgba(0,229,255,0.4)]"
+            : "border-dashed border-[#00ff9d]/30 bg-[#030609]/80 text-[#00ff9d]/40"
         }`}
       >
-        {/* 大字書法漢字席號 (水墨質感) */}
-        <div className={`text-2xl sm:text-3xl font-serif font-black transition-opacity select-none ${
-          isSelected ? "text-ukiyo-gold opacity-90 drop-shadow" : "text-ukiyo-foam/30"
-        }`}>
-          {kanjiLabel}
+        <div className="w-full flex items-center justify-between text-[8px] text-[#00e5ff]/80">
+          <span>+</span>
+          <span>NODE</span>
+          <span>+</span>
         </div>
 
-        {/* 狀態標籤 */}
+        <div className="text-sm sm:text-base font-black tracking-widest text-[#00ff9d]">
+          {hexLabel}
+        </div>
+
         {isSelected ? (
-          <span className="text-[10px] sm:text-xs font-serif font-bold text-ukiyo-gold tracking-widest mt-1 animate-pulse">
-            落此席
+          <span className="text-[9px] font-bold text-[#00ff9d] tracking-widest animate-pulse">
+            [INSERT]
           </span>
         ) : focusedByNames.length > 0 ? (
-          <span className="text-[9px] font-serif text-ukiyo-mist bg-ukiyo-bg/80 px-1.5 py-0.5 rounded-full border border-ukiyo-foam/15 truncate max-w-[90%]">
-            💭 {focusedByNames[0]} 凝視
+          <span className="text-[8px] text-[#00e5ff] truncate max-w-full">
+            &gt; {focusedByNames[0]}
           </span>
-        ) : null}
+        ) : (
+          <span className="text-[8px] text-[#00ff9d]/40">EMPTY</span>
+        )}
       </div>
     );
   }
@@ -141,7 +131,6 @@ export function BoardSlot({
       }
     }
 
-    // 揭牌階段：本人、離線代翻或房主均可點擊揭牌 (徹底杜絕死鎖)
     const canFlipNow =
       status === "locked" &&
       topCard &&
@@ -164,48 +153,48 @@ export function BoardSlot({
   return (
     <div
       onClick={(e) => handleCardClick(undefined, e)}
-      className="relative group flex flex-col items-center pt-3.5 p-1 rounded-2xl cursor-pointer transition-all border border-transparent hover:border-ukiyo-foam/20 touch-manipulation"
+      className="relative flex flex-col items-center pt-3 p-1 cursor-pointer font-mono touch-manipulation group"
     >
-      {/* 標籤權重化渲染 (撞牌 / 破綻 / 揭牌 / 代翻) */}
+      {/* 狀態指示標籤 */}
       {isFinishedReveal && isCorrectOrder === false ? (
-        <span className="absolute top-0 z-30 text-[10px] font-serif px-2.5 py-0.5 rounded-full shadow-lg bg-ukiyo-vermillion text-ukiyo-cream font-black pointer-events-none whitespace-nowrap animate-screen-shake border border-ukiyo-cream/40">
-          破綻 ✕
+        <span className="absolute top-0 z-30 text-[9px] px-1.5 py-0.5 bg-[#ff0055] text-white font-bold whitespace-nowrap animate-ascii-glitch shadow-[0_0_10px_#ff0055] border border-white">
+          [ERR_NODE ✕]
         </span>
       ) : hasCollision ? (
-        <div className="absolute top-0 z-30 bg-ukiyo-vermillion text-ukiyo-cream text-[10px] font-serif font-black px-2.5 py-0.5 rounded-full shadow-lg border border-ukiyo-cream/40 whitespace-nowrap animate-bounce pointer-events-none">
-          ⚡ 撞席！({collisionNamesText})
+        <div className="absolute top-0 z-30 bg-[#ff0055] text-white text-[9px] font-bold px-1.5 py-0.5 whitespace-nowrap shadow-[0_0_12px_#ff0055] border border-white animate-bounce">
+          [!! COLLISION !!]
         </div>
       ) : status === "locked" && topCard && !topCard?.flipped ? (
         myUnflippedCard ? (
-          <span className="absolute top-0 z-30 text-[10px] font-serif px-2.5 py-0.5 rounded-full shadow bg-ukiyo-gold text-ukiyo-bg font-black pointer-events-none whitespace-nowrap animate-pulse">
-            揭牌
+          <span className="absolute top-0 z-30 text-[9px] px-2 py-0.5 bg-[#00ff9d] text-black font-black whitespace-nowrap animate-pulse shadow-[0_0_10px_#00ff9d]">
+            [DECRYPT]
           </span>
         ) : !isOwnerOnline ? (
-          <span className="absolute top-0 z-30 text-[10px] font-serif px-2.5 py-0.5 rounded-full shadow bg-ukiyo-wave text-ukiyo-cream font-bold pointer-events-none whitespace-nowrap animate-pulse border border-ukiyo-foam/30">
-            代翻 (離線)
+          <span className="absolute top-0 z-30 text-[9px] px-1.5 py-0.5 bg-[#00e5ff] text-black font-bold whitespace-nowrap border border-[#00e5ff]">
+            [FORCE_DEC]
           </span>
         ) : isHost ? (
-          <span className="absolute top-0 z-30 text-[10px] font-serif px-2.5 py-0.5 rounded-full shadow bg-ukiyo-surface text-ukiyo-gold font-bold pointer-events-none whitespace-nowrap border border-ukiyo-gold/40">
-            房主代翻
+          <span className="absolute top-0 z-30 text-[9px] px-1.5 py-0.5 bg-[#ffb000] text-black font-bold whitespace-nowrap border border-[#ffb000]">
+            [ROOT_DEC]
           </span>
         ) : null
       ) : null}
 
-      {/* 卡牌實體區域 */}
+      {/* 卡匣容器 */}
       <div
-        className={`relative flex items-center justify-center p-1 rounded-2xl transition-all border ${
+        className={`relative flex items-center justify-center p-0.5 transition-all ${
           isFinishedReveal && isCorrectOrder === true
-            ? "ring-2 ring-emerald-500 bg-emerald-500/10 border-emerald-500 shadow-[0_0_18px_rgba(16,185,129,0.5)]"
+            ? "ring-2 ring-[#00ff9d] shadow-[0_0_18px_rgba(0,255,157,0.6)]"
             : isFinishedReveal && isCorrectOrder === false
-            ? "ring-2 ring-ukiyo-vermillion bg-ukiyo-vermillion/15 border-ukiyo-vermillion shadow-[0_0_20px_rgba(196,43,28,0.7)]"
+            ? "ring-2 ring-[#ff0055] shadow-[0_0_20px_#ff0055]"
             : isHighlightSelected
-            ? "ring-2 ring-ukiyo-gold bg-ukiyo-gold/15 border-ukiyo-gold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+            ? "ring-2 ring-[#00e5ff] shadow-[0_0_15px_#00e5ff]"
             : hasCollision
-            ? "ring-2 ring-ukiyo-vermillion border-ukiyo-vermillion bg-ukiyo-vermillion/10 shadow-[0_0_18px_rgba(196,43,28,0.5)]"
-            : "border-transparent"
+            ? "ring-2 ring-[#ff0055] shadow-[0_0_15px_#ff0055]"
+            : ""
         }`}
         style={{
-          paddingBottom: hasCollision ? `${(allCards.length - 1) * 18}px` : "4px",
+          paddingBottom: hasCollision ? `${(allCards.length - 1) * 16}px` : "2px",
         }}
       >
         {allCards.map((c, idx) => {
@@ -223,7 +212,7 @@ export function BoardSlot({
             <div
               key={`${c.placedAt}-${idx}`}
               style={{
-                transform: idx > 0 ? `translateY(${idx * 18}px)` : "none",
+                transform: idx > 0 ? `translateY(${idx * 16}px)` : "none",
                 zIndex: idx + 1,
               }}
               className={idx > 0 ? "absolute top-0 left-0 pointer-events-auto" : "relative pointer-events-auto"}
@@ -238,9 +227,9 @@ export function BoardSlot({
                 onClick={() => handleCardClick(c)}
               />
 
-              {/* 自己蓋著的牌：在右下角呈現無框晶亮金箔數字 */}
+              {/* 自己未翻開之卡牌右下角數值 */}
               {isMe && !c.flipped && (status === "playing" || status === "locked") && (
-                <div className="absolute bottom-1.5 right-2 z-20 pointer-events-none text-[11px] font-mono font-black text-ukiyo-gold drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] tracking-tight">
+                <div className="absolute bottom-1 right-1.5 z-20 pointer-events-none text-[10px] font-mono font-black text-[#00ff9d] bg-black/80 px-1 border border-[#00ff9d]/50">
                   {c.cardValue}
                 </div>
               )}
@@ -249,13 +238,13 @@ export function BoardSlot({
         })}
       </div>
 
-      {/* 出牌者標籤 */}
+      {/* 特工代號標籤 */}
       <div className="mt-1 flex items-center space-x-1 z-10">
         <span
-          className={`text-[10px] font-serif px-1.5 py-0.5 rounded border truncate max-w-[130px] transition-colors ${
+          className={`text-[9px] font-mono px-1.5 py-0.2 border truncate max-w-[120px] ${
             isAnyCardMine
-              ? "bg-ukiyo-surface/90 text-ukiyo-gold border-ukiyo-gold/40 font-bold"
-              : "bg-ukiyo-surface/60 text-ukiyo-mist border-ukiyo-foam/10"
+              ? "bg-[#00ff9d]/20 text-[#00ff9d] border-[#00ff9d] font-bold"
+              : "bg-black/60 text-[#00e5ff]/80 border-[#00e5ff]/30"
           }`}
         >
           {bottomPlayerNamesText}

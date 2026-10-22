@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef } from "react";
 
-// ASCII 密度梯度 (由淺入深，加入和風「心、秤」高能量字符)
-const ASCII_RAMP = " ·:-=+*#%@心秤";
+// 純血賽博終端 ASCII 密度表 (從空格到最密集的 @, #, 8, 0)
+const CYBER_ASCII_RAMP = " .:-=+*#%@018#&";
 
 interface AsciiWaveCanvasProps {
   active?: boolean;
@@ -24,7 +24,6 @@ export function AsciiWaveCanvas({ active = true }: AsciiWaveCanvasProps) {
     let width = 0;
     let height = 0;
 
-    // 滑鼠游標與漣漪追蹤
     const ripples: { x: number; y: number; radius: number; maxRadius: number; strength: number }[] = [];
     const mouse = { x: -1000, y: -1000, lastX: -1000, lastY: -1000, speed: 0 };
 
@@ -47,107 +46,102 @@ export function AsciiWaveCanvas({ active = true }: AsciiWaveCanvasProps) {
       mouse.lastX = e.clientX;
       mouse.lastY = e.clientY;
 
-      // 當快速移動滑鼠時產生字符水波漣漪
-      if (mouse.speed > 8) {
+      if (mouse.speed > 6) {
         ripples.push({
           x: e.clientX,
           y: e.clientY,
-          radius: 10,
-          maxRadius: 110,
-          strength: Math.min(1.0, mouse.speed / 40),
+          radius: 12,
+          maxRadius: 130,
+          strength: Math.min(1.0, mouse.speed / 35),
         });
       }
     };
 
     const handlePointerDown = (e: PointerEvent) => {
-      // 點擊觸發全螢幕擴散 ASCII 衝擊波
       ripples.push({
         x: e.clientX,
         y: e.clientY,
         radius: 10,
-        maxRadius: Math.max(width, height) * 0.8,
-        strength: 1.5,
+        maxRadius: Math.max(width, height) * 0.9,
+        strength: 1.8,
       });
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("pointerdown", handlePointerDown);
 
-    // 字符網格大小
     const cellWidth = 14;
     const cellHeight = 18;
     let time = 0;
 
     const render = () => {
-      time += 0.025;
+      time += 0.028;
 
-      // 清空為深邃賽博黑底
-      ctx.fillStyle = "#05080f";
+      // 純黑背景
+      ctx.fillStyle = "#030609";
       ctx.fillRect(0, 0, width, height);
 
-      // 更新漣漪狀態
+      // 更新漣漪
       for (let i = ripples.length - 1; i >= 0; i--) {
         const rip = ripples[i];
-        rip.radius += 5.5;
-        rip.strength *= 0.94;
+        rip.radius += 6.0;
+        rip.strength *= 0.93;
         if (rip.strength < 0.02 || rip.radius > rip.maxRadius) {
           ripples.splice(i, 1);
         }
       }
 
-      ctx.font = '13px "Courier New", Courier, monospace';
+      ctx.font = '13px "JetBrains Mono", "Courier New", monospace';
       ctx.textBaseline = "top";
 
       const cols = Math.ceil(width / cellWidth);
       const rows = Math.ceil(height / cellHeight);
 
-      // 遍歷滿版 ASCII 網格
       for (let r = 0; r < rows; r++) {
         const y = r * cellHeight;
         for (let c = 0; c < cols; c++) {
           const x = c * cellWidth;
 
-          // 基礎正弦雙波 (模擬浮世繪大浪翻湧與天秤律動)
-          const wave1 = Math.sin(c * 0.08 + time * 0.8 + r * 0.05);
-          const wave2 = Math.cos(r * 0.12 - time * 0.6 + c * 0.03);
-          const diagonalWave = Math.sin((c + r) * 0.06 - time * 0.9);
-          let energy = (wave1 + wave2 + diagonalWave + 3) / 6; // 0 ~ 1 基礎能量
+          // 正弦波疊加
+          const wave1 = Math.sin(c * 0.09 + time * 0.9 + r * 0.06);
+          const wave2 = Math.cos(r * 0.14 - time * 0.7 + c * 0.04);
+          const diagonalWave = Math.sin((c + r) * 0.07 - time * 1.1);
+          let energy = (wave1 + wave2 + diagonalWave + 3) / 6;
 
-          // 滑鼠游標靠近激發
+          // 滑鼠游標激發
           const distToMouse = Math.hypot(x - mouse.x, y - mouse.y);
-          if (distToMouse < 120) {
-            const proximity = 1 - distToMouse / 120;
-            energy += proximity * 0.65;
+          if (distToMouse < 130) {
+            const proximity = 1 - distToMouse / 130;
+            energy += proximity * 0.75;
           }
 
-          // 漣漪能量疊加
+          // 漣漪激發
           for (let k = 0; k < ripples.length; k++) {
             const rip = ripples[k];
             const distToRip = Math.hypot(x - rip.x, y - rip.y);
             const diff = Math.abs(distToRip - rip.radius);
-            if (diff < 32) {
-              const ripIntensity = (1 - diff / 32) * rip.strength;
-              energy += ripIntensity * 0.85;
+            if (diff < 36) {
+              const ripIntensity = (1 - diff / 36) * rip.strength;
+              energy += ripIntensity * 0.95;
             }
           }
 
           energy = Math.max(0, Math.min(0.999, energy));
 
-          // 挑選對應字符
-          const charIndex = Math.floor(energy * ASCII_RAMP.length);
-          const char = ASCII_RAMP[charIndex];
+          const charIndex = Math.floor(energy * CYBER_ASCII_RAMP.length);
+          const char = CYBER_ASCII_RAMP[charIndex];
 
           if (char === " ") continue;
 
-          // 根據能量決定顏色：低能量暗藍青，高能量亮金 / 琥珀
-          if (energy > 0.72) {
-            ctx.fillStyle = "#ffdf79"; // 高能亮金
-          } else if (energy > 0.45) {
-            ctx.fillStyle = "#c9a96e"; // 琥珀和風金
-          } else if (energy > 0.25) {
-            ctx.fillStyle = "#3b7a9e"; // 浮世繪波濤藍
+          // 賽博高對比螢光綠 / 青藍 / 炫白階梯
+          if (energy > 0.82) {
+            ctx.fillStyle = "#ffffff"; // 能量爆發白
+          } else if (energy > 0.6) {
+            ctx.fillStyle = "#00ff9d"; // 核心螢光綠
+          } else if (energy > 0.38) {
+            ctx.fillStyle = "#00e5ff"; // 賽博青
           } else {
-            ctx.fillStyle = "#1e374b"; // 深邃低頻藍灰
+            ctx.fillStyle = "#0a3a2a"; // 低頻深綠
           }
 
           ctx.fillText(char, x, y);
@@ -172,8 +166,8 @@ export function AsciiWaveCanvas({ active = true }: AsciiWaveCanvasProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 select-none opacity-85 mix-blend-screen"
-      style={{ filter: "contrast(1.15) brightness(1.1)" }}
+      className="fixed inset-0 pointer-events-none z-0 select-none opacity-90"
+      style={{ filter: "contrast(1.2) drop-shadow(0 0 4px rgba(0,255,157,0.3))" }}
     />
   );
 }

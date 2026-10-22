@@ -18,7 +18,6 @@ import { HostPanel } from "../../components/game/HostPanel";
 import { ResultOverlay } from "../../components/game/ResultOverlay";
 import { Button } from "../../components/ui/Button";
 import { AsciiWaveCanvas } from "../../components/ui/AsciiWaveCanvas";
-import { useVisualTheme } from "../../hooks/useVisualTheme";
 import { TOPIC_DECK, DEFAULT_TOPIC } from "../../lib/constants";
 
 function RoomInner() {
@@ -30,7 +29,6 @@ function RoomInner() {
   const [inputNameTemp, setInputNameTemp] = React.useState<string>("");
   const [selectedSlotId, setSelectedSlotId] = React.useState<string | null>(null);
   const [mounted, setMounted] = useState<boolean>(false);
-  const { isAscii } = useVisualTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -239,28 +237,28 @@ function RoomInner() {
   // 1. 暱稱未填寫阻斷 (分享連結直連進房時之暱稱輸入視窗)
   if (!playerName) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-        <div className="glass-panel p-6 rounded-3xl max-w-sm w-full border border-ukiyo-foam/20 flex flex-col items-center space-y-4 shadow-2xl relative z-30">
-          <h2 className="text-xl font-serif font-bold text-ukiyo-gold">請輸入稱號</h2>
-          <p className="text-xs text-ukiyo-mist font-serif leading-relaxed">
-            您正透過分享連結入座暗號房間 <span className="text-ukiyo-foam font-mono font-bold">{roomId}</span>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center font-mono">
+        <div className="bg-[#030609] p-6 max-w-sm w-full border-2 border-[#00ff9d] flex flex-col items-center space-y-4 shadow-[0_0_25px_rgba(0,255,157,0.3)] relative z-30">
+          <h2 className="text-base font-bold text-[#00ff9d]">&gt; SYS://SET_OPERATOR_ID</h2>
+          <p className="text-xs text-[#00e5ff] leading-relaxed">
+            透過分享連結存取加密頻道 <span className="font-bold text-[#00ff9d]">{roomId}</span>
           </p>
           <input
             type="text"
             value={inputNameTemp}
             onChange={(e) => setInputNameTemp(e.target.value)}
-            placeholder="請輸入暱稱..."
-            maxLength={12}
-            className="w-full bg-ukiyo-bg border border-ukiyo-foam/20 rounded-xl px-4 py-2.5 text-center text-sm font-serif text-ukiyo-foam focus:outline-none focus:border-ukiyo-gold"
+            placeholder="OPERATOR_NAME..."
+            maxLength={14}
+            className="w-full bg-[#020406] border-2 border-[#00ff9d] px-3 py-2 text-center text-sm font-mono text-[#00ff9d] focus:outline-none focus:shadow-[0_0_12px_#00ff9d]"
           />
           <Button
             variant="primary"
             size="md"
             disabled={!inputNameTemp.trim()}
             onClick={() => setPlayerName(inputNameTemp.trim())}
-            className="w-full font-serif font-bold tracking-widest"
+            className="w-full font-mono font-bold tracking-widest"
           >
-            入座牌席
+            [JOIN_CHANNEL // 存取席位]
           </Button>
         </div>
       </div>
@@ -270,14 +268,14 @@ function RoomInner() {
   // 2. 滿員阻斷檢測
   if (isOverflow) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center">
-        <div className="glass-panel p-8 rounded-3xl max-w-md border border-ukiyo-vermillion/40 shadow-2xl relative z-30">
-          <h2 className="text-2xl font-serif font-bold text-ukiyo-vermillion mb-2">席位已滿</h2>
-          <p className="text-xs md:text-sm text-ukiyo-mist mb-6 font-serif">
-            此暗號房間已達人數上限 ({maxPlayers} 人)，為維護牌席秩序，請選擇其他暗號房間。
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center font-mono">
+        <div className="bg-[#030609] p-6 max-w-md border-2 border-[#ff0055] shadow-[0_0_25px_#ff0055] relative z-30">
+          <h2 className="text-base font-bold text-[#ff0055] mb-2">&gt; SYS://CHANNEL_FULL_ERR</h2>
+          <p className="text-xs text-[#00ff9d]/70 mb-4">
+            此加密頻道已達節點上限 ({maxPlayers} 人)，請選擇或建立其他通訊頻道。
           </p>
           <Button variant="primary" onClick={() => router.push("/")}>
-            返回大廳
+            [RETURN_TO_LOBBY]
           </Button>
         </div>
       </div>
@@ -287,14 +285,14 @@ function RoomInner() {
   // 3. 閒置斷線提示彈窗
   if (isIdle) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-ukiyo-bg/95">
-        <div className="glass-panel p-8 rounded-3xl max-w-md border border-ukiyo-gold/40 flex flex-col items-center space-y-4 shadow-2xl relative z-30">
-          <div className="w-14 h-14 rounded-full bg-ukiyo-gold/20 border border-ukiyo-gold/40 flex items-center justify-center text-ukiyo-gold">
-            <Clock className="w-7 h-7" />
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-black/95 font-mono">
+        <div className="bg-[#030609] p-6 max-w-md border-2 border-[#ffb000] flex flex-col items-center space-y-3 shadow-[0_0_20px_#ffb000] relative z-30">
+          <div className="w-12 h-12 border border-[#ffb000] flex items-center justify-center text-[#ffb000]">
+            <Clock className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-serif font-bold text-ukiyo-foam">連線已暫停</h2>
-          <p className="text-xs md:text-sm text-ukiyo-mist font-serif leading-relaxed">
-            您已閒置超過 5 分鐘。為節省連線席位資源，系統已暫停連線。
+          <h2 className="text-base font-bold text-[#ffb000]">&gt; SYS://CONNECTION_TIMEOUT</h2>
+          <p className="text-xs text-[#00ff9d]/70 leading-relaxed">
+            特工閒置逾時超過 5 分鐘。為釋放節點頻寬資源，已自動暫停頻道連線。
           </p>
           <Button
             variant="primary"
@@ -302,37 +300,37 @@ function RoomInner() {
               resetTimer();
               window.location.reload();
             }}
-            className="gap-2 font-serif tracking-widest mt-2"
+            className="gap-2 font-mono font-bold mt-2"
           >
-            <RefreshCw className="w-4 h-4" /> 重新連線入座
+            <RefreshCw className="w-4 h-4 text-black" /> [RECONNECT_CHANNEL]
           </Button>
         </div>
       </div>
     );
   }
 
-  // 30 秒閒置預警浮動提示列 (使用 createPortal 與 z-[250]，徹底隔離父層 Stacking Context)
+  // 30 秒閒置預警浮動提示列
   const warningBannerJSX = mounted && isWarning ? (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[250] w-[92%] max-w-md glass-panel border border-ukiyo-gold/60 p-4 rounded-2xl shadow-2xl flex items-center justify-between animate-fade-in">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[250] w-[92%] max-w-md bg-[#030609] border-2 border-[#ffb000] p-3 shadow-[0_0_20px_#ffb000] flex items-center justify-between animate-fade-in font-mono">
       <div className="flex items-center gap-3">
-        <AlertCircle className="w-5 h-5 text-ukiyo-gold shrink-0" />
+        <AlertCircle className="w-5 h-5 text-[#ffb000] shrink-0" />
         <div className="text-left">
-          <h4 className="text-xs font-serif font-bold text-ukiyo-gold">閒置提示</h4>
-          <p className="text-[11px] font-serif text-ukiyo-foam">
-            即將暫停連線 (剩餘 <span className="font-mono text-ukiyo-gold font-bold text-sm">{remainingSeconds}</span> 秒)
+          <h4 className="text-xs font-bold text-[#ffb000]">&gt; SYS://IDLE_WARN</h4>
+          <p className="text-[11px] text-[#00ff9d]">
+            即將中斷連線 (剩餘 <span className="font-bold text-sm text-[#ffb000]">{remainingSeconds}</span> 秒)
           </p>
         </div>
       </div>
-      <Button variant="primary" size="sm" onClick={resetTimer} className="font-serif text-xs px-3">
-        繼續遊玩
+      <Button variant="primary" size="sm" onClick={resetTimer} className="font-mono text-xs px-3">
+        [CONTINUE]
       </Button>
     </div>
   ) : null;
 
   return (
-    <main className="w-full max-w-4xl mx-auto flex flex-col justify-between min-h-[100dvh] relative py-1.5 px-2 sm:px-4">
-      {/* 60fps 互動 ASCII 字符海浪畫布 (ascii-magic 靈魂) */}
-      <AsciiWaveCanvas active={isAscii} />
+    <main className="w-full max-w-4xl mx-auto flex flex-col justify-between min-h-[100dvh] relative py-1 px-2 sm:px-4 font-mono">
+      {/* 60fps 賽博矩陣 ASCII 字符海浪畫布 */}
+      <AsciiWaveCanvas active={true} />
 
       {mounted && warningBannerJSX && createPortal(warningBannerJSX, document.body)}
 
@@ -398,16 +396,16 @@ function RoomInner() {
         />
       )}
 
-      {/* 揭牌階段底部指揮列 (防死鎖與信心出發) */}
+      {/* 揭牌階段底部指揮列 */}
       {status === "locked" && (
-        <div className="w-full glass-panel rounded-2xl p-3 my-2 flex flex-col sm:flex-row items-center justify-between gap-2.5 animate-fade-in shadow-xl border border-ukiyo-gold/40">
-          <div className="flex items-center gap-2 text-xs sm:text-sm font-serif">
-            <span className="w-2.5 h-2.5 rounded-full bg-ukiyo-gold animate-ping" />
-            <span className="text-ukiyo-gold font-bold">
-              揭牌階段 ({board.filter((c) => c.flipped).length} / {board.length} 席已揭曉)
+        <div className="w-full bg-[#04080e] p-2.5 my-1.5 flex flex-col sm:flex-row items-center justify-between gap-2 border-2 border-[#00ff9d] shadow-[0_0_20px_rgba(0,255,157,0.3)] font-mono animate-fade-in">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="w-2 h-2 bg-[#00ff9d] animate-ping" />
+            <span className="text-[#00ff9d] font-bold">
+              SYS://DECRYPTION_PHASE ({board.filter((c) => c.flipped).length} / {board.length} NODES DECRYPTED)
             </span>
-            <span className="text-ukiyo-mist hidden md:inline text-xs">
-              — 請從全場最有信心的席位點擊揭牌！
+            <span className="text-[#00e5ff] hidden md:inline text-[10px]">
+              &gt; 點擊全場最有把握之節點進行解密
             </span>
           </div>
 
@@ -416,9 +414,9 @@ function RoomInner() {
               variant="secondary"
               size="sm"
               onClick={() => flipAllCards(playerId)}
-              className="text-xs font-serif text-ukiyo-gold border-ukiyo-gold/40 hover:bg-ukiyo-gold/15 whitespace-nowrap"
+              className="text-xs whitespace-nowrap"
             >
-              房主一鍵全揭
+              [ROOT: DECRYPT_ALL // 一鍵全揭]
             </Button>
           )}
         </div>
@@ -426,13 +424,13 @@ function RoomInner() {
 
       {/* 大廳等待提示與房主開局按鈕 */}
       {status === "waiting" && (
-        <div className="w-full glass-panel rounded-2xl p-4 my-2 text-center flex flex-col items-center">
-          <p className="text-xs text-ukiyo-mist font-serif mb-3">
+        <div className="w-full bg-[#030609]/95 p-3.5 my-1.5 text-center flex flex-col items-center border border-[#00ff9d]/40 font-mono">
+          <p className="text-xs text-[#00ff9d]/70 mb-2.5">
             {isHost
               ? totalPlayers >= 2
-                ? "全員入座後，請點擊下方按鈕開始發牌。"
-                : "靜候至少 2 位玩家入座方可開局..."
-              : "靜候房主開始牌局..."}
+                ? "&gt; 全節點連線已建立，點擊下方執行發牌開局。"
+                : "&gt; 等待至少 2 個節點加入通訊頻道..."
+              : "&gt; 等待 ROOT 權限特工執行發牌開局..."}
           </p>
           {isHost && (
             <Button
@@ -442,11 +440,11 @@ function RoomInner() {
               onClick={() => {
                 if (totalPlayers >= 2) dealCards(playerId);
               }}
-              className={`font-serif tracking-widest ${
-                totalPlayers < 2 ? "opacity-50 cursor-not-allowed border-ukiyo-foam/20" : ""
+              className={`font-mono font-bold tracking-widest ${
+                totalPlayers < 2 ? "opacity-40 cursor-not-allowed" : ""
               }`}
             >
-              {totalPlayers < 2 ? "等待玩家入座 (至少 2 人)" : "發牌開局"}
+              {totalPlayers < 2 ? "[WAITING_FOR_PEERS: MIN 2]" : "[DISPATCH_PACKETS // 發牌開局]"}
             </Button>
           )}
         </div>
@@ -479,8 +477,8 @@ export default function RoomPage() {
 
   if (!roomId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-ukiyo-bg text-ukiyo-gold font-serif">
-        載入中...
+      <div className="flex items-center justify-center min-h-screen bg-[#030609] text-[#00ff9d] font-mono text-sm">
+        &gt; SYS://ESTABLISHING_NEURAL_LINK...
       </div>
     );
   }

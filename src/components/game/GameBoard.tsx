@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sparkles, Trophy, ArrowRight, Dices, Eye, EyeOff } from "lucide-react";
+import { Terminal, Cpu, ArrowRight, Dices, Eye, EyeOff } from "lucide-react";
 import { BoardSlot } from "./BoardSlot";
 import { BoardCard, TopicItem } from "../../types/game";
 import { useBoardState } from "../../hooks/useBoardState";
@@ -48,6 +48,7 @@ export function GameBoard({
   onFlipCard,
 }: GameBoardProps) {
   const [isTopicCollapsed, setIsTopicCollapsed] = useState<boolean>(false);
+
   const { totalSlotsCount, slotsMap, slotCorrectnessMap, isFinishedReveal } = useBoardState(
     board,
     totalPlayers,
@@ -55,9 +56,7 @@ export function GameBoard({
     status
   );
 
-  // 每列嚴格固定 4 個席位 (4-column grid layout)，確保手機端全卡牌一目瞭然，免除橫向滾動看牌
   const maxPerRow = 4;
-
   const slotRows: number[][] = [];
   for (let i = 0; i < totalSlotsCount; i += maxPerRow) {
     const row: number[] = [];
@@ -68,152 +67,150 @@ export function GameBoard({
   }
 
   return (
-    <div className="w-full flex-1 min-h-[260px] sm:min-h-[300px] md:min-h-[360px] bg-gradient-to-b from-ukiyo-surface/95 via-ukiyo-bg/95 to-ukiyo-surface/95 rounded-2xl md:rounded-3xl p-2.5 md:p-5 border border-ukiyo-gold/30 shadow-2xl relative flex flex-col items-center justify-between my-2 washi-texture overflow-hidden">
-      {/* 背景水墨波浪浮水印 */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-        <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border-8 border-ukiyo-foam flex items-center justify-center">
-          <span className="text-8xl font-serif text-ukiyo-foam">心</span>
-        </div>
-      </div>
+    <div className="w-full flex-1 min-h-[260px] sm:min-h-[300px] md:min-h-[360px] bg-[#030609]/95 border-2 border-[#00ff9d]/40 p-2 sm:p-4 relative flex flex-col items-center justify-between my-2 font-mono shadow-[0_0_25px_rgba(0,0,0,0.9)] overflow-hidden">
+      {/* 頂部四角裝飾錨點 */}
+      <div className="absolute top-1 left-1 text-[9px] text-[#00ff9d]/40 pointer-events-none">+</div>
+      <div className="absolute top-1 right-1 text-[9px] text-[#00ff9d]/40 pointer-events-none">+</div>
+      <div className="absolute bottom-1 left-1 text-[9px] text-[#00ff9d]/40 pointer-events-none">+</div>
+      <div className="absolute bottom-1 right-1 text-[9px] text-[#00ff9d]/40 pointer-events-none">+</div>
 
-      {/* 結算狀態橫條 */}
+      {/* 結算完成提示列 */}
       {status === "finished" && (
-        <div className="relative z-20 w-full mb-2 p-2 rounded-xl bg-ukiyo-surface/95 border border-ukiyo-gold/40 shadow-lg flex items-center justify-between text-xs font-serif animate-fade-in">
-          <div className="flex items-center gap-1.5 text-ukiyo-gold font-bold">
-            <Trophy className="w-4 h-4 text-ukiyo-gold animate-bounce" />
-            <span>盤面檢視模式（可查看結算點數與卡牌位置）</span>
+        <div className="relative z-20 w-full mb-1.5 p-1.5 bg-[#00ff9d]/15 border border-[#00ff9d] flex items-center justify-between text-xs text-[#00ff9d] animate-fade-in font-bold">
+          <div className="flex items-center gap-1.5">
+            <Cpu className="w-4 h-4 text-[#00ff9d] animate-pulse" />
+            <span>SYS://MEM_SCAN_COMPLETE (檢視資料節點數值與順序)</span>
           </div>
         </div>
       )}
 
       {/* 頂部狀態列 */}
-      <div className="relative z-10 w-full flex items-center justify-between px-2 py-1 text-xs text-ukiyo-mist font-serif border-b border-ukiyo-foam/10 pb-2">
-        <div className="flex items-center gap-1.5 font-bold text-ukiyo-foam text-[11px] sm:text-xs">
-          <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" />
+      <div className="relative z-10 w-full flex items-center justify-between px-1 py-1 text-xs border-b border-[#00ff9d]/20 pb-1.5">
+        <div className="flex items-center gap-1.5 font-bold text-[#00ff9d] text-[11px] sm:text-xs">
+          <Terminal className="w-3.5 h-3.5 text-[#00e5ff]" />
           <span>
-            已落牌 {board.length} / {totalSlotsCount} 張 (共 {totalSlotsCount} 席)
+            MEM_ALLOC: {board.length} / {totalSlotsCount} NODES (MAX: {totalSlotsCount})
           </span>
         </div>
 
-        {/* 主題收合時的展開快捷按鈕，或操作提示 */}
+        {/* 主題收合時的展開快捷按鈕 */}
         <div className="flex items-center gap-2">
           {showTopicSetting && isTopicCollapsed && (
             <button
               onClick={() => setIsTopicCollapsed(false)}
-              className="flex items-center gap-1 text-[10px] text-ukiyo-gold bg-ukiyo-surface/90 hover:bg-ukiyo-gold/15 px-2 py-0.5 rounded-full border border-ukiyo-gold/40 transition-all font-serif cursor-pointer active:scale-95"
+              className="flex items-center gap-1 text-[10px] text-[#00e5ff] bg-black/80 hover:bg-[#00e5ff]/20 px-2 py-0.5 border border-[#00e5ff]/50 transition-all cursor-pointer active:scale-95"
             >
-              <Eye className="w-3 h-3 text-ukiyo-gold" />
-              <span>展開主題:《{topic?.title || "心流"}》</span>
+              <Eye className="w-3 h-3 text-[#00e5ff]" />
+              <span>[EXPAND_BENCHMARK: {topic?.title || "CLASSIC"}]</span>
             </button>
           )}
-          <div className="text-[10px] text-ukiyo-mist font-normal hidden md:block">
-            💡 點選空席位預定落牌，點擊已出卡牌收回
+          <div className="text-[10px] text-[#00ff9d]/50 hidden md:block">
+            &gt; SELECT_NODE_TO_INSERT_OR_RECALL
           </div>
         </div>
       </div>
 
-      {/* 本局價值主題卷軸 (Topic Scroll Banner) - 支援一鍵隱藏/收合 */}
+      {/* 基準測試協定橫幅 (Benchmark Query) */}
       {showTopicSetting && !isTopicCollapsed && (
-        <div className="relative z-10 w-full max-w-xl topic-scroll-banner rounded-2xl p-2.5 my-1 text-center flex flex-col items-center transition-all animate-fade-in">
-          <div className="flex items-center justify-between w-full mb-1">
-            <div className="flex items-center gap-1.5 text-[10px] sm:text-xs text-ukiyo-gold font-serif font-bold">
-              <span className="w-2 h-2 rounded-full bg-ukiyo-gold animate-pulse" />
-              <span>價值天秤主題</span>
+        <div className="relative z-10 w-full max-w-xl bg-[#04080e] border border-[#00e5ff]/60 p-2 sm:p-2.5 my-1 text-center flex flex-col items-center shadow-[0_0_15px_rgba(0,229,255,0.15)] animate-fade-in">
+          <div className="flex items-center justify-between w-full mb-1 border-b border-[#00e5ff]/20 pb-1">
+            <div className="flex items-center gap-1.5 text-[10px] text-[#00e5ff] font-bold">
+              <span className="w-1.5 h-1.5 bg-[#00e5ff] animate-ping" />
+              <span>[ PROTOCOL_BENCHMARK ]</span>
             </div>
 
             <div className="flex items-center gap-1.5">
               {isHost && onRandomTopic && status === "waiting" && (
                 <button
                   onClick={onRandomTopic}
-                  className="flex items-center gap-1 text-[10px] sm:text-xs text-ukiyo-gold hover:text-ukiyo-foam bg-ukiyo-gold/15 hover:bg-ukiyo-gold/25 px-2.5 py-0.5 rounded-full border border-ukiyo-gold/40 transition-all font-serif cursor-pointer active:scale-95"
+                  className="flex items-center gap-1 text-[10px] text-[#ffb000] hover:bg-[#ffb000]/20 px-2 py-0.5 border border-[#ffb000]/50 transition-all cursor-pointer active:scale-95"
                 >
                   <Dices className="w-3 h-3" />
-                  <span>抽籤換題</span>
+                  <span>[REROLL_QUERY]</span>
                 </button>
               )}
 
-              {/* 一鍵收合隱藏主題按鈕 */}
               <button
                 onClick={() => setIsTopicCollapsed(true)}
-                title="收合隱藏主題卷軸，獲取更大牌桌視野"
-                className="flex items-center gap-1 text-[10px] text-ukiyo-mist hover:text-ukiyo-gold bg-ukiyo-bg/80 hover:bg-ukiyo-gold/10 px-2 py-0.5 rounded-full border border-ukiyo-foam/20 hover:border-ukiyo-gold/40 transition-all font-serif cursor-pointer active:scale-95"
+                title="最小化測試協定"
+                className="flex items-center gap-1 text-[10px] text-[#00ff9d]/70 hover:text-[#00ff9d] hover:bg-[#00ff9d]/20 px-2 py-0.5 border border-[#00ff9d]/40 transition-all cursor-pointer active:scale-95"
               >
                 <EyeOff className="w-3 h-3" />
-                <span>隱藏主題</span>
+                <span>[HIDE]</span>
               </button>
             </div>
           </div>
 
-          <h3 className="text-sm sm:text-base md:text-lg font-serif font-black text-ukiyo-foam tracking-wider my-0.5 drop-shadow">
-            {topic?.title || "純數字心流默契"}
+          <h3 className="text-sm sm:text-base font-black text-[#ffffff] tracking-wider my-0.5 drop-shadow-[0_0_6px_#00e5ff]">
+            &gt; {topic?.title || "SYS://BENCHMARK_ALPHA"}
           </h3>
 
-          {/* 標尺兩端極端標籤 */}
-          <div className="flex items-center justify-between w-full mt-1.5 pt-1.5 border-t border-ukiyo-foam/10 text-[10px] sm:text-xs font-serif">
-            <span className="text-ukiyo-gold/90 font-bold truncate max-w-[45%] text-left">
-              1 ‧ {topic?.minLabel || "極小值"}
+          {/* 兩端極限標尺刻度 */}
+          <div className="flex items-center justify-between w-full mt-1 pt-1 border-t border-[#00e5ff]/20 text-[10px] sm:text-[11px]">
+            <span className="text-[#00e5ff] font-bold truncate max-w-[45%] text-left">
+              [001: {topic?.minLabel || "MIN_LIMIT"}]
             </span>
 
-            <div className="flex items-center gap-1 text-[9px] text-ukiyo-mist shrink-0 px-1 font-mono">
-              <span>默契遞增</span>
-              <ArrowRight className="w-2.5 h-2.5 text-ukiyo-gold" />
+            <div className="flex items-center gap-1 text-[9px] text-[#00ff9d]/60 shrink-0 px-1 font-mono">
+              <span>SYNC_GRADIENT</span>
+              <ArrowRight className="w-2.5 h-2.5 text-[#00ff9d]" />
             </div>
 
-            <span className="text-ukiyo-gold/90 font-bold truncate max-w-[45%] text-right">
-              {topic?.maxLabel || "極大值"} ‧ 100
+            <span className="text-[#00e5ff] font-bold truncate max-w-[45%] text-right">
+              [{topic?.maxLabel || "MAX_LIMIT"} :100]
             </span>
           </div>
         </div>
       )}
 
-      {/* 盤面槽位 (席位精準動態排版：每列固定 4 個席位，手機屏一次全覽免橫滾) */}
-      <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-full gap-2 sm:gap-3 md:gap-4 min-h-[140px] my-auto">
+      {/* 盤面記憶體節點 (每列 4 槽位) */}
+      <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-full gap-2 sm:gap-3 min-h-[140px] my-auto">
         {slotRows.map((rowSlotIndexes, rowIndex) => (
           <div
             key={`row-${rowIndex}`}
-            className="flex items-center justify-center gap-1.5 sm:gap-3 md:gap-4 w-full flex-wrap py-1"
+            className="flex items-center justify-center gap-1.5 sm:gap-3 w-full flex-wrap py-0.5"
           >
-              {rowSlotIndexes.map((idx) => {
-                const slotKey = `slot-${idx}`;
-                const slotCards = slotsMap[slotKey] || [];
-                const topCard = slotCards[slotCards.length - 1];
+            {rowSlotIndexes.map((idx) => {
+              const slotKey = `slot-${idx}`;
+              const slotCards = slotsMap[slotKey] || [];
+              const topCard = slotCards[slotCards.length - 1];
 
-                return (
-                  <BoardSlot
-                    key={slotKey}
-                    slotId={slotKey}
-                    cards={slotCards}
-                    status={status}
-                    lockedList={lockedList}
-                    isOwnerLocked={
-                      topCard
-                        ? lockedList.includes(topCard.playerId) ||
-                          Boolean((topCard as any).connectionId && lockedList.includes((topCard as any).connectionId))
-                        : false
-                    }
-                    isCurrentPlayer={
-                      topCard
-                        ? (currentPlayerId && topCard.playerId === currentPlayerId) ||
-                          topCard.playerId === currentConnectionId ||
-                          (topCard as any).connectionId === currentConnectionId
-                        : false
-                    }
-                    currentConnectionId={currentConnectionId}
-                    currentPlayerId={currentPlayerId}
-                    isSelected={selectedSlotId === slotKey}
-                    isCorrectOrder={slotCorrectnessMap[slotKey]}
-                    isFinishedReveal={isFinishedReveal}
-                    focusedByNames={presenceSlotsMap[slotKey] || []}
-                    isHost={isHost}
-                    activePlayerIds={activePlayerIds}
-                    onSelectSlot={onSelectSlot}
-                    onRecall={onRecallCard}
-                    onFlip={onFlipCard}
-                  />
-                );
-              })}
-            </div>
-          ))}
+              return (
+                <BoardSlot
+                  key={slotKey}
+                  slotId={slotKey}
+                  cards={slotCards}
+                  status={status}
+                  lockedList={lockedList}
+                  isOwnerLocked={
+                    topCard
+                      ? lockedList.includes(topCard.playerId) ||
+                        Boolean((topCard as any).connectionId && lockedList.includes((topCard as any).connectionId))
+                      : false
+                  }
+                  isCurrentPlayer={
+                    topCard
+                      ? (currentPlayerId && topCard.playerId === currentPlayerId) ||
+                        topCard.playerId === currentConnectionId ||
+                        (topCard as any).connectionId === currentConnectionId
+                      : false
+                  }
+                  currentConnectionId={currentConnectionId}
+                  currentPlayerId={currentPlayerId}
+                  isSelected={selectedSlotId === slotKey}
+                  isCorrectOrder={slotCorrectnessMap[slotKey]}
+                  isFinishedReveal={isFinishedReveal}
+                  focusedByNames={presenceSlotsMap[slotKey] || []}
+                  isHost={isHost}
+                  activePlayerIds={activePlayerIds}
+                  onSelectSlot={onSelectSlot}
+                  onRecall={onRecallCard}
+                  onFlip={onFlipCard}
+                />
+              );
+            })}
+          </div>
+        ))}
       </div>
     </div>
   );

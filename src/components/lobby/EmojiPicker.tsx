@@ -8,7 +8,6 @@ interface EmojiPickerProps {
   onRoomSelect: (roomId: string) => void;
 }
 
-// 隨機選取陣列中的一個元素
 function getRandomEmoji(arr: string[]): string {
   return arr[Math.floor(Math.random() * arr.length)];
 }
@@ -24,18 +23,17 @@ export function EmojiPicker({ onRoomSelect }: EmojiPickerProps) {
   }, [e1, e2, e3, onRoomSelect]);
 
   return (
-    <div className="flex flex-col items-center space-y-3 w-full">
-      <label className="text-xs font-serif font-bold text-ukiyo-gold tracking-widest uppercase">
-        選擇房間暗號 (配對代碼)
+    <div className="flex flex-col items-center space-y-2.5 w-full font-mono">
+      <label className="text-[11px] font-bold text-[#00e5ff] tracking-wider text-left w-full max-w-xs">
+        &gt; CRYPTO_CHANNEL [加密頻道金鑰]
       </label>
 
       {/* 3 個 Emoji 選擇列 */}
       <div className="grid grid-cols-3 gap-2.5 w-full max-w-xs">
-        {/* 第一組: 動物 */}
         <select
           value={e1}
           onChange={(e) => setE1(e.target.value)}
-          className="bg-ukiyo-surface/90 border border-ukiyo-foam/20 rounded-xl p-2.5 text-2xl text-center focus:outline-none focus:border-ukiyo-gold cursor-pointer transition-colors"
+          className="bg-[#020406] border border-[#00ff9d]/60 p-2 text-2xl text-center focus:outline-none focus:border-[#00e5ff] cursor-pointer"
         >
           {EMOJI_GROUPS.animals.map((emoji) => (
             <option key={emoji} value={emoji}>
@@ -44,11 +42,10 @@ export function EmojiPicker({ onRoomSelect }: EmojiPickerProps) {
           ))}
         </select>
 
-        {/* 第二組: 物品 */}
         <select
           value={e2}
           onChange={(e) => setE2(e.target.value)}
-          className="bg-ukiyo-surface/90 border border-ukiyo-foam/20 rounded-xl p-2.5 text-2xl text-center focus:outline-none focus:border-ukiyo-gold cursor-pointer transition-colors"
+          className="bg-[#020406] border border-[#00ff9d]/60 p-2 text-2xl text-center focus:outline-none focus:border-[#00e5ff] cursor-pointer"
         >
           {EMOJI_GROUPS.items.map((emoji) => (
             <option key={emoji} value={emoji}>
@@ -57,11 +54,10 @@ export function EmojiPicker({ onRoomSelect }: EmojiPickerProps) {
           ))}
         </select>
 
-        {/* 第三組: 食物 */}
         <select
           value={e3}
           onChange={(e) => setE3(e.target.value)}
-          className="bg-ukiyo-surface/90 border border-ukiyo-foam/20 rounded-xl p-2.5 text-2xl text-center focus:outline-none focus:border-ukiyo-gold cursor-pointer transition-colors"
+          className="bg-[#020406] border border-[#00ff9d]/60 p-2 text-2xl text-center focus:outline-none focus:border-[#00e5ff] cursor-pointer"
         >
           {EMOJI_GROUPS.foods.map((emoji) => (
             <option key={emoji} value={emoji}>
@@ -72,9 +68,9 @@ export function EmojiPicker({ onRoomSelect }: EmojiPickerProps) {
       </div>
 
       {/* 預覽展示 */}
-      <div className="bg-ukiyo-surface/60 border border-ukiyo-foam/10 rounded-xl px-4 py-1.5 text-center">
-        <span className="text-[10px] text-ukiyo-mist block mb-0.5 font-serif">暗號預覽</span>
-        <span className="text-base font-mono text-ukiyo-gold tracking-widest">{`${e1} ${e2} ${e3}`}</span>
+      <div className="bg-black/80 border border-[#00ff9d]/30 px-3 py-1 text-center w-full max-w-xs flex items-center justify-between">
+        <span className="text-[10px] text-[#00ff9d]/60 font-mono">CHANNEL_KEY:</span>
+        <span className="text-sm font-mono text-[#00ff9d] font-bold tracking-widest">{`${e1} :: ${e2} :: ${e3}`}</span>
       </div>
     </div>
   );

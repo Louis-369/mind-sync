@@ -21,17 +21,23 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   if (!isOpen || !mounted) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-ukiyo-bg/90 backdrop-blur-md animate-fade-in pointer-events-auto">
-      <div className="glass-panel w-full max-w-md rounded-2xl p-5 md:p-6 border border-ukiyo-foam/20 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between pb-3 border-b border-ukiyo-foam/15 mb-4">
-          <h3 className="text-base md:text-lg font-serif font-bold text-ukiyo-foam tracking-wide flex items-center gap-2">
-            {title}
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in pointer-events-auto font-mono">
+      <div className="bg-[#030609] border-2 border-[#00ff9d] w-full max-w-md p-5 shadow-[0_0_25px_rgba(0,255,157,0.3)] relative my-auto max-h-[90vh] overflow-y-auto">
+        {/* 四角錨點 */}
+        <div className="absolute top-1 left-1.5 text-[8px] text-[#00ff9d]">+</div>
+        <div className="absolute top-1 right-1.5 text-[8px] text-[#00ff9d]">+</div>
+        <div className="absolute bottom-1 left-1.5 text-[8px] text-[#00ff9d]">+</div>
+        <div className="absolute bottom-1 right-1.5 text-[8px] text-[#00ff9d]">+</div>
+
+        <div className="flex items-center justify-between pb-2 border-b border-[#00ff9d]/30 mb-3">
+          <h3 className="text-sm md:text-base font-bold text-[#00ff9d] tracking-wider flex items-center gap-2">
+            &gt; {title}
           </h3>
           <button
             onClick={onClose}
-            className="text-ukiyo-mist hover:text-ukiyo-foam p-1 rounded-lg hover:bg-ukiyo-surface transition-colors cursor-pointer"
+            className="text-[#00ff9d]/70 hover:text-[#00ff9d] p-0.5 hover:bg-[#00ff9d]/20 transition-colors cursor-pointer"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
         <div>{children}</div>

@@ -18,19 +18,19 @@ export function Button({
   disabled,
   ...props
 }: ButtonProps) {
-  const baseStyles = "inline-flex items-center justify-center font-bold rounded-xl transition-all duration-200 shadow-md active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer tracking-wider";
+  const baseStyles = "inline-flex items-center justify-center font-mono font-bold transition-all duration-150 active:scale-95 disabled:opacity-40 disabled:pointer-events-none cursor-pointer tracking-wider";
 
   const variants = {
-    primary: "bg-ukiyo-indigo hover:bg-ukiyo-indigoHover text-ukiyo-foam border border-ukiyo-foam/20 shadow-ukiyo-soft",
-    secondary: "bg-ukiyo-wave hover:bg-ukiyo-wave/80 text-ukiyo-foam border border-ukiyo-foam/20",
-    danger: "bg-ukiyo-vermillion hover:bg-red-800 text-ukiyo-cream border border-red-400/30",
-    ghost: "bg-ukiyo-surface/60 hover:bg-ukiyo-surface text-ukiyo-mist border border-ukiyo-foam/10",
+    primary: "bg-[#00ff9d] hover:bg-white text-black border border-[#00ff9d] shadow-[0_0_12px_rgba(0,255,157,0.5)]",
+    secondary: "bg-black/80 hover:bg-[#00e5ff]/20 text-[#00e5ff] border border-[#00e5ff]/70 shadow-[0_0_8px_rgba(0,229,255,0.3)]",
+    danger: "bg-[#ff0055] hover:bg-white hover:text-[#ff0055] text-white border border-white shadow-[0_0_12px_#ff0055]",
+    ghost: "bg-transparent hover:bg-[#00ff9d]/10 text-[#00ff9d]/70 hover:text-[#00ff9d] border border-transparent",
   };
 
   const sizes = {
-    sm: "px-3.5 py-1.5 text-xs",
-    md: "px-5 py-2.5 text-sm",
-    lg: "px-7 py-3.5 text-base md:text-lg font-serif",
+    sm: "px-3 py-1 text-xs",
+    md: "px-4 py-2 text-xs sm:text-sm",
+    lg: "px-6 py-2.5 text-sm sm:text-base font-bold",
   };
 
   return (

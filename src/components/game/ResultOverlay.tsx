@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import confetti from "canvas-confetti";
-import { RotateCcw, Eye, Share2, Check } from "lucide-react";
+import { RotateCcw, Eye, Share2, Check, AlertOctagon, CheckCircle2 } from "lucide-react";
 import { Button } from "../ui/Button";
 import { BoardCard, TopicItem } from "../../types/game";
 import { sound } from "../../lib/soundEngine";
@@ -45,15 +45,18 @@ export function ResultOverlay({
 
         if (result === "win") {
           try {
+            sound.playVictory();
             confetti({
-              particleCount: 100,
-              spread: 70,
+              particleCount: 80,
+              spread: 60,
               origin: { y: 0.6 },
-              colors: ["#c9a96e", "#e8dcc8", "#2d5a7b", "#f5f0e3"],
+              colors: ["#00ff9d", "#00e5ff", "#ffffff"],
             });
           } catch (error) {
             console.error("觸發彩帶動畫失敗:", error);
           }
+        } else {
+          sound.playCollisionWarn();
         }
       }, 700);
     } else {
@@ -69,14 +72,12 @@ export function ResultOverlay({
 
   const isWin = result === "win";
 
-  // 排序並分析盤面卡牌
   const sortedBoard = [...board].sort((a, b) => {
     const slotA = parseInt((a.slotId || a.uniqueKey || "").replace("slot-", ""), 10) || 0;
     const slotB = parseInt((b.slotId || b.uniqueKey || "").replace("slot-", ""), 10) || 0;
     return slotA - slotB;
   });
 
-  // 計算相鄰正確對數與同步率
   let correctPairs = 0;
   const totalPairs = Math.max(1, sortedBoard.length - 1);
   let minDiff = 100;
@@ -100,58 +101,53 @@ export function ResultOverlay({
 
   const syncRate = Math.round((correctPairs / totalPairs) * 100);
 
-// 決定評語與專屬稱號印章
-  let stampLabel = "共鳴";
-  let resultTitle = "心天秤完美平衡！";
-  let detailRoast = "所有和紙卡牌由小到大精準歸位，彼此的默契宛如一體。";
+  let statusBadge = "PERFECT_HARMONY";
+  let resultTitle = "SYS://SYNC_SUCCESS [100%]";
+  let detailDiagnostic = "所有資料封包由低頻至高頻完美排序，神經頻率達成完全同相！";
 
   if (isWin) {
     if (closestPair && closestPair.diff <= 3) {
-      stampLabel = "神合";
-      resultTitle = "極限心靈神合！";
-      detailRoast = `神仙級默契！${closestPair.a.playerName} 的【${closestPair.a.cardValue}】與 ${closestPair.b.playerName} 的【${closestPair.b.cardValue}】僅差 ${closestPair.diff} 點，依然完美咬合！`;
+      statusBadge = "QUANTUM_SYNC";
+      resultTitle = "SYS://EXTREME_RESONANCE";
+      detailDiagnostic = `極限神經契合！特工 ${closestPair.a.playerName} [${closestPair.a.cardValue}] 與 ${closestPair.b.playerName} [${closestPair.b.cardValue}] 僅差 ${closestPair.diff} 單位，零碰撞咬合！`;
     } else {
-      stampLabel = "共鳴";
-      resultTitle = "心天秤圓滿平衡！";
-      detailRoast = `全員在主題《${topic?.title || "心流"}》下的價值觀驚人一致，成功全數過關！`;
+      statusBadge = "SYNC_PASSED";
+      resultTitle = "SYS://SYNCHRONIZATION_OK";
+      detailDiagnostic = `全體特工在測試協定《${topic?.title || "CLASSIC"}》下達成高度共識，封包無失真通過！`;
     }
   } else {
-    stampLabel = "失衡";
-    resultTitle = "價值觀出現交錯失衡";
+    statusBadge = "FATAL_DESYNC";
+    resultTitle = "SYS://DESYNCHRONIZATION_ERR";
     if (firstError) {
-      const KANJI = ["壹", "貳", "參", "肆", "伍", "陸", "柒", "捌", "玖", "拾"];
-      const slotKanji = KANJI[firstError.slotIdx - 1] || `${firstError.slotIdx}`;
-      detailRoast = `在【${slotKanji}之席】發生價值斷層！${firstError.cardA.playerName} 的【${firstError.cardA.cardValue}】搶先落在了 ${firstError.cardB.playerName} 的【${firstError.cardB.cardValue}】前面。`;
+      detailDiagnostic = `在 [NODE_0x${firstError.slotIdx.toString(16).toUpperCase()}] 檢測到頻率逆向斷層！特工 ${firstError.cardA.playerName} [${firstError.cardA.cardValue}] 搶先佔位在 ${firstError.cardB.playerName} [${firstError.cardB.cardValue}] 之前。`;
     } else {
-      detailRoast = "某張卡牌順序微幅交錯，彼此的心跳節奏稍有誤差，再試一局！";
+      detailDiagnostic = "檢測到封包順序輕微錯置，系統頻率失諧，建議重啟同步測試！";
     }
   }
 
-  // 產生 Threads / 社群複製戰報
   const handleCopyReport = async () => {
     try {
-      const shareText = `🎴 心天秤 (Mind Sync) ‧ 默契檢定報告\n📌 本局主題：《${topic?.title || "純數字心流"}》\n⚖️ 判定：【${stampLabel}】 心靈同步率 ${syncRate}%\n💬 結語：${detailRoast}\n\n🌐 來測你們的價值觀默契：https://louis-369.github.io/mind-sync/`;
+      const shareText = `[SYS://MIND_SYNC_DIAGNOSTIC]\nQUERY: 《${topic?.title || "SYS://BENCHMARK_ALPHA"}》\nSTATUS: [${statusBadge}] SYNC_RATE: ${syncRate}%\nLOG: ${detailDiagnostic}\nLINK: https://louis-369.github.io/mind-sync/`;
       await navigator.clipboard.writeText(shareText);
       sound.playSlotTap();
       setCopiedReport(true);
       setTimeout(() => setCopiedReport(false), 2500);
     } catch (e) {
-      console.error("複製戰報失敗:", e);
+      console.error("複製診斷日誌失敗:", e);
     }
   };
 
-  // 當使用者點擊「檢視盤面」後關閉彈窗
   if (!showModal) {
     return (
-      <div className="game-action-bar animate-fade-in relative z-20">
+      <div className="game-action-bar animate-fade-in relative z-20 font-mono">
         {isHost ? (
-          <Button variant="primary" size="md" onClick={onRestart} className="host-action-btn">
-            <RotateCcw className="w-4 h-4 text-ukiyo-gold" /> 房主重新開局
+          <Button variant="primary" size="md" onClick={onRestart} className="font-mono font-bold">
+            <RotateCcw className="w-4 h-4 text-black" /> [ROOT: RESTART_SYNC]
           </Button>
         ) : (
-          <div className="guest-wait-badge">
-            <span className="w-2 h-2 rounded-full bg-ukiyo-gold animate-ping" />
-            <span>靜候房主重新開局...</span>
+          <div className="flex items-center gap-2 bg-black/80 px-3 py-1.5 border border-[#00ff9d]/40 text-xs text-[#00ff9d]">
+            <span className="w-2 h-2 bg-[#00ff9d] animate-ping" />
+            <span>WAITING_FOR_ROOT_RESTART...</span>
           </div>
         )}
       </div>
@@ -160,88 +156,83 @@ export function ResultOverlay({
 
   if (!mounted) return null;
 
-  // 結算 Modal
   const modalJSX = (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-ukiyo-bg/90 backdrop-blur-md animate-fade-in pointer-events-auto">
-      <div className="glass-panel rounded-3xl p-6 text-center border border-ukiyo-foam/20 shadow-2xl relative overflow-hidden flex flex-col items-center w-full max-w-md my-auto">
-        <div className="flex flex-col items-center w-full pt-1">
-          {/* 大字書法落款印章 */}
-          <div
-            className={`w-18 h-18 rounded-2xl flex items-center justify-center text-3xl font-serif font-black mb-3 shadow-2xl border ${
-              stampLabel === "神合"
-                ? "bg-gradient-to-br from-ukiyo-cream via-ukiyo-gold to-[#a18247] text-ukiyo-bg border-ukiyo-gold shadow-[0_0_30px_rgba(201,169,110,0.8)] animate-pulse"
-                : isWin
-                ? "bg-ukiyo-gold text-ukiyo-bg border-ukiyo-gold/60 shadow-[0_0_20px_rgba(201,169,110,0.5)]"
-                : "ukiyo-seal text-ukiyo-cream border-ukiyo-vermillion/60 shadow-[0_0_20px_rgba(199,62,29,0.6)]"
-            }`}
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fade-in pointer-events-auto font-mono">
+      <div className="bg-[#030609] border-2 border-[#00ff9d] p-6 text-center shadow-[0_0_30px_rgba(0,255,157,0.3)] relative w-full max-w-md my-auto flex flex-col items-center">
+        {/* 四角錨點 */}
+        <div className="absolute top-1 left-1 text-[8px] text-[#00ff9d]">+</div>
+        <div className="absolute top-1 right-1 text-[8px] text-[#00ff9d]">+</div>
+        <div className="absolute bottom-1 left-1 text-[8px] text-[#00ff9d]">+</div>
+        <div className="absolute bottom-1 right-1 text-[8px] text-[#00ff9d]">+</div>
+
+        {/* 頂部標誌 */}
+        <div className={`w-14 h-14 flex items-center justify-center text-xl font-bold mb-3 border-2 ${
+          isWin
+            ? "bg-[#00ff9d]/20 border-[#00ff9d] text-[#00ff9d] shadow-[0_0_20px_#00ff9d]"
+            : "bg-[#ff0055]/20 border-[#ff0055] text-[#ff0055] shadow-[0_0_20px_#ff0055]"
+        }`}>
+          {isWin ? <CheckCircle2 className="w-8 h-8" /> : <AlertOctagon className="w-8 h-8" />}
+        </div>
+
+        <h2 className={`text-lg sm:text-xl font-black mb-1 tracking-wider ${isWin ? "text-[#00ff9d]" : "text-[#ff0055]"}`}>
+          {resultTitle}
+        </h2>
+
+        {/* 同步率進度列 */}
+        <div className="flex items-center gap-2 my-2 bg-black/80 px-4 py-1 border border-[#00ff9d]/40 text-xs">
+          <span className="text-[#00e5ff]">SYNC_RATE:</span>
+          <span className="text-base font-bold text-[#00ff9d]">{syncRate}%</span>
+        </div>
+
+        {/* 診斷日誌文字 */}
+        <p className="text-xs text-[#00ff9d]/90 my-3 max-w-xs leading-relaxed bg-[#04080e] p-3 border border-[#00ff9d]/30 text-left">
+          &gt; {detailDiagnostic}
+        </p>
+
+        {/* 操作按鈕群 */}
+        <div className="flex flex-col items-center justify-center gap-2 w-full max-w-xs mx-auto mt-2">
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={handleCopyReport}
+            className="w-full flex items-center justify-center gap-2 text-xs font-mono font-bold border-[#00e5ff] text-[#00e5ff] hover:bg-[#00e5ff]/20"
           >
-            {stampLabel}
-          </div>
-
-          <h2 className={`text-xl sm:text-2xl font-serif font-black mb-1 tracking-widest ${isWin ? "text-ukiyo-gold" : "text-ukiyo-vermillion"}`}>
-            {resultTitle}
-          </h2>
-
-          {/* 心靈同步率膠囊 */}
-          <div className="flex items-center gap-2 my-2 bg-ukiyo-bg/80 px-4 py-1.5 rounded-full border border-ukiyo-foam/15">
-            <span className="text-xs font-serif text-ukiyo-mist">心靈同步率</span>
-            <span className="text-base sm:text-lg font-mono font-black text-ukiyo-gold">
-              {syncRate}%
-            </span>
-          </div>
-
-          {/* 戰犯抓包 / 神默契調侃評語 */}
-          <p className="text-xs sm:text-sm text-ukiyo-foam/90 my-3 max-w-xs leading-relaxed font-serif bg-ukiyo-surface/60 p-3 rounded-2xl border border-ukiyo-foam/10">
-            {detailRoast}
-          </p>
-
-          {/* 操作按鈕組 */}
-          <div className="flex flex-col items-center justify-center gap-2 w-full max-w-xs mx-auto mt-2">
-            {/* 一鍵複製戰報 */}
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={handleCopyReport}
-              className="w-full flex items-center justify-center gap-2 font-serif text-xs text-ukiyo-gold border-ukiyo-gold/40 hover:bg-ukiyo-gold/15 cursor-pointer rounded-xl"
-            >
-              {copiedReport ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-400" />
-                  <span>已複製戰報，快去分享發串！</span>
-                </>
-              ) : (
-                <>
-                  <Share2 className="w-4 h-4 text-ukiyo-gold" />
-                  <span>複製對局戰報 (分享好友/Threads)</span>
-                </>
-              )}
-            </Button>
-
-            {isHost ? (
-              <Button
-                variant={isWin ? "primary" : "danger"}
-                size="md"
-                onClick={onRestart}
-                className="w-full flex items-center justify-center gap-2 font-serif tracking-widest cursor-pointer rounded-xl"
-              >
-                <RotateCcw className="w-4 h-4" /> 房主重新開局
-              </Button>
+            {copiedReport ? (
+              <>
+                <Check className="w-4 h-4 text-[#00ff9d]" />
+                <span>[LOG_COPIED_TO_BUFFER]</span>
+              </>
             ) : (
-              <div className="text-xs text-ukiyo-mist font-serif py-2.5 text-center bg-ukiyo-surface/60 w-full rounded-xl border border-ukiyo-foam/10">
-                靜候房主重新開局...
-              </div>
+              <>
+                <Share2 className="w-4 h-4 text-[#00e5ff]" />
+                <span>[COPY_DIAGNOSTIC_LOG]</span>
+              </>
             )}
+          </Button>
 
-            {/* 檢視盤面按鈕 */}
+          {isHost ? (
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowModal(false)}
-              className="w-full text-xs text-ukiyo-mist hover:text-ukiyo-foam font-serif cursor-pointer"
+              variant={isWin ? "primary" : "danger"}
+              size="md"
+              onClick={onRestart}
+              className="w-full flex items-center justify-center gap-2 font-mono font-bold"
             >
-              <Eye className="w-3.5 h-3.5" /> 檢視盤面席位
+              <RotateCcw className="w-4 h-4" /> [ROOT: REBOOT_SEQUENCE]
             </Button>
-          </div>
+          ) : (
+            <div className="text-xs text-[#00ff9d]/50 py-2 text-center bg-black/60 w-full border border-[#00ff9d]/20">
+              [WAITING_FOR_ROOT_RESTART...]
+            </div>
+          )}
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowModal(false)}
+            className="w-full text-xs text-[#00ff9d]/60 hover:text-[#00ff9d] font-mono"
+          >
+            <Eye className="w-3.5 h-3.5" /> [INSPECT_NODES]
+          </Button>
         </div>
       </div>
     </div>

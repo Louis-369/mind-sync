@@ -12,8 +12,8 @@ describe('PlayerHand Component', () => {
         onPlayCard={() => {}}
       />
     );
-    expect(screen.getByText('風之浪人')).toBeInTheDocument();
-    expect(screen.getByText('3 張手牌')).toBeInTheDocument();
+    expect(screen.getByText(/> 風之浪人/)).toBeInTheDocument();
+    expect(screen.getAllByText(/PACKETS: 3/)[0]).toBeInTheDocument();
   });
 
   it('triggers onPlayCard when a card is clicked', () => {
@@ -38,6 +38,6 @@ describe('PlayerHand Component', () => {
         onPlayCard={() => {}}
       />
     );
-    expect(screen.getByText(/手牌已完全出完/)).toBeInTheDocument();
+    expect(screen.getByText(/ALL_PACKETS_DISPATCHED/)).toBeInTheDocument();
   });
 });

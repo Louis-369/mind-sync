@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Users, Copy, Check, Settings, Edit3, Volume2, VolumeX, ArrowLeft, Terminal } from "lucide-react";
+import { Users, Copy, Check, Settings, Edit3, Volume2, VolumeX, ArrowLeft } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 import { sound } from "../../lib/soundEngine";
-import { useVisualTheme } from "../../hooks/useVisualTheme";
 
 interface GameStatusProps {
   roomId: string;
@@ -32,7 +31,6 @@ export function GameStatus({
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [tempName, setTempName] = useState<string>(playerName);
   const [muted, setMuted] = useState<boolean>(false);
-  const { isAscii, toggleTheme } = useVisualTheme();
 
   useEffect(() => {
     setMuted(sound.isMuted());
@@ -64,127 +62,108 @@ export function GameStatus({
   };
 
   return (
-    <div className="w-full glass-panel rounded-2xl px-2.5 sm:px-4 py-1.5 my-1 flex items-center justify-between gap-2 border-ukiyo-gold/30 shadow-xl relative z-20">
-      {/* 左側：離開按鈕 + 房間代碼一鍵複製 */}
+    <div className="w-full bg-[#030609]/95 border border-[#00ff9d]/50 px-2 sm:px-3 py-1 my-1 flex items-center justify-between gap-2 font-mono shadow-[0_0_15px_rgba(0,0,0,0.8)] relative z-20">
+      {/* 左側：離席 + 頻道代碼 + 特工 ID */}
       <div className="flex items-center space-x-1.5 sm:space-x-2">
         {onLeaveRoom && (
           <button
             onClick={onLeaveRoom}
-            title="離開席位"
-            className="flex items-center gap-1 text-[11px] sm:text-xs text-ukiyo-mist hover:text-ukiyo-foam bg-ukiyo-surface/60 hover:bg-ukiyo-surface px-2.5 py-1 rounded-xl border border-ukiyo-foam/15 transition-all cursor-pointer font-serif touch-manipulation active:scale-95"
+            title="終止連線"
+            className="flex items-center gap-1 text-[11px] text-[#00ff9d]/70 hover:text-[#00ff9d] bg-black/60 hover:bg-[#00ff9d]/20 px-2 py-0.5 border border-[#00ff9d]/40 transition-all cursor-pointer active:scale-95"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">離席</span>
+            <span className="hidden sm:inline">[EXIT]</span>
           </button>
         )}
 
-        {/* 房間暗號與複製膠囊 */}
+        {/* 頻道金鑰 */}
         <button
           onClick={handleCopyLink}
-          title="點擊複製邀請連結"
-          className="flex items-center space-x-1.5 bg-ukiyo-bg/85 hover:bg-ukiyo-surface/90 px-2.5 py-1 rounded-xl border border-ukiyo-gold/40 shadow-inner cursor-pointer transition-colors active:scale-95"
+          title="複製連線頻率網址"
+          className="flex items-center space-x-1.5 bg-[#04080e] hover:bg-[#00e5ff]/20 px-2 py-0.5 border border-[#00e5ff]/60 cursor-pointer transition-colors active:scale-95"
         >
-          <span className="text-xs sm:text-sm font-bold text-ukiyo-gold font-mono tracking-wider">{roomId}</span>
-          <span className="text-ukiyo-mist">
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+          <span className="text-xs font-bold text-[#00e5ff] tracking-wider">{roomId}</span>
+          <span className="text-[#00e5ff]">
+            {copied ? <Check className="w-3.5 h-3.5 text-[#00ff9d]" /> : <Copy className="w-3.5 h-3.5" />}
           </span>
         </button>
 
-        {/* 個人稱號 (點選修改) */}
+        {/* 特工代號修改 */}
         {playerName && onChangePlayerName && (
           <button
             onClick={() => {
               setTempName(playerName);
               setIsEditModalOpen(true);
             }}
-            title="點擊修改稱號"
-            className="hidden md:flex items-center gap-1.5 text-xs text-ukiyo-foam/90 bg-ukiyo-surface/80 hover:bg-ukiyo-surface px-2.5 py-1 rounded-xl border border-ukiyo-foam/15 transition-all cursor-pointer font-serif active:scale-95"
+            title="修改特工代號"
+            className="hidden md:flex items-center gap-1 text-xs text-[#00ff9d] bg-black/60 hover:bg-[#00ff9d]/20 px-2 py-0.5 border border-[#00ff9d]/40 transition-all cursor-pointer active:scale-95"
           >
-            <span className="font-bold truncate max-w-[90px] text-ukiyo-gold">{playerName}</span>
-            <Edit3 className="w-3 h-3 text-ukiyo-gold" />
+            <span className="font-bold truncate max-w-[100px]">ID: {playerName}</span>
+            <Edit3 className="w-3 h-3 text-[#00ff9d]" />
           </button>
         )}
       </div>
 
-      {/* 右側：靜音開關 + 人數膠囊 + 房主設定 */}
-      <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs font-serif">
-        {/* 手機端稱號修改圖示 */}
+      {/* 右側：音效 + 連線數 + 房主設定 */}
+      <div className="flex items-center space-x-1.5 sm:space-x-2 text-xs">
         {playerName && onChangePlayerName && (
           <button
             onClick={() => {
               setTempName(playerName);
               setIsEditModalOpen(true);
             }}
-            title="修改稱號"
-            className="md:hidden p-1.5 rounded-xl bg-ukiyo-surface/80 text-ukiyo-gold border border-ukiyo-foam/15 touch-manipulation active:scale-95"
+            title="修改特工代號"
+            className="md:hidden p-1 bg-black/60 text-[#00ff9d] border border-[#00ff9d]/40 active:scale-95"
           >
             <Edit3 className="w-3.5 h-3.5" />
           </button>
         )}
 
-        {/* 音效開關切換 */}
+        {/* 音效開關 */}
         <button
           onClick={handleToggleMute}
-          title={muted ? "開啟音效" : "靜音"}
-          className="p-1.5 rounded-xl bg-ukiyo-surface/80 hover:bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-foam/15 transition-colors cursor-pointer touch-manipulation active:scale-95"
+          title={muted ? "開啟合成音效" : "靜音"}
+          className="p-1 bg-black/60 hover:bg-[#00ff9d]/20 text-[#00ff9d] border border-[#00ff9d]/40 transition-colors cursor-pointer active:scale-95"
         >
-          {muted ? <VolumeX className="w-3.5 h-3.5 text-ukiyo-mist" /> : <Volume2 className="w-3.5 h-3.5" />}
+          {muted ? <VolumeX className="w-3.5 h-3.5 text-[#00ff9d]/40" /> : <Volume2 className="w-3.5 h-3.5" />}
         </button>
 
-        {/* ASCII / 和紙 雙主題一鍵切換開關 (Develop 專屬) */}
-        <button
-          onClick={toggleTheme}
-          title={isAscii ? "點擊切換為 🎴 浮世繪和紙主題" : "點擊切換為 📟 ASCII-Magic 主題"}
-          className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-ukiyo-surface/90 hover:bg-ukiyo-surface text-ukiyo-gold border border-ukiyo-gold/40 transition-all cursor-pointer touch-manipulation active:scale-95 font-mono text-[11px] font-bold shadow-sm"
-        >
-          {isAscii ? (
-            <>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>ASCII</span>
-            </>
-          ) : (
-            <>
-              <span>🎴 和紙</span>
-            </>
-          )}
-        </button>
-
-        {/* 人數席位 */}
-        <div className="flex items-center space-x-1 text-ukiyo-foam bg-ukiyo-bg/80 px-2.5 py-1 rounded-full border border-ukiyo-foam/15 shadow-inner">
-          <Users className="w-3 h-3 text-ukiyo-gold" />
-          <span className="font-sans text-[11px] sm:text-xs font-semibold">{`${connectedCount}/${maxPlayers}`} 人席</span>
+        {/* 特工在線席位 */}
+        <div className="flex items-center space-x-1 text-[#00ff9d] bg-black/80 px-2 py-0.5 border border-[#00ff9d]/40">
+          <Users className="w-3 h-3 text-[#00e5ff]" />
+          <span className="text-[11px] font-bold">{`${connectedCount}/${maxPlayers}`} NODES</span>
         </div>
 
-        {/* 房主齒輪設定按鈕 */}
+        {/* ROOT 權限設定 */}
         {isHost && onOpenHostPanel && (
           <button
             onClick={onOpenHostPanel}
-            title="房主設定"
-            className="p-1.5 rounded-xl bg-ukiyo-surface hover:bg-ukiyo-wave text-ukiyo-foam border border-ukiyo-gold/40 transition-colors cursor-pointer touch-manipulation active:scale-95 shadow-md"
+            title="ROOT 系統規則設定"
+            className="p-1 bg-[#ffb000]/15 hover:bg-[#ffb000]/30 text-[#ffb000] border border-[#ffb000]/70 cursor-pointer active:scale-95"
           >
-            <Settings className="w-3.5 h-3.5 text-ukiyo-gold" />
+            <Settings className="w-3.5 h-3.5" />
           </button>
         )}
       </div>
 
-      {/* 稱號修改 Modal 彈窗 */}
+      {/* 特工代號修改 Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        title="✏️ 修改個人稱號"
+        title="SYS://RENAME_OPERATOR"
       >
-        <div className="space-y-4 font-serif text-center pt-1">
-          <p className="text-xs text-ukiyo-mist">
-            請輸入新的稱號，修改後將自動同步至牌席全場玩家。
+        <div className="space-y-4 font-mono text-center pt-1">
+          <p className="text-xs text-[#00ff9d]/70">
+            請輸入新的特工代號 (OPERATOR_ID)，將同步廣播至全節點。
           </p>
 
           <input
             type="text"
             value={tempName}
             onChange={(e) => setTempName(e.target.value)}
-            maxLength={12}
-            placeholder="請輸入新稱號..."
-            className="w-full bg-ukiyo-bg border border-ukiyo-foam/20 rounded-xl px-4 py-2.5 text-center text-sm font-serif text-ukiyo-foam focus:outline-none focus:border-ukiyo-gold"
+            maxLength={14}
+            placeholder="OPERATOR_NAME..."
+            className="w-full bg-[#030609] border-2 border-[#00ff9d] px-3 py-2 text-center text-sm font-mono text-[#00ff9d] focus:outline-none focus:shadow-[0_0_15px_#00ff9d]"
           />
 
           <div className="flex items-center justify-end gap-2 pt-2">
@@ -192,18 +171,18 @@ export function GameStatus({
               variant="secondary"
               size="sm"
               onClick={() => setIsEditModalOpen(false)}
-              className="text-xs"
+              className="text-xs font-mono"
             >
-              取消
+              [ABORT]
             </Button>
             <Button
               variant="primary"
               size="sm"
               disabled={!tempName.trim()}
               onClick={handleSaveName}
-              className="text-xs font-bold tracking-widest"
+              className="text-xs font-mono font-bold"
             >
-              儲存稱號
+              [SAVE_ID]
             </Button>
           </div>
         </div>

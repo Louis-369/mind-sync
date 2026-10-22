@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, HeartHandshake, Layers, Eye } from "lucide-react";
+import { Terminal, ArrowRight, ArrowLeft, CheckCircle2, ShieldAlert, Cpu, Eye } from "lucide-react";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 
@@ -15,51 +15,51 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
 
   const steps = [
     {
-      title: "第一步：設定主題與價值交流",
-      icon: <HeartHandshake className="w-8 h-8 text-ukiyo-gold" />,
-      subtitle: "不透露實際數字，分享彼此的真實想法",
+      title: "01 // BENCHMARK PROTOCOL [基準測試]",
+      icon: <Cpu className="w-8 h-8 text-[#00ff9d]" />,
+      subtitle: "禁言絕對數字，純粹透過語意訊號溝通頻率",
       content: (
-        <div className="space-y-3 text-left">
-          <div className="p-3 bg-ukiyo-surface/80 rounded-xl border border-ukiyo-gold/20 text-xs text-ukiyo-mist space-y-2">
-            <p className="font-bold text-ukiyo-foam flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 核心精神：
+        <div className="space-y-3 text-left font-mono">
+          <div className="p-3 bg-[#04080e] border border-[#00ff9d]/30 text-xs text-[#00ff9d]/80 space-y-2">
+            <p className="font-bold text-[#00e5ff] flex items-center gap-1.5">
+              <Terminal className="w-3.5 h-3.5" /> 核心通訊規則：
             </p>
             <p>
-              選定一個有趣主題（例如：「出國最想去的地方」、「買過最瞎的東西」）。大家在不直接說出 1~100 數字的前提下，自由討論並各自在心中給出衡量點數。
+              系統會發布一組情境基準測試（例如：「收到最想翻白眼的交換禮物」）。特工在不直接透露 001~100 數值的前提下，自由討論並各自在心中評定信號強度。
             </p>
           </div>
         </div>
       ),
     },
     {
-      title: "第二步：價值轉化與默契落牌",
-      icon: <Layers className="w-8 h-8 text-ukiyo-gold" />,
-      subtitle: "由左至右，將手牌放入檯面槽位",
+      title: "02 // PACKET ALLOCATION [封包調度]",
+      icon: <Terminal className="w-8 h-8 text-[#00ff9d]" />,
+      subtitle: "由左至右 [0x01..]，將加密卡匣落入記憶體節點",
       content: (
-        <div className="space-y-3 text-left">
-          <div className="p-3 bg-ukiyo-surface/80 rounded-xl border border-ukiyo-gold/20 text-xs text-ukiyo-mist space-y-2">
-            <p className="font-bold text-ukiyo-foam flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 出牌方式：
+        <div className="space-y-3 text-left font-mono">
+          <div className="p-3 bg-[#04080e] border border-[#00ff9d]/30 text-xs text-[#00ff9d]/80 space-y-2">
+            <p className="font-bold text-[#00e5ff] flex items-center gap-1.5">
+              <Terminal className="w-3.5 h-3.5" /> 節點插槽機制：
             </p>
             <p>
-              將你的衡量標準轉化為手上的卡牌數字。憑藉與同伴的默契，點選盤面上的空席位（<span className="text-ukiyo-gold font-bold">壹、貳、參...</span>），將卡牌由左至右放置到檯面。
+              將你評定的信號強度轉化為手中的卡匣。憑藉與同伴的直覺默契，點擊盤面槽位（<span className="text-[#00ff9d] font-bold">NODE_0x01, 0x02...</span>），依頻率由低到高排序。若發生撞席，請積極協商讓位！
             </p>
           </div>
         </div>
       ),
     },
     {
-      title: "第三步：蓋牌同意與揭牌驗證",
-      icon: <Eye className="w-8 h-8 text-ukiyo-gold" />,
-      subtitle: "全體鎖定蓋上朱印，翻開驗證共鳴",
+      title: "03 // DECRYPT & SYNC [解密驗證]",
+      icon: <Eye className="w-8 h-8 text-[#00ff9d]" />,
+      subtitle: "全體特工提交鎖定，解密節點判定同步率",
       content: (
-        <div className="space-y-3 text-left">
-          <div className="p-3 bg-ukiyo-surface/80 rounded-xl border border-ukiyo-gold/20 text-xs text-ukiyo-mist space-y-2">
-            <p className="font-bold text-ukiyo-foam flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-ukiyo-gold" /> 勝負條件：
+        <div className="space-y-3 text-left font-mono">
+          <div className="p-3 bg-[#04080e] border border-[#00ff9d]/30 text-xs text-[#00ff9d]/80 space-y-2">
+            <p className="font-bold text-[#00e5ff] flex items-center gap-1.5">
+              <Terminal className="w-3.5 h-3.5" /> 判定條件：
             </p>
             <p>
-              出完手牌後點擊「蓋印定案」，卡牌會蓋上日式朱紅「確」字落款。全員落印後進入揭牌階段，只要卡牌數字<span className="text-ukiyo-gold font-bold">由左至右完美遞增</span>，即代表心天秤平衡勝利！
+              卡匣派發完畢後點擊「COMMIT_SYNC」提交鎖定。全員鎖定後進入解密階段，可從最有把握的節點開始揭牌。只要所有封包數值<span className="text-[#00ff9d] font-bold">由左至右嚴格遞增</span>，即達成 100% 神經頻率同步成功！
             </p>
           </div>
         </div>
@@ -82,64 +82,58 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="🌸 心天秤 ‧ 遊戲玩法教學">
-      <div className="space-y-5 font-serif text-center pt-1">
-        {/* 步驟指示點 */}
-        <div className="flex items-center justify-center gap-2 mb-2">
+    <Modal isOpen={isOpen} onClose={onClose} title="SYS://PROTOCOL_MANUAL">
+      <div className="space-y-4 font-mono text-center">
+        <div className="flex justify-center my-1">{steps[currentStep].icon}</div>
+
+        <div>
+          <h4 className="text-sm font-bold text-[#00ff9d] mb-1">
+            {steps[currentStep].title}
+          </h4>
+          <p className="text-[11px] text-[#00e5ff]">
+            {steps[currentStep].subtitle}
+          </p>
+        </div>
+
+        <div>{steps[currentStep].content}</div>
+
+        {/* 步驟指示器 */}
+        <div className="flex justify-center items-center gap-1.5 pt-1">
           {steps.map((_, idx) => (
-            <button
+            <div
               key={idx}
-              onClick={() => setCurrentStep(idx)}
-              className={`h-2 rounded-full transition-all cursor-pointer ${
-                currentStep === idx
-                  ? "w-8 bg-ukiyo-gold"
-                  : "w-2 bg-ukiyo-foam/30 hover:bg-ukiyo-foam/50"
+              className={`h-1.5 transition-all ${
+                idx === currentStep ? "w-6 bg-[#00ff9d]" : "w-1.5 bg-[#00ff9d]/30"
               }`}
             />
           ))}
         </div>
 
-        {/* 步驟標題與圖示 */}
-        <div className="flex flex-col items-center justify-center space-y-2">
-          <div className="p-3 bg-ukiyo-gold/10 rounded-2xl border border-ukiyo-gold/30">
-            {steps[currentStep].icon}
-          </div>
-          <h3 className="text-base font-bold text-ukiyo-foam">
-            {steps[currentStep].title}
-          </h3>
-          <p className="text-xs text-ukiyo-gold/90">
-            {steps[currentStep].subtitle}
-          </p>
-        </div>
-
-        {/* 步驟圖文內容 */}
-        {steps[currentStep].content}
-
-        {/* 底部導覽按鈕 */}
-        <div className="flex items-center justify-between pt-2 border-t border-ukiyo-foam/10">
+        {/* 導航按鈕列 */}
+        <div className="flex items-center justify-between pt-2 border-t border-[#00ff9d]/20">
           <Button
             variant="ghost"
             size="sm"
-            disabled={currentStep === 0}
             onClick={handlePrev}
-            className="gap-1 text-xs"
+            disabled={currentStep === 0}
+            className="text-xs"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> 上一步
+            <ArrowLeft className="w-3.5 h-3.5 mr-1" /> [PREV]
           </Button>
 
           <Button
             variant="primary"
             size="sm"
             onClick={handleNext}
-            className="gap-1 text-xs tracking-widest font-bold"
+            className="text-xs font-bold"
           >
             {currentStep === steps.length - 1 ? (
-              <span className="flex items-center gap-1">
-                開始遊玩 <CheckCircle2 className="w-3.5 h-3.5 text-ukiyo-gold" />
+              <span className="flex items-center gap-1 text-black">
+                <CheckCircle2 className="w-3.5 h-3.5 text-black" /> [INITIALIZE]
               </span>
             ) : (
-              <span className="flex items-center gap-1">
-                下一步 <ArrowRight className="w-3.5 h-3.5" />
+              <span className="flex items-center gap-1 text-black">
+                [NEXT] <ArrowRight className="w-3.5 h-3.5 text-black" />
               </span>
             )}
           </Button>

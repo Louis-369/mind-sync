@@ -18,13 +18,13 @@ export const DEFAULT_SETTINGS: GameSettings = {
   showTopic: true,
 };
 
-// 預設純數字主題
+// 預設純數字主題 (神經頻率同步基準)
 export const DEFAULT_TOPIC: TopicItem = {
   id: "classic-numbers",
-  title: "純數字心流默契",
-  minLabel: "極小 1",
-  maxLabel: "極大 100",
-  category: "經典",
+  title: "SYS://BENCHMARK_ALPHA 數位心流同步",
+  minLabel: "001 // 低頻基底",
+  maxLabel: "100 // 極限超載",
+  category: "基準",
 };
 
 // 精選價值觀主題卡庫 (ITO / 派對爆笑主題)
@@ -235,11 +235,11 @@ export const TOPIC_DECK: TopicItem[] = [
   },
 ];
 
-// 預設玩家隨機稱號 (典雅和風雅號)
+// 預設特工代號 (賽博黑客風格)
 export const RANDOM_NAMES = [
-  "秤心客", "調頻師", "默契匠", "知音人",
-  "觀潮客", "聽風者", "落花師", "探幽人",
-  "持衡者", "明鏡客", "同心匠", "渡雲者"
+  "CYPHER_01", "GHOST_X", "NEON_BIT", "NULL_PTR",
+  "BYTE_RUNNER", "SYNTAX_ERR", "ZERO_COOL", "PROXY_9",
+  "VAPOR_TRACE", "ROOT_ADMIN", "NEXUS_7", "QUANTUM_K"
 ];
 
 // 快速心情氣泡

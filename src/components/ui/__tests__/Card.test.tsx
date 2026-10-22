@@ -12,7 +12,7 @@ describe('Card Component', () => {
 
   it('renders seal stamp when showSeal is true', () => {
     render(<Card value={15} showSeal={true} />);
-    expect(screen.getByText('確')).toBeInTheDocument();
+    expect(screen.getByText('LOCKED')).toBeInTheDocument();
   });
 
   it('adds underline for numbers 6, 9, 66, 99 to prevent confusion', () => {

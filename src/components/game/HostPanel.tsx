@@ -26,7 +26,7 @@ export function HostPanel({
   const getMaxCardsForPlayers = (numPlayers: number) => {
     if (numPlayers === 2) return 6;
     if (numPlayers === 3) return 4;
-    return 3; // 4 人遊戲最高 3 張
+    return 3;
   };
 
   const maxAllowedCards = settings ? getMaxCardsForPlayers(settings.maxPlayers) : 6;
@@ -40,58 +40,58 @@ export function HostPanel({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="房主規則設定">
-      <div className="space-y-4 font-serif">
+    <Modal isOpen={isOpen} onClose={onClose} title="SYS://ROOT_CONFIG">
+      <div className="space-y-4 font-mono text-xs">
         {settings && onUpdateSettings && (
-          <div className="grid grid-cols-2 gap-3 bg-ukiyo-surface/80 p-4 rounded-xl border border-ukiyo-foam/10">
-            {/* 最大人數選單 */}
+          <div className="grid grid-cols-2 gap-3 bg-[#04080e] p-3 border border-[#00ff9d]/40">
+            {/* 最大特工席位 */}
             <div className="flex flex-col">
-              <label className="text-xs text-ukiyo-mist mb-1 font-bold">房間人數上限</label>
+              <label className="text-[#00e5ff] mb-1 font-bold">MAX_NODES (人數上限)</label>
               <select
                 value={settings.maxPlayers}
                 disabled={status !== "waiting"}
                 onChange={(e) => handleMaxPlayersChange(Number(e.target.value))}
-                className="bg-ukiyo-bg border border-ukiyo-foam/20 rounded-lg px-2.5 py-1.5 text-xs text-ukiyo-foam focus:outline-none focus:border-ukiyo-gold cursor-pointer"
+                className="bg-[#030609] border border-[#00ff9d]/40 px-2 py-1 text-xs text-[#00ff9d] focus:outline-none focus:border-[#00ff9d]"
               >
-                <option value={2}>2 人席 (最高 6 張)</option>
-                <option value={3}>3 人席 (最高 4 張)</option>
-                <option value={4}>4 人席 (最高 3 張)</option>
+                <option value={2}>2 NODES (MAX 6 CARTS)</option>
+                <option value={3}>3 NODES (MAX 4 CARTS)</option>
+                <option value={4}>4 NODES (MAX 3 CARTS)</option>
               </select>
             </div>
 
-            {/* 每人發牌數選單 */}
+            {/* 每位特工配發卡匣數 */}
             <div className="flex flex-col">
-              <label className="text-xs text-ukiyo-mist mb-1 font-bold">每人手牌張數</label>
+              <label className="text-[#00e5ff] mb-1 font-bold">CARTS_PER_OP (卡匣張數)</label>
               <select
                 value={currentCardsPerPlayer}
                 disabled={status !== "waiting"}
                 onChange={(e) => onUpdateSettings({ cardsPerPlayer: Number(e.target.value) })}
-                className="bg-ukiyo-bg border border-ukiyo-foam/20 rounded-lg px-2.5 py-1.5 text-xs text-ukiyo-foam focus:outline-none focus:border-ukiyo-gold cursor-pointer"
+                className="bg-[#030609] border border-[#00ff9d]/40 px-2 py-1 text-xs text-[#00ff9d] focus:outline-none focus:border-[#00ff9d]"
               >
                 {Array.from({ length: maxAllowedCards }, (_, i) => i + 1).map((num) => (
                   <option key={num} value={num}>
-                    {num} 張
+                    {num} PACKETS
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* 價值主題卷軸全局開關 */}
-            <div className="col-span-2 flex items-center justify-between pt-2 border-t border-ukiyo-foam/10">
+            {/* 啟用基準測試橫幅 */}
+            <div className="col-span-2 flex items-center justify-between pt-2 border-t border-[#00ff9d]/20">
               <div className="flex flex-col">
-                <span className="text-xs text-ukiyo-foam font-bold">啟用價值天秤主題</span>
-                <span className="text-[10px] text-ukiyo-mist">關閉後進入純數字默契模式，隱藏主題卷軸</span>
+                <span className="text-[#00ff9d] font-bold">ENABLE_BENCHMARK_QUERY</span>
+                <span className="text-[10px] text-[#00ff9d]/60">關閉後進入純數字頻率同步模式</span>
               </div>
               <button
                 type="button"
                 onClick={() => onUpdateSettings({ showTopic: settings.showTopic === false ? true : false })}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                  settings.showTopic !== false ? "bg-ukiyo-gold" : "bg-ukiyo-bg border border-ukiyo-foam/20"
+                className={`relative inline-flex h-5 w-10 items-center border transition-colors ${
+                  settings.showTopic !== false ? "bg-[#00ff9d] border-[#00ff9d]" : "bg-black border-[#00ff9d]/30"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-ukiyo-surface shadow-md transition-transform ${
-                    settings.showTopic !== false ? "translate-x-6 bg-ukiyo-bg" : "translate-x-1"
+                  className={`inline-block h-3.5 w-3.5 transform transition-transform ${
+                    settings.showTopic !== false ? "translate-x-5 bg-black" : "translate-x-0.5 bg-[#00ff9d]/50"
                   }`}
                 />
               </button>
@@ -100,14 +100,14 @@ export function HostPanel({
         )}
 
         {/* 儲存按鈕 */}
-        <div className="pt-2">
+        <div className="pt-1">
           <Button
             variant="primary"
             size="md"
             onClick={onClose}
-            className="w-full flex items-center justify-center gap-1.5 tracking-widest font-serif"
+            className="w-full flex items-center justify-center gap-1.5 font-mono font-bold"
           >
-            <Check className="w-4 h-4 text-ukiyo-gold" /> 確認設定
+            <Check className="w-4 h-4 text-black" /> [APPLY_SYS_CONFIG]
           </Button>
         </div>
       </div>
