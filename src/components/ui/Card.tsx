@@ -81,8 +81,8 @@ export function Card({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={clsx(
-        "relative select-none cursor-pointer transition-all duration-150 perspective-1000 touch-manipulation",
-        "w-15 h-22 sm:w-18 sm:h-26 md:w-22 md:h-30",
+        "relative select-none cursor-pointer transition-all duration-150 perspective-1000 touch-manipulation shrink-0",
+        "w-14 h-20 sm:w-16 sm:h-24 md:w-20 md:h-28",
         isSelected && "-translate-y-4",
         shake && "animate-error-shake",
         className

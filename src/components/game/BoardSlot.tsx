@@ -137,7 +137,7 @@ export function BoardSlot({
             onSelectSlot(slotId);
           }
         }}
-        className={`relative w-16 h-24 sm:w-18 sm:h-26 md:w-22 md:h-30 rounded-xl border-2 transition-all flex flex-col items-center justify-between p-2 select-none ${
+        className={`relative w-14 h-20 sm:w-16 sm:h-24 md:w-20 md:h-28 shrink-0 rounded-xl border-2 transition-all flex flex-col items-center justify-between p-1.5 select-none ${
           canSelect
             ? "cursor-pointer hover:-translate-y-1 active:translate-y-0.5"
             : "cursor-default opacity-40"
@@ -260,7 +260,7 @@ export function BoardSlot({
       >
         <Card
           value={allCards[0].cardValue}
-          flipped={Boolean(allCards[0].flipped || isCardMine(allCards[0]))}
+          flipped={Boolean(allCards[0].flipped)}
           isOwner={Boolean(isCardMine(allCards[0]))}
           playerName={allCards[0].playerName}
           showSeal={Boolean(lockedList.includes(allCards[0].playerId))}
@@ -283,7 +283,7 @@ export function BoardSlot({
             >
               <Card
                 value={c.cardValue}
-                flipped={Boolean(c.flipped || isCardMine(c))}
+                flipped={Boolean(c.flipped)}
                 isOwner={Boolean(isCardMine(c))}
                 playerName={c.playerName}
                 showSeal={Boolean(lockedList.includes(c.playerId))}

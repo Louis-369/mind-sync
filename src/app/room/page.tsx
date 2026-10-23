@@ -101,26 +101,17 @@ function RoomInner() {
       ? myOnlineRank >= maxPlayers && totalUniqueOnlineCount > maxPlayers
       : totalUniqueOnlineCount > maxPlayers;
 
-  // 雙向直覺出牌核心邏輯：
-  // 情況 A：玩家點選了手牌
-  const handleSelectHandCard = (cardValue: number) => {
-    if (selectedSlotId) {
-      // 若先前已選定空位，直接將這張牌放進該空位！
-      placeCard(cardValue, playerName, selectedSlotId, playerId);
-      setSelectedSlotId(null);
-      setSelectedHandCard(null);
-      setFocusedSlot(null);
-      return;
-    }
-
-    // 否則切換手牌選取狀態
-    setSelectedHandCard((prev) => (prev === cardValue ? null : cardValue));
+  // 出牌邏輯：點擊手牌即可直接落牌（若有先點選空位則落入該空位，若無則自動落入第一個空位）
+  const handlePlayHandCard = (cardValue: number) => {
+    placeCard(cardValue, playerName, selectedSlotId || undefined, playerId);
+    setSelectedSlotId(null);
+    setSelectedHandCard(null);
+    setFocusedSlot(null);
   };
 
-  // 情況 B：玩家點選了場上槽位
+  // 點選場上槽位
   const handleSelectSlot = (slotId: string) => {
     if (selectedHandCard !== null) {
-      // 若當前已有選中的手牌，直接放入該槽位！
       placeCard(selectedHandCard, playerName, slotId, playerId);
       setSelectedHandCard(null);
       setSelectedSlotId(null);
@@ -420,12 +411,8 @@ function RoomInner() {
           hand={myHand}
           playerName={playerName}
           selectedCard={selectedHandCard}
-          onSelectCard={handleSelectHandCard}
-          onPlayCard={(cardVal) => {
-            placeCard(cardVal, playerName, selectedSlotId || undefined, playerId);
-            setSelectedSlotId(null);
-            setSelectedHandCard(null);
-          }}
+          onSelectCard={handlePlayHandCard}
+          onPlayCard={handlePlayHandCard}
           isLocked={isLocked}
           lockedCount={lockedList.filter((id) => uniquePlayerIds.has(id)).length}
           totalPlayers={totalPlayers}
