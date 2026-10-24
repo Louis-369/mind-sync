@@ -96,21 +96,21 @@ export function GameBoard({
   }
 
   return (
-    <div className="w-full flex-1 min-h-[260px] sm:min-h-[300px] md:min-h-[360px] bg-[#ffffff] border-2 border-[#18181b] rounded-2xl p-3 sm:p-5 relative flex flex-col items-center justify-between my-2 shadow-[4px_4px_0px_#18181b] overflow-hidden">
+    <div className="w-full flex-1 min-h-[260px] sm:min-h-[300px] md:min-h-[360px] glass-panel p-3 sm:p-5 relative flex flex-col items-center justify-between my-2 overflow-hidden shadow-2xl">
       {/* 結算完成提示列 */}
       {status === "finished" && (
-        <div className="relative z-20 w-full mb-2 p-2.5 rounded-xl bg-[#fef3c7] border-2 border-[#18181b] flex items-center justify-between text-xs text-[#18181b] animate-fade-in font-black shadow-[2px_2px_0px_#18181b]">
+        <div className="relative z-20 w-full mb-2 p-2.5 rounded-xl bg-[#1b2838] border border-[#c9a96e]/60 flex items-center justify-between text-xs text-[#c9a96e] animate-fade-in font-bold shadow-lg">
           <div className="flex items-center gap-2">
-            <Trophy className="w-4 h-4 text-[#f59e0b] animate-bounce" />
+            <Trophy className="w-4 h-4 text-[#c9a96e] animate-bounce" />
             <span>對局已完成！全部數字已揭曉驗證。</span>
           </div>
         </div>
       )}
 
       {/* 頂部狀態列 */}
-      <div className="relative z-10 w-full flex items-center justify-between px-1 py-1 text-xs border-b-2 border-slate-100 pb-2">
-        <div className="flex items-center gap-1.5 font-black text-[#18181b] text-xs sm:text-sm">
-          <Sparkles className="w-4 h-4 text-[#f59e0b]" />
+      <div className="relative z-10 w-full flex items-center justify-between px-1 py-1 text-xs border-b border-[rgba(201,169,110,0.2)] pb-2">
+        <div className="flex items-center gap-1.5 font-bold text-[#f5f0e3] text-xs sm:text-sm">
+          <Sparkles className="w-4 h-4 text-[#c9a96e]" />
           <span>
             已出牌 {board.length} / {totalSlotsCount} 張
           </span>
@@ -121,24 +121,24 @@ export function GameBoard({
           {showTopicSetting && isTopicCollapsed && (
             <button
               onClick={() => setIsTopicCollapsed(false)}
-              className="flex items-center gap-1 text-[11px] font-black text-[#18181b] bg-[#f4f1ea] hover:bg-[#e7e1d5] px-2.5 py-1 rounded-lg border-2 border-[#18181b] transition-all cursor-pointer shadow-[2px_2px_0px_#18181b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+              className="flex items-center gap-1 text-[11px] font-bold text-[#c9a96e] bg-[#162436] hover:bg-[#1f3148] px-2.5 py-1 rounded-lg border border-[rgba(201,169,110,0.4)] transition-all cursor-pointer shadow-md"
             >
-              <Eye className="w-3 h-3 text-[#f59e0b]" />
+              <Eye className="w-3 h-3 text-[#c9a96e]" />
               <span>題目：《{topic?.title || "數字排序"}》</span>
             </button>
           )}
-          <div className="text-[11px] text-slate-500 font-bold hidden md:block">
+          <div className="text-[11px] text-[#8a9bb0] hidden md:block">
             {selectedHandCard !== null ? `👉 點擊空位即可放入【${selectedHandCard}】` : "先選牌或先選位皆可"}
           </div>
         </div>
       </div>
 
-      {/* 本局主題天秤橫樑 */}
+      {/* 本局主題天秤卷軸橫樑 */}
       {showTopicSetting && !isTopicCollapsed && (
         <div className="relative z-10 w-full max-w-xl topic-scroll-banner p-3 my-1.5 text-center flex flex-col items-center animate-fade-in">
           <div className="flex items-center justify-between w-full mb-1">
-            <div className="flex items-center gap-1.5 text-xs text-[#18181b] font-black">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] border border-[#18181b]" />
+            <div className="flex items-center gap-1.5 text-xs text-[#c9a96e] font-bold">
+              <span className="w-2 h-2 rounded-full bg-[#c9a96e] animate-pulse" />
               <span>本局題目</span>
             </div>
 
@@ -146,9 +146,9 @@ export function GameBoard({
               {isHost && onRandomTopic && status === "waiting" && (
                 <button
                   onClick={onRandomTopic}
-                  className="flex items-center gap-1 text-[11px] font-black text-[#18181b] bg-[#fef3c7] hover:bg-[#fde68a] px-2.5 py-1 rounded-lg border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+                  className="flex items-center gap-1 text-[11px] font-bold text-[#c9a96e] bg-[#c9a96e]/15 hover:bg-[#c9a96e]/25 px-2.5 py-0.5 rounded border border-[#c9a96e]/40 transition-all cursor-pointer"
                 >
-                  <Dices className="w-3.5 h-3.5 text-[#f59e0b]" />
+                  <Dices className="w-3.5 h-3.5" />
                   <span>換題</span>
                 </button>
               )}
@@ -156,7 +156,7 @@ export function GameBoard({
               <button
                 onClick={() => setIsTopicCollapsed(true)}
                 title="隱藏題目"
-                className="flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-black bg-[#f4f1ea] px-2 py-1 rounded-lg border border-slate-300 transition-all cursor-pointer"
+                className="flex items-center gap-1 text-[11px] font-bold text-[#8a9bb0] hover:text-[#f5f0e3] bg-[#162436] px-2 py-0.5 rounded border border-[rgba(201,169,110,0.3)] transition-all cursor-pointer"
               >
                 <EyeOff className="w-3 h-3" />
                 <span>收合</span>
@@ -164,24 +164,24 @@ export function GameBoard({
             </div>
           </div>
 
-          <h3 className="text-base sm:text-lg font-black text-[#18181b] tracking-wide my-1">
+          <h3 className="text-base sm:text-lg font-bold text-[#f5f0e3] tracking-wide my-1 font-serif">
             {topic?.title || "純數字默契挑戰"}
           </h3>
 
-          {/* 兩端極限標尺 (冷暖色帶) */}
-          <div className="flex items-center justify-between w-full mt-1.5 pt-1.5 border-t border-slate-200 text-xs">
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#e0f2fe] text-[#0284c7] font-black border border-[#0284c7]/30 max-w-[45%] truncate">
+          {/* 兩端極限光譜標尺 */}
+          <div className="flex items-center justify-between w-full mt-1.5 pt-1.5 border-t border-[rgba(201,169,110,0.2)] text-xs">
+            <div className="flex items-center gap-1 text-[#38bdf8] font-bold max-w-[45%] truncate">
               <span>❄️ 1</span>
-              <span className="truncate">{topic?.minLabel || "最小"}</span>
+              <span className="truncate">（{topic?.minLabel || "最小"}）</span>
             </div>
 
-            <div className="flex items-center gap-1 text-[11px] text-slate-500 font-black shrink-0 px-2">
+            <div className="flex items-center gap-1 text-[11px] text-[#8a9bb0] shrink-0 px-2 font-serif">
               <span>由小到大</span>
-              <ArrowRight className="w-3 h-3 text-[#f59e0b]" />
+              <ArrowRight className="w-3 h-3 text-[#c9a96e]" />
             </div>
 
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#fee2e2] text-[#dc2626] font-black border border-[#dc2626]/30 max-w-[45%] truncate">
-              <span className="truncate">{topic?.maxLabel || "最大"}</span>
+            <div className="flex items-center gap-1 text-[#ff8e72] font-bold max-w-[45%] truncate">
+              <span className="truncate">（{topic?.maxLabel || "最大"}）</span>
               <span>100 🔥</span>
             </div>
           </div>
@@ -190,28 +190,28 @@ export function GameBoard({
 
       {/* 翻牌階段即時安全水位線 (Threshold Bar) */}
       {status === "locked" && (
-        <div className="relative z-10 w-full max-w-xl my-1 p-2.5 rounded-xl border-2 border-[#18181b] shadow-[3px_3px_0px_#18181b] animate-fade-in font-mono text-xs flex items-center justify-between transition-all bg-[#ffffff]">
+        <div className="relative z-10 w-full max-w-xl my-1 p-2.5 rounded-xl border border-[rgba(201,169,110,0.4)] shadow-xl animate-fade-in text-xs flex items-center justify-between transition-all bg-[#121c28]/95">
           {hasInversion ? (
-            <div className="flex items-center gap-2 text-[#ef4444] font-black w-full">
+            <div className="flex items-center gap-2 text-[#ff6b4a] font-bold w-full">
               <AlertCircle className="w-4 h-4 shrink-0 animate-bounce" />
               <span>
                 順序爆掉啦！第 {inversionInfo.slotIdx} 格【 {inversionInfo.nextVal} 】比前一張【 {inversionInfo.prevVal} 】還要小！
               </span>
             </div>
           ) : flippedCardsInOrder.length === 0 ? (
-            <div className="flex items-center gap-2 text-[#18181b] font-black w-full">
-              <ShieldCheck className="w-4 h-4 text-[#0ea5e9] shrink-0" />
+            <div className="flex items-center gap-2 text-[#f5f0e3] font-bold w-full">
+              <ShieldCheck className="w-4 h-4 text-[#38bdf8] shrink-0" />
               <span>翻牌開始！請點擊最有把握的格子翻開驗證</span>
             </div>
           ) : (
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-2 text-[#10b981] font-black">
+              <div className="flex items-center gap-2 text-[#34d399] font-bold">
                 <ShieldCheck className="w-4 h-4 shrink-0" />
                 <span>
-                  目前安全水位：<span className="text-base text-[#18181b] bg-[#fef3c7] px-2 py-0.5 rounded border border-[#18181b]">{currentSafeThreshold}</span>
+                  目前安全水位：<span className="text-base text-[#c9a96e] bg-[#1b2838] px-2 py-0.5 rounded border border-[#c9a96e]/40 font-mono font-black">{currentSafeThreshold}</span>
                 </span>
               </div>
-              <span className="text-[#18181b] font-bold text-[11px] bg-[#f4f1ea] px-2 py-0.5 rounded border border-slate-300">
+              <span className="text-[#8a9bb0] font-bold text-[11px] bg-[#162436] px-2 py-0.5 rounded border border-[rgba(201,169,110,0.25)]">
                 下一張必須 ≥ {currentSafeThreshold}
               </span>
             </div>
@@ -219,7 +219,7 @@ export function GameBoard({
         </div>
       )}
 
-      {/* 盤面槽位 (每列 4 槽位) */}
+      {/* 盤面槽位 (每列 4 槽位，居中排列) */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-full gap-2 sm:gap-3 min-h-[140px] my-auto">
         {slotRows.map((rowSlotIndexes, rowIndex) => (
           <div

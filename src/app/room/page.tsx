@@ -253,15 +253,15 @@ function RoomInner() {
   // 1. 暱稱未填寫阻斷
   if (!playerName) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#f5f2eb]">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#0d1b2a]">
         <AsciiWaveCanvas active={true} />
-        <div className="bg-[#ffffff] p-6 sm:p-8 max-w-sm w-full border-2 border-[#18181b] rounded-2xl flex flex-col items-center space-y-4 shadow-[6px_6px_0px_#18181b] relative z-30">
-          <div className="w-12 h-12 rounded-2xl bg-[#fef3c7] border-2 border-[#18181b] flex items-center justify-center text-xl font-black text-[#f59e0b] shadow-[2px_2px_0px_#18181b]">
+        <div className="bg-[#132238]/90 p-6 sm:p-8 max-w-sm w-full border border-[#d4af37]/40 rounded-2xl flex flex-col items-center space-y-4 shadow-[0_8px_32px_rgba(0,0,0,0.6)] relative z-30">
+          <div className="w-12 h-12 rounded-2xl bg-[#0d1b2a] border border-[#d4af37]/40 flex items-center justify-center text-xl font-black text-[#d4af37] shadow-md">
             心
           </div>
-          <h2 className="text-xl font-black text-[#18181b]">加入遊戲房間</h2>
-          <p className="text-xs text-slate-600 leading-relaxed font-medium">
-            房間暗號 <span className="font-mono font-bold text-[#f59e0b] bg-[#f4f1ea] px-1.5 py-0.5 rounded border border-slate-300">{roomId}</span>，請先輸入你的暱稱：
+          <h2 className="text-xl font-black text-white">加入遊戲房間</h2>
+          <p className="text-xs text-slate-300 leading-relaxed font-medium">
+            房間暗號 <span className="font-mono font-bold text-[#d4af37] bg-[#0d1b2a] px-1.5 py-0.5 rounded border border-[#d4af37]/30">{roomId}</span>，請先輸入你的暱稱：
           </p>
           <input
             type="text"
@@ -269,7 +269,7 @@ function RoomInner() {
             onChange={(e) => setInputNameTemp(e.target.value)}
             placeholder="請輸入暱稱..."
             maxLength={14}
-            className="w-full bg-[#f4f1ea] border-2 border-[#18181b] rounded-xl px-3 py-2.5 text-center text-sm font-black text-[#18181b] focus:outline-none focus:bg-[#ffffff]"
+            className="w-full bg-[#0d1b2a] border border-[#d4af37]/40 rounded-xl px-3 py-2.5 text-center text-sm font-bold text-white focus:outline-none focus:border-[#d4af37]"
           />
           <Button
             variant="primary"
@@ -288,11 +288,11 @@ function RoomInner() {
   // 2. 滿員阻斷檢測
   if (isOverflow) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#f5f2eb]">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#0d1b2a]">
         <AsciiWaveCanvas active={true} />
-        <div className="bg-[#ffffff] p-6 max-w-md border-2 border-[#18181b] rounded-2xl shadow-[6px_6px_0px_#18181b] relative z-30">
-          <h2 className="text-lg font-black text-[#ef4444] mb-2">房間席位已滿</h2>
-          <p className="text-xs text-slate-600 mb-4 font-medium">
+        <div className="bg-[#132238]/90 p-6 max-w-md border border-[#d4af37]/40 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] relative z-30">
+          <h2 className="text-lg font-black text-red-400 mb-2">房間席位已滿</h2>
+          <p className="text-xs text-slate-300 mb-4 font-medium">
             此房間已達人數上限 ({maxPlayers} 人)，請返回大廳選擇其他房間暗號。
           </p>
           <Button variant="primary" onClick={() => router.push("/")}>
@@ -306,14 +306,14 @@ function RoomInner() {
   // 3. 閒置斷線提示彈窗
   if (isIdle) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#f5f2eb]/90">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 text-center bg-[#0d1b2a]/95">
         <AsciiWaveCanvas active={true} />
-        <div className="bg-[#ffffff] p-6 max-w-md border-2 border-[#18181b] rounded-2xl flex flex-col items-center space-y-3 shadow-[6px_6px_0px_#18181b] relative z-30">
-          <div className="w-12 h-12 rounded-2xl bg-[#fef3c7] border-2 border-[#18181b] flex items-center justify-center text-[#f59e0b] shadow-[2px_2px_0px_#18181b]">
+        <div className="bg-[#132238]/95 p-6 max-w-md border border-[#d4af37]/40 rounded-2xl flex flex-col items-center space-y-3 shadow-[0_8px_32px_rgba(0,0,0,0.6)] relative z-30">
+          <div className="w-12 h-12 rounded-2xl bg-[#0d1b2a] border border-[#d4af37]/40 flex items-center justify-center text-[#d4af37] shadow-md">
             <Clock className="w-6 h-6" />
           </div>
-          <h2 className="text-lg font-black text-[#18181b]">閒置連線已暫停</h2>
-          <p className="text-xs text-slate-600 leading-relaxed font-medium">
+          <h2 className="text-lg font-black text-white">閒置連線已暫停</h2>
+          <p className="text-xs text-slate-300 leading-relaxed font-medium">
             超過 5 分鐘未操作，系統已自動釋放席位資源。點擊下方按鈕即可重新進入！
           </p>
           <Button
@@ -324,7 +324,7 @@ function RoomInner() {
             }}
             className="gap-2 font-bold mt-2"
           >
-            <RefreshCw className="w-4 h-4 text-[#18181b]" /> 重新進入房間
+            <RefreshCw className="w-4 h-4 text-slate-950" /> 重新進入房間
           </Button>
         </div>
       </div>
@@ -333,13 +333,13 @@ function RoomInner() {
 
   // 30 秒閒置預警浮動提示列
   const warningBannerJSX = mounted && isWarning ? (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[250] w-[92%] max-w-md bg-[#ffffff] border-2 border-[#18181b] rounded-2xl p-3 shadow-[4px_4px_0px_#18181b] flex items-center justify-between animate-fade-in">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[250] w-[92%] max-w-md bg-[#132238]/95 border border-[#d4af37]/50 rounded-2xl p-3 shadow-[0_8px_32px_rgba(0,0,0,0.8)] flex items-center justify-between animate-fade-in">
       <div className="flex items-center gap-3">
-        <AlertCircle className="w-5 h-5 text-[#f59e0b] shrink-0" />
+        <AlertCircle className="w-5 h-5 text-[#d4af37] shrink-0" />
         <div className="text-left">
-          <h4 className="text-xs font-black text-[#18181b]">即將自動離席</h4>
-          <p className="text-[11px] text-slate-600 font-bold">
-            閒置倒數 <span className="font-mono text-sm text-[#ef4444]">{remainingSeconds}</span> 秒
+          <h4 className="text-xs font-black text-white">即將自動離席</h4>
+          <p className="text-[11px] text-slate-300 font-bold">
+            閒置倒數 <span className="font-mono text-sm text-red-400 font-bold">{remainingSeconds}</span> 秒
           </p>
         </div>
       </div>
@@ -423,13 +423,13 @@ function RoomInner() {
 
       {/* 揭牌階段底部指揮列 */}
       {status === "locked" && (
-        <div className="w-full bg-[#ffffff] p-3 my-1.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 border-2 border-[#18181b] shadow-[3px_3px_0px_#18181b] animate-fade-in">
+        <div className="w-full bg-[#132238]/90 p-3 my-1.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-2 border border-[#d4af37]/40 shadow-lg animate-fade-in">
           <div className="flex items-center gap-2 text-xs">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] border border-[#18181b] animate-ping" />
-            <span className="text-[#18181b] font-black">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#d4af37] animate-ping" />
+            <span className="text-white font-bold">
               翻牌進度：已翻開 {board.filter((c) => c.flipped).length} / {board.length} 張
             </span>
-            <span className="text-slate-500 hidden md:inline text-xs font-bold">
+            <span className="text-slate-400 hidden md:inline text-xs font-medium">
               — 請點擊最有把握的卡牌翻開驗證！
             </span>
           </div>
@@ -449,8 +449,8 @@ function RoomInner() {
 
       {/* 大廳等待提示與房主開局按鈕 */}
       {(!status || status === "waiting") && (
-        <div className="w-full bg-[#ffffff] p-4 my-1.5 rounded-2xl text-center flex flex-col items-center border-2 border-[#18181b] shadow-[4px_4px_0px_#18181b]">
-          <p className="text-xs text-slate-700 font-bold mb-3">
+        <div className="w-full bg-[#132238]/90 p-4 my-1.5 rounded-2xl text-center flex flex-col items-center border border-[#d4af37]/40 shadow-lg">
+          <p className="text-xs text-slate-300 font-bold mb-3">
             {!isStorageLoaded
               ? "正在同步房間狀態..."
               : isHost
@@ -471,8 +471,8 @@ function RoomInner() {
                 !isStorageLoaded || totalPlayers < 2 ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              <span className="flex items-center gap-2 text-[#18181b]">
-                <Sparkles className="w-4 h-4 text-[#18181b]" />
+              <span className="flex items-center gap-2 text-slate-950 font-bold">
+                <Sparkles className="w-4 h-4 text-slate-950" />
                 {totalPlayers < 2 ? "等待玩家加入 (至少 2 人)" : "開始發牌"}
               </span>
             </Button>
@@ -507,7 +507,7 @@ export default function RoomPage() {
 
   if (!roomId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#f5f2eb] text-[#18181b] text-sm font-black">
+      <div className="flex items-center justify-center min-h-screen bg-[#0d1b2a] text-[#d4af37] text-sm font-black">
         正在載入房間資訊...
       </div>
     );

@@ -28,10 +28,10 @@ export function AsciiWaveCanvas({ active = true }: WaveCanvasProps) {
     let animationFrameId: number;
     let width = 0;
     let height = 0;
-    const spacing = 28; // 圓點間距
+    const spacing = 32;
 
     const ripples: Ripple[] = [];
-    const spectrumColors = ["#0ea5e9", "#10b981", "#f59e0b", "#f97316"];
+    const colors = ["#c9a96e", "#38bdf8", "#e8dcc8", "#c73e1d"];
     let colorIdx = 0;
 
     const resize = () => {
@@ -54,14 +54,14 @@ export function AsciiWaveCanvas({ active = true }: WaveCanvasProps) {
         clientY = e.clientY;
       }
 
-      if (Math.random() > 0.4) {
+      if (Math.random() > 0.45) {
         ripples.push({
           x: clientX,
           y: clientY,
           radius: 4,
-          maxRadius: 60,
-          color: spectrumColors[colorIdx % spectrumColors.length],
-          alpha: 0.45,
+          maxRadius: 70,
+          color: colors[colorIdx % colors.length],
+          alpha: 0.5,
         });
         colorIdx++;
       }
@@ -82,10 +82,10 @@ export function AsciiWaveCanvas({ active = true }: WaveCanvasProps) {
         ripples.push({
           x: clientX,
           y: clientY,
-          radius: 6 + i * 15,
-          maxRadius: 100 + i * 30,
-          color: spectrumColors[(colorIdx + i) % spectrumColors.length],
-          alpha: 0.6,
+          radius: 8 + i * 16,
+          maxRadius: 110 + i * 35,
+          color: colors[(colorIdx + i) % colors.length],
+          alpha: 0.65,
         });
       }
       colorIdx += 2;
@@ -101,29 +101,28 @@ export function AsciiWaveCanvas({ active = true }: WaveCanvasProps) {
       // 1. 更新漣漪
       for (let i = ripples.length - 1; i >= 0; i--) {
         const r = ripples[i];
-        r.radius += 2.2;
+        r.radius += 2.0;
         r.alpha *= 0.94;
         if (r.alpha < 0.02 || r.radius > r.maxRadius) {
           ripples.splice(i, 1);
         }
       }
 
-      // 2. 繪製精緻規律的暖米色點陣 (Dot Grid)
+      // 2. 繪製低調和風微粒矩陣
       ctx.save();
       for (let x = spacing / 2; x < width; x += spacing) {
         for (let y = spacing / 2; y < height; y += spacing) {
-          let dotRadius = 1.3;
-          let dotColor = "#e5dfd3";
+          let dotRadius = 1.2;
+          let dotColor = "rgba(45, 90, 123, 0.28)";
 
-          // 計算是否被漣漪波及
           for (const rip of ripples) {
             const dx = x - rip.x;
             const dy = y - rip.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             const diff = Math.abs(dist - rip.radius);
-            if (diff < 20) {
-              const strength = (1 - diff / 20) * rip.alpha;
-              dotRadius = Math.max(dotRadius, 1.3 + strength * 3.5);
+            if (diff < 22) {
+              const strength = (1 - diff / 22) * rip.alpha;
+              dotRadius = Math.max(dotRadius, 1.2 + strength * 3.8);
               dotColor = rip.color;
             }
           }
@@ -153,7 +152,7 @@ export function AsciiWaveCanvas({ active = true }: WaveCanvasProps) {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 opacity-80"
+      className="fixed inset-0 pointer-events-none z-0 opacity-70"
       style={{ touchAction: "none" }}
     />
   );

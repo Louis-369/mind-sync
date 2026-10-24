@@ -63,7 +63,7 @@ export function PlayerList({
 
   return (
     <div className="w-full flex flex-col md:flex-row items-center justify-between gap-1.5 py-1 px-1 my-0.5 relative z-20 text-xs">
-      {/* 玩家列表 (立體圓角膠囊) */}
+      {/* 玩家列表 (和風深邃微光膠囊) */}
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
         {allPlayers.map((p) => {
           const isHost = p.playerId === hostId || p.connectionId === hostId;
@@ -74,10 +74,10 @@ export function PlayerList({
             <div
               key={p.playerId}
               className={clsx(
-                "relative flex items-center space-x-1.5 px-3 py-1 rounded-xl text-xs font-bold border-2 border-[#18181b] transition-all duration-150 select-none",
+                "relative flex items-center space-x-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all duration-200 select-none",
                 isLocked
-                  ? "bg-[#d1fae5] text-[#065f46] shadow-[2px_2px_0px_#18181b]"
-                  : "bg-[#ffffff] text-[#18181b] shadow-[2px_2px_0px_rgba(24,24,27,0.3)]"
+                  ? "bg-[#064e3b]/85 border border-emerald-500/60 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+                  : "bg-[#132238]/80 border border-[#d4af37]/25 text-slate-200 shadow-sm hover:border-[#d4af37]/50"
               )}
             >
               {hasRecentReaction && (
@@ -86,15 +86,15 @@ export function PlayerList({
                 </div>
               )}
 
-              {isHost && <Crown className="w-3.5 h-3.5 text-[#f59e0b] fill-[#f59e0b] shrink-0" />}
+              {isHost && <Crown className="w-3.5 h-3.5 text-[#d4af37] fill-[#d4af37] shrink-0" />}
 
               <span className="truncate max-w-[90px] sm:max-w-[120px]">
                 {p.name} {p.isSelf ? "(我)" : ""}
               </span>
 
               {isLocked ? (
-                <span className="text-[10px] bg-[#10b981] text-white px-1.5 py-0.2 rounded font-black">
-                  ✓
+                <span className="text-[10px] bg-emerald-500 text-slate-950 px-1.5 py-0.2 rounded font-black">
+                  已鎖定
                 </span>
               ) : (
                 <span className="text-[10px] text-slate-400 font-normal">
@@ -108,7 +108,7 @@ export function PlayerList({
 
       {/* 快速反應氣泡 */}
       {onSendReaction && (
-        <div className="flex items-center gap-1 bg-[#ffffff] px-2 py-0.5 rounded-xl border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b]">
+        <div className="flex items-center gap-1 bg-[#132238]/80 px-2 py-0.5 rounded-xl border border-[#d4af37]/25 shadow-sm">
           {QUICK_REACTIONS.map((emoji) => (
             <button
               key={emoji}

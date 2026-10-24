@@ -43,15 +43,15 @@ export function HostPanel({
     <Modal isOpen={isOpen} onClose={onClose} title="房間規則設定">
       <div className="space-y-4 text-xs">
         {settings && onUpdateSettings && (
-          <div className="grid grid-cols-2 gap-3 bg-[#f4f1ea] p-3.5 rounded-2xl border-2 border-[#18181b]">
+          <div className="grid grid-cols-2 gap-3 bg-[#0d1b2a]/90 p-3.5 rounded-2xl border border-[#d4af37]/30">
             {/* 最大人數 */}
             <div className="flex flex-col">
-              <label className="text-[#18181b] mb-1.5 font-black">房間人數上限</label>
+              <label className="text-slate-300 mb-1.5 font-bold">房間人數上限</label>
               <select
                 value={settings.maxPlayers}
                 disabled={status !== "waiting"}
                 onChange={(e) => handleMaxPlayersChange(Number(e.target.value))}
-                className="bg-[#ffffff] border-2 border-[#18181b] rounded-xl px-2.5 py-1.5 text-xs font-black text-[#18181b] focus:outline-none shadow-[2px_2px_0px_#18181b] cursor-pointer"
+                className="bg-[#132238] border border-[#d4af37]/40 rounded-xl px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-[#d4af37] cursor-pointer"
               >
                 <option value={2}>2 人局 (最多 6 張/人)</option>
                 <option value={3}>3 人局 (最多 4 張/人)</option>
@@ -61,12 +61,12 @@ export function HostPanel({
 
             {/* 每人手牌數 */}
             <div className="flex flex-col">
-              <label className="text-[#18181b] mb-1.5 font-black">每人手牌張數</label>
+              <label className="text-slate-300 mb-1.5 font-bold">每人手牌張數</label>
               <select
                 value={currentCardsPerPlayer}
                 disabled={status !== "waiting"}
                 onChange={(e) => onUpdateSettings({ cardsPerPlayer: Number(e.target.value) })}
-                className="bg-[#ffffff] border-2 border-[#18181b] rounded-xl px-2.5 py-1.5 text-xs font-black text-[#18181b] focus:outline-none shadow-[2px_2px_0px_#18181b] cursor-pointer"
+                className="bg-[#132238] border border-[#d4af37]/40 rounded-xl px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-[#d4af37] cursor-pointer"
               >
                 {Array.from({ length: maxAllowedCards }, (_, i) => i + 1).map((num) => (
                   <option key={num} value={num}>
@@ -77,16 +77,16 @@ export function HostPanel({
             </div>
 
             {/* 啟用主題卷軸 */}
-            <div className="col-span-2 flex items-center justify-between pt-2.5 border-t border-slate-200">
+            <div className="col-span-2 flex items-center justify-between pt-2.5 border-t border-slate-700/60">
               <div className="flex flex-col">
-                <span className="text-[#18181b] font-black">啟用情境題目</span>
-                <span className="text-[11px] text-slate-500 font-bold">關閉後進入純數字心電感應模式</span>
+                <span className="text-white font-bold">啟用情境題目</span>
+                <span className="text-[11px] text-slate-400 font-medium">關閉後進入純數字心電感應模式</span>
               </div>
               <button
                 type="button"
                 onClick={() => onUpdateSettings({ showTopic: settings.showTopic === false ? true : false })}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors border-2 border-[#18181b] cursor-pointer ${
-                  settings.showTopic !== false ? "bg-[#10b981]" : "bg-slate-300"
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors border border-[#d4af37]/40 cursor-pointer ${
+                  settings.showTopic !== false ? "bg-emerald-600" : "bg-slate-700"
                 }`}
               >
                 <span
@@ -107,7 +107,7 @@ export function HostPanel({
             onClick={onClose}
             className="w-full flex items-center justify-center gap-1.5 font-black"
           >
-            <Check className="w-4 h-4 text-[#18181b]" /> 完成設定
+            <Check className="w-4 h-4 text-slate-950" /> 完成設定
           </Button>
         </div>
       </div>

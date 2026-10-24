@@ -62,16 +62,16 @@ export function GameStatus({
   };
 
   return (
-    <div className="w-full bg-[#ffffff] border-2 border-[#18181b] rounded-2xl px-3 py-1.5 my-1 flex items-center justify-between gap-2 shadow-[3px_3px_0px_#18181b] relative z-20">
+    <div className="w-full bg-[#132238]/85 backdrop-blur-md border border-[#d4af37]/30 rounded-2xl px-3 py-1.5 my-1 flex items-center justify-between gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.4)] relative z-20">
       {/* 左側：離開按鈕 + 房間代碼 + 暱稱 */}
       <div className="flex items-center space-x-2">
         {onLeaveRoom && (
           <button
             onClick={onLeaveRoom}
             title="離開房間"
-            className="flex items-center gap-1 text-xs font-bold text-[#18181b] bg-[#f4f1ea] hover:bg-[#e7e1d5] px-2.5 py-1 rounded-xl border-2 border-[#18181b] transition-all cursor-pointer shadow-[2px_2px_0px_#18181b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+            className="flex items-center gap-1 text-xs font-bold text-slate-300 bg-[#0d1b2a]/80 hover:bg-[#1a2e46] hover:text-white px-2.5 py-1 rounded-xl border border-slate-700 hover:border-[#d4af37]/40 transition-all cursor-pointer shadow-sm active:scale-95"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
+            <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
             <span className="hidden sm:inline">離房</span>
           </button>
         )}
@@ -80,11 +80,11 @@ export function GameStatus({
         <button
           onClick={handleCopyLink}
           title="點擊複製邀請連結"
-          className="flex items-center space-x-1.5 bg-[#fef3c7] hover:bg-[#fde68a] px-2.5 py-1 rounded-xl border-2 border-[#18181b] cursor-pointer shadow-[2px_2px_0px_#18181b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+          className="flex items-center space-x-1.5 bg-[#0d1b2a]/90 hover:bg-[#1a2e46] px-2.5 py-1 rounded-xl border border-[#d4af37]/40 hover:border-[#d4af37] cursor-pointer transition-all active:scale-95 shadow-sm"
         >
-          <span className="text-xs sm:text-sm font-black text-[#18181b] tracking-wider font-mono">{roomId}</span>
-          <span className="text-[#18181b]">
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+          <span className="text-xs sm:text-sm font-black text-[#d4af37] tracking-wider font-mono">{roomId}</span>
+          <span className="text-slate-400">
+            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
           </span>
         </button>
 
@@ -96,10 +96,10 @@ export function GameStatus({
               setIsEditModalOpen(true);
             }}
             title="點擊修改暱稱"
-            className="hidden md:flex items-center gap-1.5 text-xs font-bold text-[#18181b] bg-[#f4f1ea] hover:bg-[#e7e1d5] px-2.5 py-1 rounded-xl border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+            className="hidden md:flex items-center gap-1.5 text-xs font-bold text-slate-200 bg-[#0d1b2a]/70 hover:bg-[#1a2e46] px-2.5 py-1 rounded-xl border border-slate-700/80 hover:border-[#d4af37]/40 transition-all cursor-pointer"
           >
-            <span className="truncate max-w-[100px] text-[#b45309]">{playerName}</span>
-            <Edit3 className="w-3 h-3 text-[#b45309]" />
+            <span className="truncate max-w-[100px] text-amber-300 font-bold">{playerName}</span>
+            <Edit3 className="w-3 h-3 text-amber-400" />
           </button>
         )}
       </div>
@@ -113,7 +113,7 @@ export function GameStatus({
               setIsEditModalOpen(true);
             }}
             title="修改暱稱"
-            className="md:hidden p-1.5 bg-[#f4f1ea] text-[#b45309] rounded-xl border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b]"
+            className="md:hidden p-1.5 bg-[#0d1b2a]/70 text-amber-300 rounded-xl border border-slate-700"
           >
             <Edit3 className="w-3.5 h-3.5" />
           </button>
@@ -123,15 +123,15 @@ export function GameStatus({
         <button
           onClick={handleToggleMute}
           title={muted ? "開啟音效" : "靜音"}
-          className="p-1.5 bg-[#f4f1ea] hover:bg-[#e7e1d5] text-[#18181b] rounded-xl border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+          className="p-1.5 bg-[#0d1b2a]/80 hover:bg-[#1a2e46] text-slate-300 rounded-xl border border-slate-700/80 hover:border-[#d4af37]/40 transition-all active:scale-95 cursor-pointer"
         >
-          {muted ? <VolumeX className="w-3.5 h-3.5 text-slate-400" /> : <Volume2 className="w-3.5 h-3.5 text-[#f59e0b]" />}
+          {muted ? <VolumeX className="w-3.5 h-3.5 text-slate-500" /> : <Volume2 className="w-3.5 h-3.5 text-[#d4af37]" />}
         </button>
 
         {/* 人數席位 */}
-        <div className="flex items-center space-x-1 text-[#18181b] bg-[#f4f1ea] px-2.5 py-1 rounded-xl border-2 border-[#18181b] font-black shadow-[2px_2px_0px_#18181b]">
-          <Users className="w-3.5 h-3.5 text-[#f59e0b]" />
-          <span className="text-[11px] sm:text-xs">{`${connectedCount}/${maxPlayers}`} 人席</span>
+        <div className="flex items-center space-x-1 text-slate-200 bg-[#0d1b2a]/80 px-2.5 py-1 rounded-xl border border-slate-700/80 font-bold">
+          <Users className="w-3.5 h-3.5 text-[#d4af37]" />
+          <span className="text-[11px] sm:text-xs font-mono">{`${connectedCount}/${maxPlayers}`} 人席</span>
         </div>
 
         {/* 房主設定按鈕 */}
@@ -139,9 +139,9 @@ export function GameStatus({
           <button
             onClick={onOpenHostPanel}
             title="房主規則設定"
-            className="p-1.5 bg-[#fef3c7] hover:bg-[#fde68a] text-[#b45309] rounded-xl border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+            className="p-1.5 bg-[#0d1b2a]/90 hover:bg-[#1a2e46] text-amber-300 rounded-xl border border-[#d4af37]/40 hover:border-[#d4af37] transition-all active:scale-95 cursor-pointer"
           >
-            <Settings className="w-3.5 h-3.5" />
+            <Settings className="w-3.5 h-3.5 text-amber-300" />
           </button>
         )}
       </div>
@@ -153,7 +153,7 @@ export function GameStatus({
         title="修改暱稱"
       >
         <div className="space-y-4 text-center pt-1">
-          <p className="text-xs text-slate-600 font-medium">
+          <p className="text-xs text-slate-400 font-medium">
             請輸入新的暱稱，修改後將同步更新給所有玩家。
           </p>
 
@@ -163,7 +163,7 @@ export function GameStatus({
             onChange={(e) => setTempName(e.target.value)}
             maxLength={14}
             placeholder="請輸入暱稱..."
-            className="w-full bg-[#f4f1ea] border-2 border-[#18181b] rounded-xl px-3 py-2 text-center text-sm font-black text-[#18181b] focus:outline-none focus:bg-[#ffffff]"
+            className="w-full bg-[#0d1b2a] border border-[#d4af37]/40 rounded-xl px-3 py-2 text-center text-sm font-bold text-white focus:outline-none focus:border-[#d4af37]"
           />
 
           <div className="flex items-center justify-end gap-2 pt-2">

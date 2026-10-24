@@ -142,11 +142,11 @@ export function ResultOverlay({
       <div className="game-action-bar animate-fade-in relative z-20">
         {isHost ? (
           <Button variant="primary" size="md" onClick={onRestart}>
-            <RotateCcw className="w-4 h-4 text-[#18181b] mr-1" /> 再來一局
+            <RotateCcw className="w-4 h-4 text-slate-950 mr-1" /> 再來一局
           </Button>
         ) : (
-          <div className="flex items-center gap-2 bg-[#ffffff] px-4 py-2 rounded-xl border-2 border-[#18181b] text-xs font-black text-[#18181b] shadow-[2px_2px_0px_#18181b]">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] border border-[#18181b] animate-ping" />
+          <div className="flex items-center gap-2 bg-[#132238]/90 px-4 py-2 rounded-xl border border-[#d4af37]/40 text-xs font-bold text-slate-200 shadow-md">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#d4af37] animate-ping" />
             <span>等待房主開始下一局...</span>
           </div>
         )}
@@ -157,29 +157,31 @@ export function ResultOverlay({
   if (!mounted) return null;
 
   const modalJSX = (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in pointer-events-auto">
-      <div className="bg-[#ffffff] border-2 border-[#18181b] rounded-3xl p-6 sm:p-8 text-center shadow-[8px_8px_0px_#18181b] relative w-full max-w-md my-auto flex flex-col items-center">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fade-in pointer-events-auto">
+      <div className="w-full max-w-md bg-[#132238]/95 border-2 border-[#d4af37]/50 rounded-3xl p-6 sm:p-8 text-center shadow-[0_12px_40px_rgba(0,0,0,0.8),inset_0_0_20px_rgba(212,175,55,0.1)] relative my-auto flex flex-col items-center">
         {/* 圖示徽章 */}
         <div
-          className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black mb-3 shadow-[3px_3px_0px_#18181b] border-2 border-[#18181b] ${
-            isWin ? "bg-[#d1fae5] text-[#059669]" : "bg-[#fee2e2] text-[#dc2626]"
+          className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black mb-3 border shadow-md ${
+            isWin
+              ? "bg-emerald-950/80 border-emerald-500/60 text-emerald-400"
+              : "bg-red-950/80 border-red-500/60 text-red-400"
           }`}
         >
           {isWin ? <CheckCircle2 className="w-9 h-9" /> : <AlertTriangle className="w-9 h-9" />}
         </div>
 
-        <h2 className={`text-xl sm:text-2xl font-black mb-1 tracking-wide ${isWin ? "text-[#059669]" : "text-[#dc2626]"}`}>
+        <h2 className={`text-xl sm:text-2xl font-black mb-1 tracking-wide ${isWin ? "text-emerald-300" : "text-red-400"}`}>
           {resultTitle}
         </h2>
 
         {/* 默契同步率膠囊 */}
-        <div className="flex items-center gap-2 my-2 bg-[#f4f1ea] px-4 py-1.5 rounded-full border-2 border-[#18181b] shadow-[2px_2px_0px_#18181b]">
-          <span className="text-xs font-bold text-slate-600">默契同步率</span>
-          <span className="text-lg font-black text-[#f59e0b] font-mono">{syncRate}%</span>
+        <div className="flex items-center gap-2 my-2 bg-[#0d1b2a]/90 px-4 py-1.5 rounded-full border border-[#d4af37]/40 shadow-sm">
+          <span className="text-xs font-bold text-slate-400">心靈同步率</span>
+          <span className="text-lg font-black text-[#d4af37] font-mono">{syncRate}%</span>
         </div>
 
         {/* 評語 */}
-        <p className="text-xs sm:text-sm text-slate-700 font-bold my-3 max-w-xs leading-relaxed bg-[#f4f1ea] p-3.5 rounded-2xl border-2 border-[#18181b] text-left shadow-[2px_2px_0px_#18181b]">
+        <p className="text-xs sm:text-sm text-slate-200 font-medium my-3 max-w-xs leading-relaxed bg-[#0d1b2a]/80 p-3.5 rounded-2xl border border-slate-700/80 text-left">
           {detailRoast}
         </p>
 
@@ -193,12 +195,12 @@ export function ResultOverlay({
           >
             {copiedReport ? (
               <>
-                <Check className="w-4 h-4 text-emerald-600" />
+                <Check className="w-4 h-4 text-emerald-400" />
                 <span>已複製戰報！快貼給朋友看</span>
               </>
             ) : (
               <>
-                <Share2 className="w-3.5 h-3.5 text-[#f59e0b]" />
+                <Share2 className="w-3.5 h-3.5 text-[#d4af37]" />
                 <span>複製本局戰報分享</span>
               </>
             )}
@@ -217,10 +219,10 @@ export function ResultOverlay({
 
             {isHost ? (
               <Button variant="primary" size="md" onClick={onRestart} className="w-full sm:w-auto text-xs font-black">
-                <RotateCcw className="w-3.5 h-3.5 text-[#18181b] mr-1" /> 再來一局
+                <RotateCcw className="w-3.5 h-3.5 text-slate-950 mr-1" /> 再來一局
               </Button>
             ) : (
-              <div className="text-xs text-slate-500 font-bold py-1 px-2">
+              <div className="text-xs text-slate-400 font-bold py-1 px-2">
                 等待房主開新局...
               </div>
             )}

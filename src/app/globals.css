@@ -4,67 +4,76 @@
 
 @layer base {
   body {
-    background-color: #f5f2eb;
-    color: #18181b;
+    background-color: #0d1b2a;
+    color: #e8dcc8;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Noto Sans TC", sans-serif;
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
     user-select: none;
     -webkit-user-select: none;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.085 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E"),
+      radial-gradient(circle at 50% 10%, rgba(45, 90, 123, 0.45) 0%, transparent 65%),
+      radial-gradient(circle at 80% 90%, rgba(13, 27, 42, 0.95) 0%, transparent 65%);
+    background-attachment: fixed;
   }
 }
 
-/* 實體玩具風 (Tactile Pop) 面板與按鈕 */
-.toy-panel {
-  background-color: #ffffff !important;
-  border: 2px solid #18181b !important;
-  box-shadow: 4px 4px 0px #18181b !important;
-  border-radius: 16px !important;
-  color: #18181b !important;
+/* 浮世繪和風和紙面板 (深海夜空 + 和紙質紋 + 柔和金箔微光) */
+.glass-panel {
+  background: rgba(23, 34, 48, 0.92) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(201, 169, 110, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(245, 240, 227, 0.1) !important;
+  border-radius: 14px !important;
+  color: #f5f0e3 !important;
 }
 
-.toy-panel-subtle {
-  background-color: #faf8f5 !important;
-  border: 1.5px solid #d4cebe !important;
+/* 和風主題卷軸橫樑 (燙金邊框) */
+.topic-scroll-banner {
+  background: linear-gradient(135deg, rgba(27, 40, 56, 0.95) 0%, rgba(13, 27, 42, 0.92) 100%) !important;
+  border: 1px solid rgba(201, 169, 110, 0.45) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(201, 169, 110, 0.1) !important;
   border-radius: 12px !important;
 }
 
-.toy-btn-press {
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-.toy-btn-press:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px #18181b !important;
-}
-
-/* 題目橫幅 (醒目亮黃實體框) */
-.topic-scroll-banner {
-  background: #ffffff !important;
-  border: 2px solid #18181b !important;
-  box-shadow: 3px 3px 0px #18181b !important;
-  border-radius: 14px !important;
-}
-
-/* 卡牌背面 (未翻開：深海藍底 + 活力明黃粗邊框 + 心印) */
-.toy-card-back {
-  background-color: #1e293b !important;
-  border: 2px solid #18181b !important;
-  box-shadow: 3px 3px 0px #18181b !important;
-  color: #f59e0b !important;
+/* 100% 完全不透明天然和紙實體卡牌正面 (和紙纖維質感 + 墨黑數字 + 動態金箔光) */
+.washi-card-front {
+  background-color: #f6efe0 !important;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E"),
+    linear-gradient(135deg, #fdfbf7 0%, #f4ede0 50%, #e6d7bf 100%) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(201, 169, 110, 0.5) !important;
+  border: 1px solid rgba(201, 169, 110, 0.6) !important;
   border-radius: 10px !important;
+  color: #1a1a1a !important;
 }
 
-/* 卡牌正面 (純白實體卡面 + 粗黑大數字 + 4px 硬陰影) */
-.toy-card-front {
-  background-color: #ffffff !important;
-  border: 2px solid #18181b !important;
-  box-shadow: 3px 3px 0px #18181b !important;
-  color: #18181b !important;
+/* 卡牌背面 (深海藍夜空 + 燙金邊框 + 幾何古紋) */
+.ukiyo-card-back {
+  background-color: #162436 !important;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='washiGrain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23washiGrain)'/%3E%3C/svg%3E") !important;
+  border: 1.5px solid rgba(201, 169, 110, 0.65) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 0 12px rgba(201, 169, 110, 0.15) !important;
   border-radius: 10px !important;
+  color: #c9a96e !important;
 }
 
-/* 3D 卡片翻轉效果 (支援 Safari / iOS WebKit) */
+/* 日式朱紅「確」落款印章 */
+.ukiyo-seal {
+  background: #c73e1d !important;
+  color: #fdfbf7 !important;
+  border-radius: 6px !important;
+  font-family: 'Noto Serif JP', 'Songti TC', serif !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 10px rgba(199, 62, 29, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+}
+
+/* 3D 卡片翻轉效果 (支援 Safari / iOS WebKit 零穿透) */
 .perspective-1000 {
   perspective: 1000px;
   -webkit-perspective: 1000px;
@@ -85,35 +94,30 @@
   -webkit-transform: rotateY(180deg);
 }
 
-/* 鎖定狀態標籤 */
-.toy-seal {
-  background: #10b981 !important;
-  color: #ffffff !important;
-  border: 1.5px solid #18181b !important;
-  box-shadow: 2px 2px 0px #18181b !important;
-  border-radius: 6px !important;
-  font-weight: 800 !important;
-}
-
-/* 鎖定階段聚光遮罩 */
+/* 鎖定階段聚光暗角 */
 .stage-vignette-locked {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 5;
-  background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.08) 0%, rgba(24, 24, 27, 0.25) 100%);
+  background: radial-gradient(circle at 50% 45%, transparent 30%, rgba(10, 18, 30, 0.85) 100%);
+  box-shadow: inset 0 0 100px rgba(201, 169, 110, 0.12);
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-/* 錯誤牌抽搐動效 */
-.animate-error-shake {
-  animation: errorShake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+/* ASCII Glitch 抽搐動效 (紅藍色差) */
+.animate-ascii-glitch {
+  animation: asciiGlitch 0.22s steps(2) infinite;
+  text-shadow: -2px 0 rgba(199, 62, 29, 0.9), 2px 0 rgba(45, 90, 123, 0.9);
+  filter: drop-shadow(0 0 6px rgba(199, 62, 29, 0.6));
 }
 
-@keyframes errorShake {
-  10%, 90% { transform: translate3d(-1px, 0, 0) rotate(-1deg); }
-  20%, 80% { transform: translate3d(2px, 0, 0) rotate(2deg); }
-  30%, 50%, 70% { transform: translate3d(-3px, 0, 0) rotate(-2deg); }
-  40%, 60% { transform: translate3d(3px, 0, 0) rotate(1deg); }
+@keyframes asciiGlitch {
+  0% { transform: translate(0) scale(1.05); }
+  25% { transform: translate(-2px, 1.5px) scale(1.08); }
+  50% { transform: translate(2px, -1.5px) scale(0.98); }
+  75% { transform: translate(-1.5px, -2px) scale(1.05); }
+  100% { transform: translate(0) scale(1.05); }
 }
 
 @keyframes reactionPop {
@@ -129,21 +133,21 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.15s ease-out forwards;
+  animation: fadeIn 0.18s ease-out forwards;
 }
 
-/* 滾動條 */
+/* 自訂極簡和風捲軸 */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5f2eb;
+  background: #0d1b2a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d4cebe;
+  background: #2d5a7b;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #f59e0b;
+  background: #c9a96e;
 }
